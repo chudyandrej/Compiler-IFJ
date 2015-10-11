@@ -1,57 +1,52 @@
-<program>  -> <body_program>
+ 1. <program>      -> <body_program>
 
-<body_program> -> <function> <body_program>
-<body_program> -> <command> <body_program>
-<body_program> -> e
+ 2. <body_program> -> <function> <body_program>
+ 3. <body_program> -> <command> <body_program>
+ 4. <body_program> -> e
 
-<function> -> <type> ID ( <parameters> ) <def_function>
-<def_function> ;
-<def_function> { <body>  }
+ 5. <function>     -> <type> ID ( <parameters> ) <def_function>
+ 6. <def_function> -> ;
+ 7. <def_function> -> { <body>  }
 
-<parameters>   -> <type> ID <parameters_n>
-<parameters>   -> e
-<parameters_n> -> , <type> ID <parameters_n>
-<parameters_n> -> e
+ 8. <parameters>   -> <type> ID <parameters_n>
+ 9. <parameters>   -> e
+10. <parameters_n> -> , <type> ID <parameters_n>
+11. <parameters_n> -> e
 
-<type> -> int
-<type> -> double
-<type> -> string
-<type> -> auto
+12. <type> -> int
+13. <type> -> double
+14. <type> -> string
+15. <type> -> auto
 
-<command>    -> ID <command_n>			//fill variable or call function 
-<command_n>  -> = <assign> ;			//fill var
-<command_n>  -> ( <parameters> ) ;		//call function
+16. <command>    -> ID <command_n>			//fill variable or call function 
+17. <command_n>  -> = <assign> ;			//fill var
+18. <command_n>  -> ( <parameters> ) ;		       //call function
 
-<command>    -> cin >> ID ;
-<command>    -> cout << <term> <next_param> ;
-<next_param> -> e
-<next_param> -> << <term> <next_cout>
+19. <command>    -> cin >> ID ;
+20. <command>    -> cout << <term> <next_param> ;
+21. <next_param> -> e
+22. <next_param> -> << <term> <next_param>
 
-<command>  -> if ( expression ) { <body> } <else> 
-<else>     -> else { <body> }
-<else>     -> e
+23. <command>  -> if ( expression ) { <body> } <else> 
+24. <else>     -> else { <body> }
+25. <else>     -> e
 
-<command>  -> for ( <for_exp> ; <for_exp> ; <for_exp> ) { <body> }
-<for_exp>  -> e
-<for_exp>  -> <term>
+26. <command>  -> for ( <for_exp> ; <for_exp> ; <for_exp> ) { <body> }
+27. <for_exp>  -> e
+28. <for_exp>  -> <term>
 
-<assign>  -> expression
-<assign>  -> <term>
+29. <assign>  -> expression
+30. <assign>  -> <term>
 
-<term>    -> <value>
-<term>    -> ID <is_func>  
-<is_func> -> ( <parameters> )
-<is_func> -> e 
+31. <term>    -> <value>
+32. <term>    -> ID <is_func>  
+33. <is_func> -> ( <parameters> )
+34. <is_func> -> e 
 
-<value>   -> string
-<value>   -> number
+35. <value>   -> string
+36. <value>   -> number
 
-<body> <command> <body>
-<body> e
+37. <body>  -> <command> <body>
+38. <body>  -> e
  
-
-
-<body> ->
-
-
  
