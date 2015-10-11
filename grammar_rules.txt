@@ -1,0 +1,57 @@
+<program>  -> <body_program>
+
+<body_program> -> <function> <body_program>
+<body_program> -> <command> <body_program>
+<body_program> -> e
+
+<function> -> <type> ID ( <parameters> ) <def_function>
+<def_function> ;
+<def_function> { <body>  }
+
+<parameters>   -> <type> ID <parameters_n>
+<parameters>   -> e
+<parameters_n> -> , <type> ID <parameters_n>
+<parameters_n> -> e
+
+<type> -> int
+<type> -> double
+<type> -> string
+<type> -> auto
+
+<command>    -> ID <command_n>			//fill variable or call function 
+<command_n>  -> = <assign> ;			//fill var
+<command_n>  -> ( <parameters> ) ;		//call function
+
+<command>    -> cin >> ID ;
+<command>    -> cout << <term> <next_param> ;
+<next_param> -> e
+<next_param> -> << <term> <next_cout>
+
+<command>  -> if ( expression ) { <body> } <else> 
+<else>     -> else { <body> }
+<else>     -> e
+
+<command>  -> for ( <for_exp> ; <for_exp> ; <for_exp> ) { <body> }
+<for_exp>  -> e
+<for_exp>  -> <term>
+
+<assign>  -> expression
+<assign>  -> <term>
+
+<term>    -> <value>
+<term>    -> ID <is_func>  
+<is_func> -> ( <parameters> )
+<is_func> -> e 
+
+<value>   -> string
+<value>   -> number
+
+<body> <command> <body>
+<body> e
+ 
+
+
+<body> ->
+
+
+ 
