@@ -7,7 +7,7 @@
 <command> -> cout << <value> <multiple_cout> ;
 <command> -> return <value> ;
 <command> -> if ( <value> ) { <body } <else>
-<command> -> for ( <for_def> ; <value> ; <for_assign> )
+<command> -> for ( <for_def> ; <value> ; <for_assign> ) { <body> }
 <command> -> length(string ID)
 <command> -> substr(string ID, int ID, int ID)
 <command> -> concat(string ID, string ID)
