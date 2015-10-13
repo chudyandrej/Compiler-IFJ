@@ -1,8 +1,7 @@
 <program> -> <body_program>
 <declaration_var> -> <type> ID <dec>
 <declaration_func> -> <type> ID <body_func> 
-<assign> -> ID = value <multiple_assign> ;
-<func_call> -> ID ( <parameters_used> ) ;
+<assign_func> -> ID <a_f>
 <command> -> cin >> value <multiple_cin> ;
 <command> -> cout << value <multiple_cout> ;
 <command> -> return value ;
@@ -13,6 +12,9 @@
 <command> -> concat ( value , value ) ;
 <command> -> find ( value , value ) ;
 <command> -> sort ( value ) ;
+
+<a_f> -> = value <multiple_assign> ;
+<a_f> -> ( <parameters_used> ) ;
 
 <for_assign> -> ID = value
 <for_def> -> <type> ID <for_a>
@@ -56,8 +58,7 @@
 
 
 <body> -> <command> <body>
-<body> -> <func_call> <body>
-<body> -> <assign> <body>
+<body> -> <assign_func> <body>
 <body> -> <declaration_var> <body>
 <body> -> $
 
