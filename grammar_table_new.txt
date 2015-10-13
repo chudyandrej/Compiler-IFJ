@@ -7,9 +7,18 @@
 <command> -> cout << <value> <multiple_cout> ;
 <command> -> return <value> ;
 <command> -> if ( <value> ) { <body } <else>
+<command> -> for ( <for_def> ; <value> ; <for_assign> )
+<command> -> length(string ID)
+<command> -> substr(string ID, int ID, int ID)
+<command> -> concat(string ID, string ID)
+<command> -> find(string ID, string ID)
+<command> -> sort(string ID)
 
 
-		<command> -> for ( ;  ; )
+<for_assign> -> ID = <value>
+<for_def> -> <type> ID <for_a>
+<for_a> -> = <value> 
+<for_a> -> e
 
 <else> else { <body> }
 <else> e
@@ -35,9 +44,13 @@
 <type> -> auto
 <type> -> string
 
-<value> -> string 
-<value> -> ID( <parameters_used> ) 
-<value> -> expression 
+<value> -> string <more_val>
+<value> -> <func_val> <more_val> 
+<value> -> number <more_val>
+<more_val> -> e
+<more_val> -> <op> <value>
+
+<func_val> -> ID( <parameters_used> ) 
 
 <parameters>   -> <type> ID <parameters_n>
 <parameters>   -> e
