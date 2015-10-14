@@ -42,3 +42,5 @@ CMakeCache.txt
 CMakeCache.cmake
 compiler
 Makefile
+CMakeLists.txt
+cmake_install.cmake
