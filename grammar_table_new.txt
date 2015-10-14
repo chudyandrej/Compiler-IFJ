@@ -1,30 +1,39 @@
-<program>      -> <body_program>
+<program> -> <body_program>
 <declaration_var> -> <type> ID <dec>
 <declaration_func> -> <type> ID <body_func> 
-<assign> -> ID = <value> <multiple_assign> ;
-<func_call> -> ID ( <parameters_used> ) ;
-<command> -> cin >> ID <multiple_cin>;
-<command> -> cout << <value> <multiple_cout> ;
-<command> -> return <value> ;
-<command> -> if ( <value> ) { <body } <else>
+<assign_func> -> ID <a_f>
+<command> -> cin >> value <multiple_cin> ;
+<command> -> cout << value <multiple_cout> ;
+<command> -> return value ;
+<command> -> if ( value ) { <body> } <else> 
+<command> -> for ( <for_def> ; value ; <for_assign> ) { <body> }
+<command> -> length ( value ) ;
+<command> -> substr ( value , value , value ) ;
+<command> -> concat ( value , value ) ;
+<command> -> find ( value , value ) ;
+<command> -> sort ( value ) ;
 
+<a_f> -> = value <multiple_assign> ;
+<a_f> -> ( <parameters_used> ) ;
 
-		<command> -> for ( ;  ; )
+<for_assign> -> ID = value
+<for_def> -> <type> ID <for_a>
+<for_a> -> = value
+<for_a> -> $
 
 <else> else { <body> }
-<else> e
+<else> $
+<multiple_cin> -> >> value <multiple_cin>
+<multiple_cin> -> $
 
-<multiple_cin> -> >> ID <multiple_cin>
-<multiple_cin> -> e
-
-<multiple_cout> -> << <value> <multiple_cout>
-<multiple_cout> e 
+<multiple_cout> -> << value <multiple_cout>
+<multiple_cout> $
 
 <multiple_assign> -> = ID <multiple_assign>
-<multiple_assign> -> e
+<multiple_assign> -> $
 
 <dec> -> ; 
-<dec> -> = <value> ;
+<dec> -> = value ;
 
 <body_func> -> ( <parameters> ) <func>
 <func> -> ;
@@ -35,31 +44,23 @@
 <type> -> auto
 <type> -> string
 
-<value> -> string 
-<value> -> ID( <parameters_used> ) 
-<value> -> expression 
+<func_val> -> ID ( <parameters_used> ) 
 
 <parameters>   -> <type> ID <parameters_n>
-<parameters>   -> e
+<parameters>   -> $
 <parameters_n> -> , <type> ID <parameters_n>
-<parameters_n> -> e
+<parameters_n> -> $
 
-<parameters_used> -> ID <parameters_used_n>
-<parameters_used> -> e
-<parameters_used_n> -> , ID <parameters_used_n>
-<parameters_used_n> -> e
+<parameters_used> -> value <parameters_used_n>
+<parameters_used> -> $
+<parameters_used_n> -> , value
+<parameters_used_n> -> $
 
 
 <body> -> <command> <body>
-<body> -> <func_call> <body>
-<body> -> <assign> <body>
+<body> -> <assign_func> <body>
 <body> -> <declaration_var> <body>
-<body> -> e
+<body> -> $
 
 <body_program> -> <declaration_func> <body_program>
-<body_program> -> e
-wefsef
-efsefg
-seg
-sege
-g
+<body_program> -> $
