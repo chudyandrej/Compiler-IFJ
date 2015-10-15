@@ -35,6 +35,9 @@ int kokot(){
 
     return 0;
 }
+int pica(){
+    
+}
 
 
 void add_to_queue(char* Lexeme, char* category) {
