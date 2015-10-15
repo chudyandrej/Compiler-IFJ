@@ -8,11 +8,15 @@
 
 int func(){
     printf("Hello\n");
-    printf("hellow2");
-    printf("hhhelslskjdff\n");
     
     return 0;
 }
+int fuck(){
+    printf("Hello\n");
+
+    return 0;
+}
+
 
 void add_to_queue(char* Lexeme, char* category) {
     struct token *new_token;
