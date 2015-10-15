@@ -8,6 +8,8 @@
 
 int func(){
     printf("Hello\n");
+    printf("hellow2");
+    printf("hhhelslskjdff\n");
     
     return 0;
 }
