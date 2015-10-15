@@ -1,15 +1,12 @@
 
 #include "fake_skener.h"
+#include "syntax_checker.h"
 
 
 int main(int argc, char *argv[]) {
 
     set_quae();
-    printf("%s",next_token()->Lexeme);
-    printf("%s",next_token()->Lexeme);
-    printf("%s",next_token()->Lexeme);
-    printf("%s",next_token()->Lexeme);
-
+    start_syntax_analyz();
 
     return 0;
 }

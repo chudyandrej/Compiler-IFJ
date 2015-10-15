@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 project(interpret)
 
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c++11 ")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  ")
 set(SOURCE_FILES main.c)
 add_executable(interpret ${SOURCE_FILES} fake_skener.h fake_skener.c syntax_checker.h syntax_checker.c)
 if(CMAKE_COMPILER_IS_GNUCXX)
