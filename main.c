@@ -1,19 +1,15 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
+
+#include "fake_skener.h"
 
 
-int main (int argc, char *argv[]){
-    
-   int c;
-	if (argc < 2){
-		fprintf(stdout,"Usage: %s number\n",argv[0]);
-		return 1;
-	}
-	
-	double inputValue = atof(argv[1]);
-	
-	fprintf(stdout,"Theof %g is \n",inputValue);
-  
-  	return 0;
-} 
+int main(int argc, char *argv[]) {
+
+    set_quae();
+    printf("%s",next_token()->Lexeme);
+    printf("%s",next_token()->Lexeme);
+    printf("%s",next_token()->Lexeme);
+    printf("%s",next_token()->Lexeme);
+
+
+    return 0;
+}
