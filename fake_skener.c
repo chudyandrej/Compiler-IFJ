@@ -5,7 +5,11 @@
 
 
 #include "fake_skener.h"
-
+int func234(){ 
+    printf("hope work\n");
+   
+    return 0;
+}
 int func(){ 
     printf("Hello\n");
    printf("Hello\n");
