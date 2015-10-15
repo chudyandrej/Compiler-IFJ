@@ -8,7 +8,9 @@
 
 int func(){
     printf("Hello\n");
-    
+   printf("Hello\n");
+   printf("Hello\n");
+   printf("Hello\n");
     return 0;
 }
 int fuck(){
