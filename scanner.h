@@ -50,9 +50,7 @@ typedef enum TokenType {
 
 
     TT_IDENTIFIER,
-    TT_INT,
-    TT_DOUBLE,
-    TT_STRING,
+    TT_KEYWORD,
 
     TT_TEXT,
 
@@ -124,6 +122,6 @@ char * keywords[] = {
 
 
 char * check_keywords(string * str);
-tTokenType  get_token(FILE * fp, tToken * token);
+tToken get_token(FILE * fp);
 
 #endif // SCANNER_H_INCLUDED

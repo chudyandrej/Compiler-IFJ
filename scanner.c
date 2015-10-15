@@ -19,14 +19,14 @@
  * Author: Bayer Jan, Kopec Maros
  * Description: Scan input for next token
  * 
- * type: tTokenType
+ * type: tToken
  * param 'FILE * fp': file descriptor for input
- * param 'tToken * token': pointer to token, through which function returns token
- * returns: type of token and token by pointer in param
+ * returns: next token
  */
-tTokenType  get_token(FILE * fp, tToken * token) {
+tToken get_token(FILE * fp) {
     sState state = S_START;
     string * str_tmp;
+    tToken token;
     char c;
 
     while(1) {
@@ -84,9 +84,12 @@ tTokenType  get_token(FILE * fp, tToken * token) {
                 else if (isspace(c)) state = S_SLASH;
                 else if (isalnum(c)) {
                     token->type = TT_DIV;
-                    return TT_DIV;
+                    return token;
                 }
-                else return TT_UNKOWN;
+                else {
+                    token->type = TT_UNKNOWN;
+                    return token;
+                }
             break;
             
             /*case S_STRING:
@@ -137,11 +140,12 @@ tTokenType  get_token(FILE * fp, tToken * token) {
                 else {
                     ungetc(c, fp);
                     if (check_keywords(str_tmp) == '\0') {
-                        return TT_IDENTIFIER;
+                        token->type = TT_IDENTIFIER;
+                        return token;
                     }
-                    token->type = TT_IDENTIFIER;
+                    token->type = TT_KEYWORD;
                     str_copy_string_wr(token->str, str_tmp);
-                    return TT_IDENTIFIER;
+                    return token;
                 }
             break;
         }
