@@ -6,7 +6,7 @@
 
 #include "fake_skener.h"
 
-int func(){
+int func(){ 
     printf("Hello\n");
    printf("Hello\n");
    printf("Hello\n");
