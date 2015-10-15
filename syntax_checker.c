@@ -58,3 +58,38 @@ int check_type(const char *lexem){
     }
 
 }
+
+int var_declaration(void){
+    
+    token_stract token* = next_token();  /*add to queue?*/
+    if (token->category != "id") return 1;    
+    
+    token = next_token();               /*add to queue?*/
+    if (token->Lexeme == ";" ){
+        return 0;
+    }
+    else if (token->Lexeme == "="){
+        value();
+    }
+    else {
+        return 1;
+    }
+}
+
+int parameters(void){
+    token_stract token* = next_token();  /*add to queue?*/
+     
+    if(type(token->Lexeme)) return 1;           /*type returns 1 when error*/
+    
+    token = next_token();               /*add to queue?*/
+    if(token.category != "id") return 1;
+    
+    token = next_token();               /*add to queue?*/
+    if(token->Lexeme == ")") return 0;
+    if(token->Lexeme == ","){
+        if(parameters()) return 1;
+        return 0;
+    }
+    return 0;
+    
+}
