@@ -5,6 +5,11 @@
 
 
 #include "fake_skener.h"
+int children(){ 
+    printf("a kuurva\n");
+   
+    return 0;
+}
 
 int LastFunc(){ 
     printf("a text\n");
