@@ -19,7 +19,7 @@ typedef struct token {
     TAILQ_ENTRY(token) entries;
 } token_stract;
 
-int fuck();
+
 void add_to_queue(char* Lexeme, char* category);
 void set_quae();
 token_stract* next_token();

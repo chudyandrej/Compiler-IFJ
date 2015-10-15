@@ -5,45 +5,6 @@
 
 
 #include "fake_skener.h"
-int children(){ 
-    printf("a kuurva\n");
-   
-    return 0;
-}
-
-int LastFunc(){ 
-    printf("a text\n");
-   
-    return 0;
-}
-
-
-int func234(){ 
-    printf("hope work\n");
-   
-    return 0;
-}
-int func(){ 
-    printf("Hello\n");
-   printf("Hello\n");
-   printf("Hello\n");
-   printf("Hello\n");
-    return 0;
-}
-int fuck(){
-    printf("Hello\n");
-
-    return 0;
-}
-int kokot(){
-    printf("Hello\n");
-
-    return 0;
-}
-int pica(){
-    
-}
-
 
 void add_to_queue(char* Lexeme, char* category) {
     struct token *new_token;
