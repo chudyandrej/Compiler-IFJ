@@ -30,6 +30,11 @@ int fuck(){
 
     return 0;
 }
+int kokot(){
+    printf("Hello\n");
+
+    return 0;
+}
 
 
 void add_to_queue(char* Lexeme, char* category) {
