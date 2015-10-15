@@ -1,0 +1,28 @@
+0 - empty set
+1 - {e}
+/*--------------------------------------------------------------------------*/
+                    Empty      First                      Follow       Predict
+<program>       *     1     *   {}                       *   {}    *****
+<body_program>  *     1     *   {}                       *   {}    *****
+<function>      *     0     *{int,double,string,auto}    *       *****
+<command>       *     0     *{ID,cin,cout,if,for}        *       *****
+<type>          *     0     *{int,double,string,auto}    *       *****
+<parameters>    *     1     *   {}                       *       *****
+<def_function>  *     0     * { ';', '{' }               *       *****
+<body>          *     1     *   {}                       *       *****
+<parameters_n>  *     1     *   {}                       *       *****
+<command_n>     *     0     * {'=','('}                  *       *****
+<assign>        *     0     *{expression,ID,string,number}*      *****
+<term>          *     0     *{ID,string,number}          *       *****
+<next_param>    *     1     *   {}                       *       *****
+<else>          *     1     *   {}                       *       *****
+<for_exp>       *     1     *   {}                       *       *****
+<value>         *     0     *{string, number}            *       *****
+<is_func>       *     1     *   {}                       *       *****
+                *           *                            *       *****
+ID              *     0     *   ID                       *   -    *****
+int             *     0     *   int                      *   -    *****
+double          *     0     *  double                    *   -    *****
+string          *     0     *  string                    *   -    *****
+auto            *     0     *   auto                     *   -    *****
+number          *     0     *  number                    *   -    *****

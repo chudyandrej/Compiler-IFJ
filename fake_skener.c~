@@ -6,12 +6,6 @@
 
 #include "fake_skener.h"
 
-int func(){
-    printf("Hello\n");
-    
-    return 0;
-}
-
 void add_to_queue(char* Lexeme, char* category) {
     struct token *new_token;
     new_token = malloc(sizeof(struct token));

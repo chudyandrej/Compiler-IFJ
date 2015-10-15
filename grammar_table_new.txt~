@@ -1,0 +1,63 @@
+<program> -> <body_program>
+<declaration> -> <type> ID <dec>
+<assign_func> -> ID <a_f>
+<command> -> cin >> value <multiple_cin> ;
+<command> -> cout << value <multiple_cout> ;
+<command> -> return value ;
+<command> -> if ( value ) { <body> } <else> 
+<command> -> for ( <for_def> ; value ; <for_assign> ) { <body> }
+<command> -> length ( value ) ;
+<command> -> substr ( value , value , value ) ;
+<command> -> concat ( value , value ) ;
+<command> -> find ( value , value ) ;
+<command> -> sort ( value ) ;
+
+<a_f> -> = value <multiple_assign> ;
+<a_f> -> ( <parameters_used> ) ;
+
+<for_assign> -> ID = value
+<for_def> -> <type> ID <for_a>
+<for_a> -> = value
+<for_a> -> $
+
+<else> else { <body> }
+<else> $
+<multiple_cin> -> >> value <multiple_cin>
+<multiple_cin> -> $
+
+<multiple_cout> -> << value <multiple_cout>
+<multiple_cout> $
+
+<multiple_assign> -> = ID <multiple_assign>
+<multiple_assign> -> $
+
+<dec> -> ; 
+<dec> -> = value ;
+<dec> -> ( <parameters> ) <func>
+
+<func> -> ;
+<func> -> { <body> }
+
+<type> -> int
+<type> -> double
+<type> -> auto
+<type> -> string
+
+<parameters>   -> <type> ID <parameters_n>
+<parameters>   -> $
+<parameters_n> -> , <type> ID <parameters_n>
+<parameters_n> -> $
+
+<parameters_used> -> value <parameters_used_n>
+<parameters_used> -> $
+<parameters_used_n> -> , value
+<parameters_used_n> -> $
+
+
+<body> -> <command> <body>
+<body> -> <assign_func> <body>
+<body> -> <declaration> <body>
+<body> -> $
+
+<body_program> -> <declaration> <body_program>
+<body_program> -> $
