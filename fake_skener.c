@@ -5,6 +5,14 @@
 
 
 #include "fake_skener.h"
+
+int LastFunc(){ 
+    printf("a text\n");
+   
+    return 0;
+}
+
+
 int func234(){ 
     printf("hope work\n");
    
