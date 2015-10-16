@@ -6,7 +6,8 @@
 #include "syntax_checker.h"
 
 int start_syntax_analyz(){
-    if(next_token()->category == TYPE){
+    int new_token = next_token();
+    if(new_token == TYPE){
         return dec_function();
     }else{
         errorMessage("Error on global scope !");
@@ -15,96 +16,95 @@ int start_syntax_analyz(){
 }
 
 int dec_function(){
-
-    if (strcmp(next_token()->category, "id") == 0){
-        if (strcmp(next_token()->Lexeme, "(") == 0){
+    int new_token = next_token();
+    if (new_token == IDENTIFIER){
+        if (next_token() == TT_LEFTROUNDBRACKET){
             if(parameters() == 0){
-                char *lexem = next_token()->Lexeme;
-                if (strcmp(lexem, ";") == 0){ return 0;}
-                else if(strcmp(lexem, "{")  == 0){return body_funcion();}
+                new_token = next_token();
+                if (new_token == TT_SEMICOLON){ return 0;}
+                else if(new_token == TT_LEFTBRACE){return body_funcion();}
                 else {
-                    errorMessage("Error on declaration function !");
+                    errorMessage("Error during declaration function !");
                     return 1;
                 }
             }
         }
     }
-    errorMessage("Error on declaration function !");
+    errorMessage("Error during declaration function !");
     return 1;
 }
 
-int command(token_stract *new_token){
-
-    char *catedory = new_token->Lexeme;
-    if (strcmp(catedory, "cin") == 0) { return cin_cout(">>"); }
-    else if(strcmp(catedory, "cout") == 0){ return cin_cout("<<"); }
-    else if(strcmp(catedory, "for") == 0){ return for_statement(); }
-    else if(strcmp(catedory, "if") == 0){ return if_statement(); }
-    else if(strcmp(catedory, "sort") == 0){ return one_par_command(); }
-    else if(strcmp(catedory, "find") == 0){ return two_par_command(); }
-    else if(strcmp(catedory, "concat") == 0){ return two_par_command(); }
-    else if(strcmp(catedory, "substr") == 0){ return three_par_command(); }
-    else if(strcmp(catedory, "length") == 0){ return one_par_command(); }
-    else if(strcmp(catedory, "return") == 0){ return one_par_command(); }
-
-    return 1;
+int body_funcion(){
+    while(true) {
+        int  new_token = next_token();
+        switch(new_token){
+            case C_CIN:
+                if (cin_cout(TT_SCIN) == 0){ continue;} else{ return 1;}
+            case C_COUT:
+                if (cin_cout(TT_SCOUT) == 0){ continue;} else{ return 1;}
+            case C_IF:
+                if (if_statement() == 0){ continue;} else{ return 1;}
+            case C_FOR:
+                if (for_statement() == 0){ continue;} else{ return 1;}
+            case C_SORT:
+            case C_RETURN:
+            case C_LENGTH:
+                if (one_par_command() == 0){ continue;} else{ return 1;}
+            case C_FIND:
+            case C_CONCAT:
+                if (two_par_command() == 0){ continue;} else{ return 1;}
+            case C_SUBSTR:
+                if (three_par_command() == 0){ continue;} else{ return 1;}
+            case IDENTIFIER:
+                if (assing() == 0){ continue; } else{ return 1; }
+            case TYPE:
+                if (dec_variable() == TT_SEMICOLON) { continue; } else { return 1; }
+            case TT_RIGHTBRACE:
+                return 0;
+            default:
+                errorMessage("Error in body of program !");
+                return 1;
+        }
+    }
 }
 
-int for_statement(){
-    if (strcmp(next_token()->Lexeme, "(")){
-        token_stract *new_token = next_token();
-        if(strcmp(new_token->category, "type")){
-            if(strcmp(new_token->category, "id")){
-                if(assing() == 0){
-                    if(value() == 0){
-                        if(strcmp(new_token->category, "id")){
-                            return assing();
-                        }
-                    }
-                }
+int for_statement() {
+    if (next_token() == TT_LEFTROUNDBRACKET) {
+        int new_token = next_token();
+        if (new_token == TYPE) {
+            if ((next_token() == IDENTIFIER) && (assing() == TT_SEMICOLON) && (value() == TT_SEMICOLON) &&
+                    (next_token() == IDENTIFIER) && (assing() == TT_RIGHTROUNDBRACKET)&& next_token() == TT_LEFTBRACE){
+                return body_funcion();
             }
         }
-        else if(strcmp(new_token->category, "id")){
-            if(assing() == 0){
-                if(value() == 0){
-                    if(strcmp(new_token->category, "id")){
-                        return assing();
-                    }
-                }
+        else if (new_token == IDENTIFIER) {
+            if ((assing() ==TT_SEMICOLON) && (value() == TT_SEMICOLON) && (next_token() == IDENTIFIER) &&
+                    (assing() == TT_RIGHTROUNDBRACKET) && next_token() == TT_LEFTBRACE) {
+                return body_funcion();
             }
         }
     }
+    errorMessage("Error in for statement !");
     return 1;
 }
 
 int if_statement(){
-
-    if (strcmp(next_token()->Lexeme, "(")){
-        if (value() == 0){
-            if (strcmp(next_token()->Lexeme, "{")){
-                if (body_funcion() == 0){
-                    if (strcmp(next_token()->Lexeme, "else") == 0){
-                        if (strcmp(next_token()->Lexeme, "{") == 0){
-                            if (body_funcion() == 0){
-                                return 0;
-                            }
-                        }
-                    }
-                }
-            }
+    if((next_token()==TT_LEFTROUNDBRACKET) && (value()==TT_RIGHTROUNDBRACKET) &&
+            (next_token()==TT_LEFTBRACE) && (body_funcion() == 0)){
+        if ((next_token() == C_ELSE) && (next_token() == TT_LEFTBRACE)){
+            return body_funcion();
         }
     }
     return 1;
-
 }
 
-int cin_cout(const char* op){
-    if (strcmp(next_token()->Lexeme, op) == 0){
+int cin_cout(int op){
+    if (next_token() ==  op){
         while(true){
-            if (strcmp(next_token()->category, "id") == 0) {
-                token_stract *new_token = next_token();
-                if (strcmp(new_token->Lexeme, op) == 0) {continue; }
-                else if(strcmp(new_token->Lexeme, ";") == 0){return 0;}
+            if (next_token() == IDENTIFIER) {
+                int new_token = next_token();
+                if (new_token == op) {continue; }
+                else if(new_token == TT_SEMICOLON){return 0;}
                 else {
                     errorMessage("error in cin or cout command!");
                     return 1;
@@ -112,228 +112,188 @@ int cin_cout(const char* op){
             }
         }
     }
-    errorMessage("error in cin or cout operator!");
+    errorMessage("Error in cin or cout operator!");
     return 1;
 }
 
 int assing(){
-
-    char *lexem = next_token()->Lexeme;
-    if (strcmp(lexem, "(") == 0) {
-        if (parameters_used() == 0) {
-            if (strcmp(next_token()->Lexeme, ";") == 0) {
-                return 0;
-            }
-        }
+    int new_token = next_token();
+    if ((new_token == TT_LEFTROUNDBRACKET) && (parameters_used() == 0) && (next_token() == TT_SEMICOLON)) {
+        return 0;
     }
-    else if (strcmp(lexem, "=") == 0) {
-        if (value() == 0) {
-            return 0;           //kontrola bidkociarky
-        }
+    else if (new_token == TT_ASSIGNEMENT) {
+        return value();           //kontrola bidkociarky
     }
+    errorMessage("Error in assing function!");
     return 1;
-
 }
 
 int dec_variable(){
-
-    if (strcmp(next_token()->category, "id") == 0) {
-        if (strcmp(next_token()->Lexeme, ";") == 0) {
+    if (next_token() == IDENTIFIER) {
+        int new_token = next_token();
+        if (new_token == TT_SEMICOLON) {
             return 0;
         }
-        else if(strcmp(next_token()->Lexeme, "=") == 0){
+        else if(new_token == TT_ASSIGNEMENT){
             return value();
         }
     }
+    errorMessage("Error in declaration variable");
     return 1;
 }
 
-int body_funcion(){
-    while(true) {
-        token_stract *new_token = next_token();
-        if (strcmp(new_token->category, "command") == 0) {
-            if (command(new_token) == 0){ continue; } else{ return 1; }
-        }
-        else if(strcmp(new_token->category, "id") == 0){
-            if (assing() == 0){ continue; } else{ return 1; }
-        }
-        else if(strcmp(new_token->category, "type") == 0){
-            if (dec_variable() == 0) { continue; } else { return 1; }
-        }
-        else if(strcmp(new_token->Lexeme, "}") == 0){
-            return 0;
-        }
-        else{
-            return 1;
-        }
-    }
-}
+
 
 int parameters(){
-    token_stract *new_token = next_token();
-    if(strcmp(new_token->Lexeme,")") == 0) {
+    int new_token = next_token();
+    if(new_token == TT_RIGHTROUNDBRACKET) {
         return 0;
     }                                                /*means no parameters*/
     while(true) {
-        if(strcmp(new_token->category, "type") == 0){
-            if(strcmp(new_token->category, "ID") == 0) {
-                new_token = next_token();
-                if (strcmp(new_token->Lexeme, ")") == 0) {
-                    return 0;
-                }
-                else if (strcmp(new_token->Lexeme, ",") == 0) {
-                    continue;
-                }
+        if((new_token == TYPE) && (next_token() == IDENTIFIER)) {
+            new_token = next_token();
+            if (new_token == TT_RIGHTROUNDBRACKET) {
+                return 0;
+            }
+            else if (new_token == TT_COMMA) {
+                continue;
             }
         }
+        errorMessage("Error in declaration parameters!");
         return 1;
     }
 }
 
 int parameters_used(){
-
-    if(strcmp(next_token()->Lexeme,")")==0) {
+    if(next_token() == TT_RIGHTROUNDBRACKET) {
         return 0;
     }                                                /*means no parameters*/
     while(true) {
-        if (value() == 0) {
-            char *lexeme = next_token()->Lexeme;
-            if (strcmp(lexeme, ")") == 0) {
-                return 0;
-            }
-            else if (strcmp(lexeme, ",") == 0) {
-                continue;
-            }
+        int exit_code_value = value();
+        if(exit_code_value == TT_COMMA) {
+            continue;
         }
+        else if(exit_code_value == TT_RIGHTROUNDBRACKET){
+            return 0;
+        }
+        errorMessage("Error in parameter used!");
+        return 1;
     }
 }
 
 int one_par_command(){
-    if (strcmp(next_token()->Lexeme, "(") == 0){
-        if (strcmp(next_token()->category, "id") == 0){
-            if (strcmp(next_token()->Lexeme, ")") == 0){
-                if (strcmp(next_token()->Lexeme, ";") == 0){ //gun
-                    return 0;
-                }
-            }
+    if((next_token() == TT_LEFTROUNDBRACKET) && (next_token() == IDENTIFIER )&& (next_token() == TT_RIGHTROUNDBRACKET)){
+        if (next_token() == TT_SEMICOLON) {
+            return 0;
         }
     }
+    errorMessage("Error in one parameter func!");
     return 1;
 }
 
 int two_par_command(){
-    if (strcmp(next_token()->Lexeme, "(") ==0){
-        if (strcmp(next_token()->category, "id") == 0) {
-            if (strcmp(next_token()->category, ",") == 0) {
-                if (strcmp(next_token()->category, "id") == 0) {
-                    if (strcmp(next_token()->Lexeme, ")") == 0) {
-                        if (strcmp(next_token()->Lexeme, ";") == 0) {
-                            return 0;
-                        }
-                    }
-                }
-            }
-        }
+    if((next_token() == TT_LEFTROUNDBRACKET) && (next_token()== IDENTIFIER) && (next_token() == TT_COMMA) &&
+            (next_token()== IDENTIFIER) && (next_token() == TT_RIGHTROUNDBRACKET) && (next_token() == TT_SEMICOLON)){
+        return 0;
     }
+    errorMessage("Error in two parameter func!");
     return 1;
 }
 
 int three_par_command(){
-    if (strcmp(next_token()->Lexeme, "(") == 0){
-        if (strcmp(next_token()->category, "id") == 0) {
-            if (strcmp(next_token()->category, ",") == 0) {
-                if (strcmp(next_token()->category, "id") == 0) {
-                    if (strcmp(next_token()->category, ",") == 0) {
-                        if (strcmp(next_token()->category, "id") == 0) {
-                            if (strcmp(next_token()->Lexeme, ")") == 0) {
-                                if (strcmp(next_token()->Lexeme, ";") == 0) {
-                                    return 0;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+    if((next_token() == TT_LEFTROUNDBRACKET) && (next_token() == IDENTIFIER) && (next_token() == TT_COMMA) &&
+            (next_token() == IDENTIFIER) && (next_token() == TT_COMMA) && (next_token()== IDENTIFIER) &&
+            (next_token() == TT_RIGHTROUNDBRACKET) && (next_token() == TT_SEMICOLON)){
+        return 0;
     }
+    errorMessage("Error in three parameter func!");
     return 1;
 }
 
 int value(){
-    token_stract *token;
-    int bracket_number=0;
-
-    while(1){
-        if((token = next_token())==NULL) return 0;
-
-        if(strcmp(token->Lexeme, "(")==0){
-            bracket_number++;
-            token = next_token();
-        }
-        else if(strcmp(token->Lexeme, ")")==0){
-            bracket_number--;
-
-            if(bracket_number==-1) { return 0; }
-
-            if((token = next_token())==NULL) return 0;
-        }
-
-        if(strcmp(token->category, "number") && strcmp(token->category, "text")){
-            if(strcmp(token->category, "id")){         /*not id and must be there*/
+    int new_token = next_token();
+    if(new_token == IDENTIFIER){
+        new_token = next_token();
+        switch (new_token){
+            case TT_LEFTROUNDBRACKET:
+                if(parameters_used() == 0) {
+                    return val_par();
+                }
+            case OPERATOR:
+                return val_par();
+            case TT_COMMA:
+                return TT_COMMA;
+            case TT_RIGHTROUNDBRACKET:
+                return 0;
+            default:
                 return 1;
-            }
-            else{                                    /*it's var or calling function*/
-                token = next_token();
-
-                if(strcmp(token->Lexeme, ")")==0){
-                    bracket_number--;
-                    if(bracket_number==-1) { return 0; }
-                    token = next_token();
-                }
-                if(strcmp(token->Lexeme, ";")==0) { return 0; }
-                if(strcmp(token->category, "operator")==0) { continue; }
-
-                if(strcmp(token->Lexeme, "(")==0){         /*it's function*/
-                    if(parameters_used()==0){
-                        token = next_token();
-                        if(strcmp(token->Lexeme, ")")==0){
-                            bracket_number--;
-                            if(bracket_number==-1) { return 0; }
-                            token = next_token();
-                        }
-                        if(strcmp(token->Lexeme, ";")==0) { return 0; }
-                        if(strcmp(token->category, "operator")==0){
-                            continue;
-                        }
-                        else{
-                            return 1;
-                        }
-                    }
-                }
-                else{
-                    return 1;
-                }
-            }
-        }  /*if number or string the next token must be operator, ; , ) */
-        printf("%s\n", token->Lexeme);
-        token = next_token();
-
-        if(strcmp(token->Lexeme, ")")==0){
-            bracket_number--;
-            if(bracket_number==-1) { return 0; }
-
-            if((token = next_token())==NULL) return 0;
-            printf("tu%d%s\n",bracket_number, token->Lexeme);
         }
-        if(strcmp(token->category, "operator")==0) { continue; }
-        if(strcmp(token->Lexeme, ";")==0) { return 0; }
-        printf("tu\n");
     }
-    return 0;
+    else if(new_token == NUMBER){
+        int counter_bracket = 0;
+        while(true) {
+
+            new_token = next_token();
+            switch(new_token){
+                case NUMBER:
+                    if(next_token() == OPERATOR){
+                        continue;
+                    }
+                case TT_LEFTROUNDBRACKET:
+                    counter_bracket++;
+                    continue;
+                case TT_RIGHTROUNDBRACKET:
+                    counter_bracket--;
+                    if(counter_bracket == -1){
+                        return TT_RIGHTROUNDBRACKET;
+                    }
+                    continue;
+                case TT_COMMA:
+                    if(counter_bracket == 0){
+                        return TT_COMMA;
+                    }
+                    return 1;
+                case TT_SEMICOLON:
+                    if(counter_bracket == 0){
+                        return TT_SEMICOLON;
+                    }
+                    return 1;
+                default:
+                    errorMessage("Error in value!");
+                    return 1;
+            }
+        }
+    }
+
 }
 
-void errorMessage(const char *mesasge , const char *lexem){
+int val_par() {
+    int new_token = next_token();
+    if (new_token == TT_COMMA) {
+        return TT_COMMA;
+    }
+    else if (new_token == TT_RIGHTROUNDBRACKET){
+        return TT_RIGHTROUNDBRACKET;
+    }
+    else if (new_token == OPERATOR){
+        return val_par();
+    }
+    return 1;
+}
+
+
+void errorMessage(const char *mesasge ){
     printf("############ SYNTAX ERROR ############ \n");
     printf("Error message: %s \n",mesasge);
-    printf("\n \t%s \n",lexem);
+
+}
+int next_token(){
+    token_stract *new_token = next_new_token();
+    if(new_token != NULL) {
+        if (new_token->category != END_OF_FILE) {
+            return new_token->category;
+        }
+    }
+
+    return END_OF_FILE;
 }

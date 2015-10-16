@@ -20,17 +20,19 @@ int dec_variable();
 int one_par_command();
 int two_par_command();
 int three_par_command();
-int cin_cout(const char* op);
+int cin_cout(int op);
 int if_statement();
 int parameters_used();
 int for_statement();
 int value();
-void errorMessage(const char *mesasge , const char *lexem);
+void errorMessage(const char *mesasge );
+int next_token();
+int val_par();
 
 typedef enum TokenType {
     TT_ASSIGNEMENT = '=',
-    TT_SCOUT = '<<',
-    TT_SCIN = '>>',
+    TT_SCOUT = 1995, //'<<',
+    TT_SCIN = 1996, //'>>',
     TT_LEFTROUNDBRACKET = '(',
     TT_RIGHTROUNDBRACKET = ')',
     TT_LEFTBRACE = '{',
@@ -41,6 +43,18 @@ typedef enum TokenType {
     NUMBER = 'n',
     OPERATOR = 'o',
     STRING = 's',
-    TYPE = 't'
-}
+    TYPE = 't',
+    END_OF_FILE = 'e',
+    C_CIN = 1000,
+    C_COUT = 1001,
+    C_RETURN = 1002,
+    C_IF = 1003,
+    C_FOR = 1004,
+    C_LENGTH = 1005,
+    C_SUBSTR = 1006,
+    C_CONCAT = 1007,
+    C_FIND = 1008,
+    C_SORT = 1009,
+    C_ELSE = 1010
+};
 #endif //INTERPRET_SYNTAX_CHECKER_H

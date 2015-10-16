@@ -20,9 +20,9 @@ typedef struct token {
 } token_stract;
 
 
-void add_to_queue(char* Lexeme, char* category);
+void add_to_queue(char* Lexeme, int category);
 void set_quae();
-token_stract* next_token();
+token_stract* next_new_token();
 
 
 #endif //INTERPRET_FAKE_SKENER_H

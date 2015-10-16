@@ -6,7 +6,7 @@
 int main(int argc, char *argv[]) {
 
     set_quae();
-    printf("%d",start_syntax_analyz());
+
 
     return 0;
 }

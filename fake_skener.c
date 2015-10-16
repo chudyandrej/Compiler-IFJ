@@ -30,7 +30,7 @@ void set_quae() {
     add_to_queue("int", 't');
 }
 
-token_stract* next_token(){
+token_stract* next_new_token(){
     if (head.tqh_first != NULL) {
         token_stract *token_quar;
         token_quar = head.tqh_first;
