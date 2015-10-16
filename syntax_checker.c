@@ -6,42 +6,46 @@
 #include "syntax_checker.h"
 
 int start_syntax_analyz(){
-
-    if (strcmp(next_token()->category, "type")){
+    if(strcmp(next_token()->category, "type") == 0){
         return dec_function();
     }else{
+        errorMessage("Error on global scope !");
         return 1;
     }
 }
 
 int dec_function(){
 
-    if (strcmp(next_token()->category, "id")){
-        if (strcmp(next_token()->Lexeme, "(")){
+    if (strcmp(next_token()->category, "id") == 0){
+        if (strcmp(next_token()->Lexeme, "(") == 0){
             if(parameters() == 0){
                 char *lexem = next_token()->Lexeme;
-                if (strcmp(lexem, ";")){ return 0;}
-                else if(strcmp(lexem, "{")){return body_funcion();}
-                else { return 1; }
+                if (strcmp(lexem, ";") == 0){ return 0;}
+                else if(strcmp(lexem, "{")  == 0){return body_funcion();}
+                else {
+                    errorMessage("Error on declaration function !");
+                    return 1;
+                }
             }
         }
     }
+    errorMessage("Error on declaration function !");
     return 1;
 }
 
 int command(token_stract *new_token){
 
     char *catedory = new_token->Lexeme;
-    if (strcmp(catedory, "cin")) { cin_cout(">>"); }
-    else if(strcmp(catedory, "cout")){ cin_cout("<<"); }
-    else if(strcmp(catedory, "for")){ return for_statement(); }
-    else if(strcmp(catedory, "if")){ return if_statement(); }
-    else if(strcmp(catedory, "sort")){ return one_par_command(); }
-    else if(strcmp(catedory, "find")){ return two_par_command(); }
-    else if(strcmp(catedory, "concat")){ return two_par_command(); }
-    else if(strcmp(catedory, "substr")){ return three_par_command(); }
-    else if(strcmp(catedory, "length")){ return one_par_command(); }
-    else if(strcmp(catedory, "return")){ return one_par_command(); }
+    if (strcmp(catedory, "cin") == 0) { return cin_cout(">>"); }
+    else if(strcmp(catedory, "cout") == 0){ return cin_cout("<<"); }
+    else if(strcmp(catedory, "for") == 0){ return for_statement(); }
+    else if(strcmp(catedory, "if") == 0){ return if_statement(); }
+    else if(strcmp(catedory, "sort") == 0){ return one_par_command(); }
+    else if(strcmp(catedory, "find") == 0){ return two_par_command(); }
+    else if(strcmp(catedory, "concat") == 0){ return two_par_command(); }
+    else if(strcmp(catedory, "substr") == 0){ return three_par_command(); }
+    else if(strcmp(catedory, "length") == 0){ return one_par_command(); }
+    else if(strcmp(catedory, "return") == 0){ return one_par_command(); }
 
     return 1;
 }
@@ -79,8 +83,8 @@ int if_statement(){
         if (value() == 0){
             if (strcmp(next_token()->Lexeme, "{")){
                 if (body_funcion() == 0){
-                    if (strcmp(next_token()->Lexeme, "else")){
-                        if (strcmp(next_token()->Lexeme, "{")){
+                    if (strcmp(next_token()->Lexeme, "else") == 0){
+                        if (strcmp(next_token()->Lexeme, "{") == 0){
                             if (body_funcion() == 0){
                                 return 0;
                             }
@@ -95,29 +99,34 @@ int if_statement(){
 }
 
 int cin_cout(const char* op){
-    if (strcmp(next_token()->Lexeme, op)){
+    if (strcmp(next_token()->Lexeme, op) == 0){
         while(true){
-            if (strcmp(next_token()->category, "id")) {
-                if (strcmp(next_token()->Lexeme, op)) {continue; }
-                else if(strcmp(next_token()->Lexeme, ";")){return 0;}
-                else { return 1; }
+            if (strcmp(next_token()->category, "id") == 0) {
+                token_stract *new_token = next_token();
+                if (strcmp(new_token->Lexeme, op) == 0) {continue; }
+                else if(strcmp(new_token->Lexeme, ";") == 0){return 0;}
+                else {
+                    errorMessage("error in cin or cout command!");
+                    return 1;
+                }
             }
         }
     }
+    errorMessage("error in cin or cout operator!");
     return 1;
 }
 
 int assing(){
 
     char *lexem = next_token()->Lexeme;
-    if (strcmp(lexem, "(")) {
+    if (strcmp(lexem, "(") == 0) {
         if (parameters_used() == 0) {
-            if (strcmp(next_token()->Lexeme, ";")) {
+            if (strcmp(next_token()->Lexeme, ";") == 0) {
                 return 0;
             }
         }
     }
-    else if (strcmp(lexem, "=")) {
+    else if (strcmp(lexem, "=") == 0) {
         if (value() == 0) {
             return 0;           //kontrola bidkociarky
         }
@@ -128,11 +137,11 @@ int assing(){
 
 int dec_variable(){
 
-    if (strcmp(next_token()->category, "id")) {
-        if (strcmp(next_token()->Lexeme, ";")) {
+    if (strcmp(next_token()->category, "id") == 0) {
+        if (strcmp(next_token()->Lexeme, ";") == 0) {
             return 0;
         }
-        else if(strcmp(next_token()->Lexeme, "=")){
+        else if(strcmp(next_token()->Lexeme, "=") == 0){
             return value();
         }
     }
@@ -142,16 +151,16 @@ int dec_variable(){
 int body_funcion(){
     while(true) {
         token_stract *new_token = next_token();
-        if (strcmp(new_token->category, "command")) {
+        if (strcmp(new_token->category, "command") == 0) {
             if (command(new_token) == 0){ continue; } else{ return 1; }
         }
-        else if(strcmp(new_token->category, "id")){
+        else if(strcmp(new_token->category, "id") == 0){
             if (assing() == 0){ continue; } else{ return 1; }
         }
-        else if(strcmp(new_token->category, "type")){
+        else if(strcmp(new_token->category, "type") == 0){
             if (dec_variable() == 0) { continue; } else { return 1; }
         }
-        else if(strcmp(new_token->Lexeme, "}")){
+        else if(strcmp(new_token->Lexeme, "}") == 0){
             return 0;
         }
         else{
@@ -162,12 +171,12 @@ int body_funcion(){
 
 int parameters(){
     token_stract *new_token = next_token();
-    if(strcmp(new_token->Lexeme,")")==0) {
+    if(strcmp(new_token->Lexeme,")") == 0) {
         return 0;
     }                                                /*means no parameters*/
     while(true) {
-        if(strcmp(new_token->category, "type")){
-            if(strcmp(new_token->category, "ID")) {
+        if(strcmp(new_token->category, "type") == 0){
+            if(strcmp(new_token->category, "ID") == 0) {
                 new_token = next_token();
                 if (strcmp(new_token->Lexeme, ")") == 0) {
                     return 0;
@@ -177,6 +186,7 @@ int parameters(){
                 }
             }
         }
+        return 1;
     }
 }
 
@@ -199,10 +209,10 @@ int parameters_used(){
 }
 
 int one_par_command(){
-    if (strcmp(next_token()->Lexeme, "(")){
-        if (strcmp(next_token()->category, "id")){
-            if (strcmp(next_token()->Lexeme, ")")){
-                if (strcmp(next_token()->Lexeme, ";")){ //gun
+    if (strcmp(next_token()->Lexeme, "(") == 0){
+        if (strcmp(next_token()->category, "id") == 0){
+            if (strcmp(next_token()->Lexeme, ")") == 0){
+                if (strcmp(next_token()->Lexeme, ";") == 0){ //gun
                     return 0;
                 }
             }
@@ -212,12 +222,12 @@ int one_par_command(){
 }
 
 int two_par_command(){
-    if (strcmp(next_token()->Lexeme, "(")){
-        if (strcmp(next_token()->category, "id")) {
-            if (strcmp(next_token()->category, ",")) {
-                if (strcmp(next_token()->category, "id")) {
-                    if (strcmp(next_token()->Lexeme, ")")) {
-                        if (strcmp(next_token()->Lexeme, ";")) {
+    if (strcmp(next_token()->Lexeme, "(") ==0){
+        if (strcmp(next_token()->category, "id") == 0) {
+            if (strcmp(next_token()->category, ",") == 0) {
+                if (strcmp(next_token()->category, "id") == 0) {
+                    if (strcmp(next_token()->Lexeme, ")") == 0) {
+                        if (strcmp(next_token()->Lexeme, ";") == 0) {
                             return 0;
                         }
                     }
@@ -229,14 +239,14 @@ int two_par_command(){
 }
 
 int three_par_command(){
-    if (strcmp(next_token()->Lexeme, "(")){
-        if (strcmp(next_token()->category, "id")) {
-            if (strcmp(next_token()->category, ",")) {
-                if (strcmp(next_token()->category, "id")) {
-                    if (strcmp(next_token()->category, ",")) {
-                        if (strcmp(next_token()->category, "id")) {
-                            if (strcmp(next_token()->Lexeme, ")")) {
-                                if (strcmp(next_token()->Lexeme, ";")) {
+    if (strcmp(next_token()->Lexeme, "(") == 0){
+        if (strcmp(next_token()->category, "id") == 0) {
+            if (strcmp(next_token()->category, ",") == 0) {
+                if (strcmp(next_token()->category, "id") == 0) {
+                    if (strcmp(next_token()->category, ",") == 0) {
+                        if (strcmp(next_token()->category, "id") == 0) {
+                            if (strcmp(next_token()->Lexeme, ")") == 0) {
+                                if (strcmp(next_token()->Lexeme, ";") == 0) {
                                     return 0;
                                 }
                             }
@@ -320,4 +330,10 @@ int value(){
         printf("tu\n");
     }
     return 0;
+}
+
+void errorMessage(const char *mesasge){
+    printf("Syntax error. \n");
+    printf("Error message: %s \n",mesasge);
+
 }

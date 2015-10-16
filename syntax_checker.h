@@ -23,4 +23,5 @@ int if_statement();
 int parameters_used();
 int for_statement();
 int value();
+void errorMessage(const char *mesasge);
 #endif //INTERPRET_SYNTAX_CHECKER_H

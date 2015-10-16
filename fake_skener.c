@@ -18,10 +18,16 @@ void add_to_queue(char* Lexeme, char* category) {
 
 void set_quae() {
     TAILQ_INIT(&head);
-    add_to_queue(";", "operator");
-    add_to_queue("premenna", "id");
-    add_to_queue(">>", "operator");
+    add_to_queue("}", "ble");
+    add_to_queue(";", "ble");
+    add_to_queue("mata", "id");
+    add_to_queue(">>", "bla");
     add_to_queue("cin", "command");
+    add_to_queue("{", "ble");
+    add_to_queue(")", "bla");
+    add_to_queue("(", "bla");
+    add_to_queue("main", "id");
+    add_to_queue("int", "type");
 }
 
 token_stract* next_token(){
