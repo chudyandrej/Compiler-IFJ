@@ -9,7 +9,6 @@
 #include <string.h>
 #include <malloc.h>
 #include "str.h"
-#include "err.h"
 
 #define STR_LEN_INC 8
 // konstanta STR_LEN_INC udava, na kolik bytu provedeme pocatecni alokaci pameti
@@ -18,6 +17,8 @@
 
 #define STR_ERROR   1
 #define STR_SUCCESS 0
+
+enum {NOTFOUND = 0, FOUND = 1};
 
 int str_init(string *s)
 // funkce vytvori novy retezec
@@ -87,6 +88,30 @@ int str_cmp_const_str(string *s1, char* s2)
    return strcmp(s1->str, s2);
 }
 
+/*
+ * Function: str_find
+ * Author: Kopec Maros
+ * Description: Find if string is in array of strings
+ * 
+ * type: int
+ * param 'string *s1': searched string
+ * param 'char **s2': array of strings in which is searched
+ * param 'int size': number of strings in array
+ * returns: FOUND (1) if founded else NOTFOUND (0) if string is not in array
+ */
+int str_find(string *s1, char **s2, int size)
+{
+    int i;
+    for (i = 0; i<size; i++) 
+    {
+        if (!strcmp(s1->str, s2[i]))
+        {
+            return FOUND;
+        }
+    }
+    return NOTFOUND;
+}
+
 char *str_get_str(string *s)
 // vrati textovou cast retezce
 {
@@ -97,40 +122,4 @@ int str_get_length(string *s)
 // vrati delku daneho retezce
 {
    return s->length;
-}
-
-/*
- * Wrapper for handling error
- */
-int str_init_wr(string *s)
-// funkce vytvori novy retezec
-{
-    if(str_init(s)) {
-        /*INTER_ERR nie je zadefinovany*/
-        return INTER_ERR;
-    }
-}
-
-/*
- * Wrapper for handling error
- */
-int str_add_char_wr(string *s, char c)
-{
-    if(str_add_char(s, c)) {
-        str_free(s);
-        /*INTER_ERR nie je zadefinovany*/
-        return INTER_ERR;
-    }
-}
-
-/*
- * Wrapper for handling error
- */
-int str_copy_string_wr(string *s1, string *s2)
-{
-    if(str_copy_string(s1, s2)) {
-        str_free(s1);
-        /*INTER_ERR nie je zadefinovany*/
-        return INTER_ERR;
-    }
 }

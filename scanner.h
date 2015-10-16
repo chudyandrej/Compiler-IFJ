@@ -5,123 +5,92 @@
  * Authors: Bayer Jan, Kopec Maros
  *
  * Created: 2015/10/6
- * Last time modified: 2015/10/15
+ * Last time modified: 2015/10/16
  */
 
 #ifndef SCANNER_H_INCLUDED
 #define SCANNER_H_INCLUDED
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <string.h>
 #include <ctype.h>
 #include "stable.h"
 #include "str.h"
+
+extern char * data_types[];
+extern char * commands[];
 extern FILE * fp; /* Pointer to the source file */
 
+
 /*
- * Typedef: tTokenType
- * Author: Bayer Jan
+ * Typedef: tsTokenKind
+ * Author: Bayer Jan, Kopec Maros
  * Description: Type of tokens, which can be found
  */
-typedef enum TokenType {
-    TT_PLUS = 100,      /* + */
-    TT_MINUS,           /* - */
-    TT_MUL,             /* * */
-    TT_DIV,             /* / */
-    TT_BIGGER,          /* > */
-    TT_LESSER,          /* < */
-    TT_BIGGEROREQUAL,   /* >= */
-    TT_LESSEOREQUAL,    /* <= */
-    TT_EQUAL,           /* == */
-    TT_NOTEQUAL,        /* != */
-    TT_ASSIGNEMENT,     /* = */
-    TT_SCOUT,           /* << */
-    TT_SCIN,            /* >> */
+typedef enum sTokenKind {
+    /* 100 */   KIN_ASSIGNEMENT = 100,        /* = */
+    /* 101 */   KIN_SCOUT,                  /* << */    
+    /* 102 */   KIN_SCIN,                   /* >> */    
 
-    TT_LEFTROUNDBRACKET,    /* ( */
-    TT_RIGHTROUNDBRACKET,   /* ) */
-    TT_LEFTBRACE,           /* { */
-    TT_RIGHTBRACE,          /* } */
+    /* 103 */   KIN_LEFTROUNDBRACKET,    /* ( */    
+    /* 104 */   KIN_RIGHTROUNDBRACKET,   /* ) */    
+    /* 105 */   KIN_LEFTBRACE,           /* { */    
+    /* 106 */   KIN_RIGHTBRACE,          /* } */    
 
-    TT_SEMICOLON,   /* ; */
-    TT_COLON,       /* : */
-    TT_COMMA,       /* . */
+    /* 107 */   KIN_SEMICOLON,   /* ; */    
+    /* 108 */   KIN_COLON,       /* : */    
+    /* 109 */   KIN_COMMA,       /* . */    
 
+    /* 110 */   KIN_DATA_TYPE,   /* int, double, string */      
+    /* 111 */   KIN_NUMBER,                                     
+    /* 112 */   KIN_IDENTIFIER,                                 
+    /* 113 */   KIN_COMMAND,     /* cin, cout, for etc. */      
+    /* 114 */   KIN_OPERATOR,    /* + - * / etc. */             
+    /* 115 */   KIN_TEXT,        /* String value "example" */   
+    /* 116 */   KIN_UNKNOWN,      /*LEX_ERR*/                   
+    /* 117 */   END_OF_FILE                                     
 
+}tsTokenKind;
 
-    TT_IDENTIFIER,
-    TT_KEYWORD,
-
-    TT_TEXT,
-
-    TT_UNKOWN,
-    END_OF_FILE
-
-}tTokenType;
 
 
 /*
- * Typedef: tToken
+ * Typedef: tsToken
  * Author: Bayer Jan
  * Description: struct for token
  * item 'string': text part of token (represents name)
  * item 'tTokenType': stores which type of token it is 
  */
-typedef struct token {
-    string * str;
-    tTokenType type;
-}tToken;
+typedef struct stoken {
+    tsTokenKind type;
+    char * str;
+    double value;
+}tsToken;
 
 
 /*
- * Typedef: tState
+ * Typedef: tsState
  * Author: Bayer Jan
  * Description: states for finite-state machine
  */
-typedef enum State {
-    S_START = 200,
-
-    S_LESSER,
-    S_BIGGER,
-    S_EQUAL,
-    S_PLUS,
-
-    S_IDENTIFIER,
-    S_INT,
-    S_DOUBLE,
-    S_DOUBLE_EXP,
-    S_STRING,
-
-    S_COMMENT_LINE,
-    S_COMMENT_BLOCK,
-    S_SLASH
-}sState;
-
-/*
- * keywords
- * Author: Bayer Jan
- * Description: defines keywords for lang IFJ15
- */
-char * keywords[] = {
-    "auto",
-    "cin",
-    "cout",
-    "double",
-    "else",
-    "for",
-    "if",
-    "int",
-    "return",
-    "string",
-    "length",
-    "substr",
-    "concat",
-    "find",
-    "sort"
-};
+typedef enum sState {
+    /* 200 */   S_START = 200,              
+    /* 201 */   S_LESSER,                   
+    /* 202 */   S_BIGGER,                   
+    /* 203 */   S_EQUAL,                    
+    /* 204 */   S_PLUS,                     
+    /* 205 */   S_MINUS,                    
+    /* 206 */   S_SLASH,                    
+    /* 207 */   S_SCREAMER,     /* ! */     
+    /* 208 */   S_IDENTIFIER,               
+    /* 209 */   S_TEXT,                     
+    /* 210 */   S_COMMENT_LINE,             
+    /* 211 */   S_COMMENT_BLOCK             
+}tsState;
 
 
-char * check_keywords(string * str);
-tToken get_token(FILE * fp);
+int copy_char_to_token(tsToken *t, char c);
+int copy_str_to_token(tsToken *t, string *s);
+tsToken * get_token(FILE * fp);
+tsToken * cleanup();
 
 #endif // SCANNER_H_INCLUDED
