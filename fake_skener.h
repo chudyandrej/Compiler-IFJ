@@ -15,7 +15,7 @@ TAILQ_HEAD(tailhead, token) head;
 
 typedef struct token {
     char Lexeme[10];
-    char category[10];
+    int category;
     TAILQ_ENTRY(token) entries;
 } token_stract;
 

@@ -7,6 +7,8 @@
 
 #include "fake_skener.h"
 
+
+
 int start_syntax_analyz();
 int dec_function();
 
@@ -23,5 +25,22 @@ int if_statement();
 int parameters_used();
 int for_statement();
 int value();
-void errorMessage(const char *mesasge);
+void errorMessage(const char *mesasge , const char *lexem);
+
+typedef enum TokenType {
+    TT_ASSIGNEMENT = '=',
+    TT_SCOUT = '<<',
+    TT_SCIN = '>>',
+    TT_LEFTROUNDBRACKET = '(',
+    TT_RIGHTROUNDBRACKET = ')',
+    TT_LEFTBRACE = '{',
+    TT_RIGHTBRACE = '}',
+    TT_SEMICOLON = ';',
+    TT_COMMA = ',',
+    IDENTIFIER = 'i',
+    NUMBER = 'n',
+    OPERATOR = 'o',
+    STRING = 's',
+    TYPE = 't'
+}
 #endif //INTERPRET_SYNTAX_CHECKER_H

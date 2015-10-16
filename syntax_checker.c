@@ -6,7 +6,7 @@
 #include "syntax_checker.h"
 
 int start_syntax_analyz(){
-    if(strcmp(next_token()->category, "type") == 0){
+    if(next_token()->category == TYPE){
         return dec_function();
     }else{
         errorMessage("Error on global scope !");
@@ -332,8 +332,8 @@ int value(){
     return 0;
 }
 
-void errorMessage(const char *mesasge){
-    printf("Syntax error. \n");
+void errorMessage(const char *mesasge , const char *lexem){
+    printf("############ SYNTAX ERROR ############ \n");
     printf("Error message: %s \n",mesasge);
-
+    printf("\n \t%s \n",lexem);
 }
