@@ -8,16 +8,19 @@
  * Last time modified: 2015/10/17
  */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include "scanner.h"
+
 #define DATA_TYPES_SIZE 4
 #define COMMANDS_SIZE 11
 #define KEYWORDS_SIZE 15
 #define SUCCESS 0
 #define FAIL 1
 
-#include <stdio.h>
-#include <stdlib.h>
-#include "scanner.h"
-
+int count_e;
+int enable_op;
+int count_dot;
 
 /*
  * Function: get_token
@@ -59,7 +62,12 @@ Token * get_token(FILE * fp) {
                         cleanup(token, str_tmp);
                     }
                 }
-                else if (isdigit(c))    state = S_NUMBER;
+                else if (isdigit(c)) {
+                    state = S_NUMBER;
+                    count_e = FALSE;
+                    enable_op = 0;
+                    count_dot = 0;
+                }
                 else if (c == EOF) {
                     token->type = END_OF_FILE;
                     cleanup(NULL, str_tmp);
@@ -108,6 +116,7 @@ Token * get_token(FILE * fp) {
                 else if (c == '=')    state = S_EQUAL;
                 else if (c == '!')    state = S_SCREAMER;
                 else if (c == '"')    state = S_TEXT;
+                else if (c == '.')    state = S_NUMBER;
                 else {
                     token->type = KIN_UNKNOWN;
                     return token;
@@ -134,7 +143,7 @@ Token * get_token(FILE * fp) {
                 }
                 else if (isoperator(c)) {
                     ungetc(c, fp);
-                    token->type = KIN_IDENTIFIER;
+                    token->type = KIN_DIV;
                     if (copy_str_to_token(token, str_tmp)) {
                         cleanup(token, str_tmp);
                     }
@@ -165,7 +174,7 @@ Token * get_token(FILE * fp) {
             }
             else if (isoperator(c)) {
                     ungetc(c, fp);
-                    token->type = KIN_IDENTIFIER;
+                    token->type = KIN_PLUS;
                     if (copy_str_to_token(token, str_tmp)) {
                         cleanup(token, str_tmp);
                     }
@@ -202,7 +211,7 @@ Token * get_token(FILE * fp) {
             }
             else if (isoperator(c)) {
                     ungetc(c, fp);
-                    token->type = KIN_IDENTIFIER;
+                    token->type = KIN_MINUS;
                     if (copy_str_to_token(token, str_tmp)) {
                         cleanup(token, str_tmp);
                     }
@@ -239,7 +248,7 @@ Token * get_token(FILE * fp) {
             }
             else if (isoperator(c)) {
                     ungetc(c, fp);
-                    token->type = KIN_IDENTIFIER;
+                    token->type = KIN_GREATER;
                     if (copy_str_to_token(token, str_tmp)) {
                         cleanup(token, str_tmp);
                     }
@@ -275,7 +284,7 @@ Token * get_token(FILE * fp) {
             }
             else if (isoperator(c)) {
                     ungetc(c, fp);
-                    token->type = KIN_IDENTIFIER;
+                    token->type = KIN_SMALLER;
                     if (copy_str_to_token(token, str_tmp)) {
                         cleanup(token, str_tmp);
                     }
@@ -306,7 +315,7 @@ Token * get_token(FILE * fp) {
             }
             else if (isoperator(c)) {
                     ungetc(c, fp);
-                    token->type = KIN_IDENTIFIER;
+                    token->type = KIN_ASSIGNEMENT;
                     if (copy_str_to_token(token, str_tmp)) {
                         cleanup(token, str_tmp);
                     }
@@ -353,91 +362,58 @@ Token * get_token(FILE * fp) {
         
         /* ######################## S_NUMBER ################################ */    
         case S_NUMBER:
-            if (isdigit(c)) {
+            if (isdigit(c) || (enable_op && (c == '+' || c == '-'))) {
+                if ((c == '+' || c == '-')) {
+                    if (isdigit(getc(fp))) {
+                        ungetc(c, fp);
+                    }
+                    else {
+                        token->type = KIN_UNKNOWN;
+                        cleanup(NULL, str_tmp);
+                        return token;
+                    }
+                }
+                enable_op = FALSE;
                 if (str_add_char(str_tmp, c)) {
                     cleanup(token, str_tmp);
                 }
-            }
-            else if (c == 'e' || c == 'E') {
-                if (str_add_char(str_tmp, c)) {
-                    cleanup(token, str_tmp);
-                }
-                token->type = KIN_FLOAT_NUMBER;
-                state = S_NUM_E;
             }
             else if (c == '.') {
-                if (str_add_char(str_tmp, c)) {
-                    cleanup(token, str_tmp);
-                }
-                token->type = KIN_FLOAT_NUMBER;
-                state = S_NUM_F;
-            }
-            else if (isoperator(c)) {
-                    ungetc(c, fp);
-                    token->type = KIN_IDENTIFIER;
-                    if (copy_str_to_token(token, str_tmp)) {
-                        cleanup(token, str_tmp);
-                    }
-                    str_free(str_tmp);
+                if (++count_dot > 1  || count_e != 0) {
+                    token->type = KIN_UNKNOWN;
+                    cleanup(NULL, str_tmp);
                     return token;
                 }
-            else {
-                token->type = KIN_NUMBER;
-                if (copy_str_to_token(token, str_tmp)) {
-                    cleanup(token, str_tmp);
-                }
-                str_free(str_tmp);
-                return token;    
-            }  
-        break;
-        
-        /* ######################## S_NUMBER_E ############################## */    
-        case S_NUM_E:
-            if (c == 'e' || c == 'E' || c == '.') {
-                token->type = KIN_UNKNOWN;
-                str_free(str_tmp);
-                return token;
-            }
-            if (isdigit(c)) {
-                if (str_add_char(str_tmp, c)) {
-                    cleanup(token, str_tmp);
-                }
-            }
-            else if (isoperator(c))  {
-                if (copy_str_to_token(token, str_tmp)) {
-                    cleanup(token, str_tmp);
-                }
-                str_free(str_tmp);
-                return token;    
-            } 
-        break;
-        
-        /* ######################## S_NUMBER_F ############################## */    
-        case S_NUM_F:
-            if (c == '.') {
-                token->type = KIN_UNKNOWN;
-                str_free(str_tmp);
-                return token;
-            }
-            if (isdigit(c)) {
-                if (str_add_char(str_tmp, c)) {
-                    cleanup(token, str_tmp);
-                }
+                token->type = KIN_NUM_DOUBLE;
+                enable_op = FALSE;
             }
             else if (c == 'e' || c == 'E') {
-                if (str_add_char(str_tmp, c)) {
-                    cleanup(token, str_tmp);
+                if (++count_e > 1) {
+                    token->type = KIN_UNKNOWN;
+                    cleanup(NULL, str_tmp);
+                    return token;
                 }
-                token->type = KIN_FLOAT_NUMBER;
-                state = S_NUM_E;
+                token->type = KIN_NUM_DOUBLE;
+                enable_op = TRUE;
             }
-            else {
+            else if (isoperator(c)) {
+                ungetc(c, fp);
+                if ((count_e == 0) && (count_dot == 0)) {
+                    if (int isINT(c))   token->type = KIN_NUM_INT;
+                    else                token->type = KIN_NUM_DOUBLE;
+                }
                 if (copy_str_to_token(token, str_tmp)) {
                     cleanup(token, str_tmp);
                 }
                 str_free(str_tmp);
-                return token;    
-            } 
+                return token;
+            }
+            else {
+                token->type = KIN_UNKNOWN;
+                str_free(str_tmp);
+                return token;
+            }
+        
         break;
 
         /* ##################### S_COMMENT_LINE ############################# */
@@ -554,6 +530,66 @@ int copy_char_to_token(Token *t, char c)
         return FAIL;
     t->str[0] = c;
     return SUCCESS;
+}
+
+
+/*
+ * Function: isINT
+ * Author: Kopec Maros
+ * Description: Check if number in string is in range of INT
+ * 
+ * type: int
+ * param 'char c': character that will be check'd
+ * returns: TRUE (1) if is in range, else FALSE (0)
+ */
+int isINT(char * c)
+{
+    int l = strlen(c);
+    int i;
+    
+    /* 6, because INT has range <−32767, +32767> including '-' */
+    if (c[0] == '-') {
+        if ( l > 6) return FALSE;
+        for (i = 0; i < l; ++i) {
+            if (i == 1) {
+                if(c[i] > '3') return FALSE;
+            }
+            else if (i == 2) {
+                if(c[i] > '2') return FALSE;
+            }
+            else if (i == 3) {
+                if(c[i] > '7') return FALSE;
+            }
+            else if (i == 4) {
+                if(c[i] > '6') return FALSE;
+            }
+            else {
+                if(c[i] > '7') return FALSE;
+            }
+        }
+    }
+    else {
+        if (l > 5) return FALSE;
+        for (i = 0; i < l; ++i) {
+            if (i == 0) {
+                if(c[i] > '3') return FALSE;
+            }
+            else if (i == 1) {
+                if(c[i] > '2') return FALSE;
+            }
+            else if (i == 2) {
+                if(c[i] > '7') return FALSE;
+            }
+            else if (i == 3) {
+                if(c[i] > '6') return FALSE;
+            }
+            else {
+                if(c[i] > '7') return FALSE;
+            }
+        }
+    }
+    
+    return TRUE;
 }
 
 
