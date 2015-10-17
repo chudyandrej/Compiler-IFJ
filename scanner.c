@@ -393,7 +393,7 @@ Token * get_token(FILE * fp) {
                     ungetc(c, fp);
                     int position;
                     if ((position = (str_find(str_tmp, keywords, KEYWORDS_SIZE))) != NOTFOUND) {
-                        token->type = KIN_AUTO + position;
+                        token->type = KW_AUTO + position;
                         if (copy_carray_to_token(token, keywords[position])) {
                             cleanup(token, str_tmp);
                         }

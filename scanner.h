@@ -43,21 +43,23 @@ typedef enum sTokenKind {
     /* 112 */   KIN_R_BRACE,                /* } */
     /* 113 */   KIN_SEMICOLON,              /* ; */
     /* 114 */   KIN_IDENTIFIER,             /* identifier */
-    /* 115 */   KIN_AUTO,                   /* data type */
-    /* 116 */   KIN_DOUBLE,                 /* data type */
-    /* 117 */   KIN_INT,                    /* data type */
-    /* 118 */   KIN_STRING,                 /* data type */
-    /* 119 */   KIN_CIN,                    /* command */
-    /* 120 */   KIN_COUT,                   /* command */
-    /* 121 */   KIN_ELSE,                   /* command */
-    /* 122 */   KIN_FOR,                    /* command */
-    /* 123 */   KIN_IF,                     /* command */
-    /* 124 */   KIN_RETURN,                 /* command */
-    /* 125 */   KIN_LENGTH,                 /* command */
-    /* 126 */   KIN_SUBSTR,                 /* command */
-    /* 127 */   KIN_CONCAT,                 /* command */
-    /* 128 */   KIN_FIND,                   /* command */
-    /* 129 */   KIN_SORT,                   /* command */
+    /*################## KEYWORDS ########################*/
+    /* 115 */   KW_AUTO,                   /* data type */
+    /* 116 */   KW_DOUBLE,                 /* data type */
+    /* 117 */   KW_INT,                    /* data type */
+    /* 118 */   KW_STRING,                 /* data type */
+    /* 119 */   KW_CIN,                    /* command */
+    /* 120 */   KW_COUT,                   /* command */
+    /* 121 */   KW_ELSE,                   /* command */
+    /* 122 */   KW_FOR,                    /* command */
+    /* 123 */   KW_IF,                     /* command */
+    /* 124 */   KW_RETURN,                 /* command */
+    /* 125 */   KW_LENGTH,                 /* command */
+    /* 126 */   KW_SUBSTR,                 /* command */
+    /* 127 */   KW_CONCAT,                 /* command */
+    /* 128 */   KW_FIND,                   /* command */
+    /* 129 */   KW_SORT,                   /* command */
+    /*###################################################*/
     /* 130 */   KIN_PLUS,                   /* + */
     /* 131 */   KIN_PLUSPLUS,               /* ++ */
     /* 132 */   KIN_MINUS,                  /* - */
@@ -72,6 +74,7 @@ typedef enum sTokenKind {
     /* 140 */   END_OF_FILE                 /* EOF */
 
 }TokenKind;
+
 
 
 /*
