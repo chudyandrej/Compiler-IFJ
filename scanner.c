@@ -165,6 +165,7 @@ Token * get_token(FILE * fp) {
                 return token;
             }
             else if (isalnum(c) || isspace(c) || c == '_') {
+                ungetc(c, fp);
                 token->type = KIN_PLUS;
                 //if (copy_char_to_token(token, c)) {
                 //    cleanup(token, str_tmp);
@@ -196,6 +197,7 @@ Token * get_token(FILE * fp) {
                 return token;
             }
             else if (isalnum(c) || isspace(c) || c == '_') {
+                ungetc(c, fp);
                 token->type = KIN_MINUS;
                 //if (copy_char_to_token(token, c)) {
                 //    cleanup(token, str_tmp);
@@ -239,6 +241,7 @@ Token * get_token(FILE * fp) {
                 return token;
             }
             else if (isalnum(c) || isspace(c) || c == '_') {
+                ungetc(c, fp);
                 token->type = KIN_GREATER;
                 //if (copy_char_to_token(token, c)) {
                 //    cleanup(token, str_tmp);
@@ -275,6 +278,7 @@ Token * get_token(FILE * fp) {
                 return token;
             }
             else if (isalnum(c) || isspace(c) || c == '_') {
+                ungetc(c, fp);
                 token->type = KIN_SMALLER;
                 //if (copy_char_to_token(token, c)) {
                 //    cleanup(token, str_tmp);
@@ -306,6 +310,7 @@ Token * get_token(FILE * fp) {
                 return token;
             }
             else if (isalnum(c) || isspace(c) || c == '_') {
+                ungetc(c, fp);
                 token->type = KIN_ASSIGNEMENT;
                 //if (copy_char_to_token(token, c)) {
                 //    cleanup(token, str_tmp);
