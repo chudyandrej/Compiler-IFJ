@@ -143,8 +143,8 @@ int assing(){
     if ((new_token == KIN_L_ROUNDBRACKET) && (parameters_used() != 100) && (next_token() == KIN_SEMICOLON)) {
         return 0;
     }
-    else if (new_token == KIN_ASSIGNEMENT) {
-        return value();           //kontrola bidkociarky
+    else if ((new_token == KIN_ASSIGNEMENT) && (value() == KIN_SEMICOLON)){
+        return 0;           //kontrola bidkociarky
     }
     errorMessage("Error in assing function!");
     return 1;
@@ -163,8 +163,6 @@ int dec_variable(){
     errorMessage("Error in declaration variable");
     return 1;
 }
-
-
 
 int parameters(){
     int new_token = next_token();
@@ -219,8 +217,6 @@ int value(){
             return bracket(new_token);
         case KIN_COMMA:
             return KIN_COMMA;
-        case KIN_SEMICOLON:
-            return KIN_SEMICOLON;
         default:
             errorMessage("error pri volani vsetkeho ");
             printf("%d",new_token);
@@ -269,6 +265,7 @@ int value_identifier(){
             return 1;
     }
 }
+
 int value_operator(){
     int new_token = next_token();
     switch(new_token) {
@@ -302,7 +299,6 @@ int value_number_func(){
             return 1;
     }
 }
-
 
 void errorMessage(const char *mesasge ){
     printf("############ SYNTAX ERROR ############ \n");
