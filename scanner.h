@@ -1,4 +1,4 @@
-/*
+/* 
  * File: scanner.h
  *
  * Description: header file for lexical analyzer
@@ -13,13 +13,12 @@
 
 #include <string.h>
 #include <ctype.h>
-#include "stable.h"
 #include "str.h"
 
 extern char * keywords[];
 extern FILE * fp; /* Pointer to the source file */
 
-enum {APOSTROPH = 39};
+enum {TRUE = 1, FALSE = 0};
 
 
 /*
@@ -67,14 +66,13 @@ typedef enum sTokenKind {
     /* 134 */   KIN_DIV,                    /* / */
     /* 135 */   KIN_MUL,                    /* * */
     /* 136 */   KIN_TEXT,                   /* String value "example" */
-    /* 137 */   KIN_NUMBER,                 /* 42; 42e42; 4E2 */
+    /* 137 */   KIN_NUMBER,                 /* 42 */
     /* 138 */   KIN_FLOAT_NUMBER,           /* 42.42; 4e-2 */
     /* 139 */   KIN_COMMA,                  /* , */
-    /* 139 */   KIN_UNKNOWN,                /*LEX_ERR*/
-    /* 140 */   END_OF_FILE                 /* EOF */
-
+    /* 140 */   KIN_UNKNOWN,                /*LEX_ERR*/
+    /* 141 */   END_OF_FILE,                 /* EOF */
+    /* 142 */   OPERATORS
 }TokenKind;
-
 
 
 /*
@@ -83,21 +81,24 @@ typedef enum sTokenKind {
  * Description: states for finite-state machine
  */
 typedef enum sState {
-    /* 200 */   S_START = 200,
-    /* 201 */   S_SMALLER,
-    /* 202 */   S_GREATER,
-    /* 203 */   S_EQUAL,
-    /* 204 */   S_PLUS,
-    /* 205 */   S_MINUS,
-    /* 206 */   S_SLASH,
-    /* 207 */   S_SCREAMER,         /* '!' */
-    /* 208 */   S_IDENTIFIER,
-    /* 209 */   S_TEXT,
-    /* 210 */   S_COMMENT_LINE,
+    /* 200 */   S_START = 200,              
+    /* 201 */   S_SMALLER,                   
+    /* 202 */   S_GREATER,                   
+    /* 203 */   S_EQUAL,                    
+    /* 204 */   S_PLUS,                     
+    /* 205 */   S_MINUS,                    
+    /* 206 */   S_SLASH,             
+    /* 207 */   S_SCREAMER,         /* '!' */     
+    /* 208 */   S_IDENTIFIER,               
+    /* 209 */   S_TEXT,                     
+    /* 210 */   S_COMMENT_LINE,             
     /* 211 */   S_COMMENT_BLOCK,
-    /* 212 */   S_NUMBER,
-    /* 213 */   S_NUMBER_E,         /* detected exponent */
-    /* 214 */   S_NUMBER_F          /* detected floating point */
+    /* 212 */   S_PUNCT,            /* punctuation character */
+    /* 213 */   S_NUMBER,
+    /* 214 */   S_NUM_E,            /* detected exponent */
+    /* 215 */   S_NUM_DOT,          /* detected floating point */
+    /* 216 */   S_NUM_AE,           /* after number exponent */
+    /* 217 */   S_NUM_F
 }State;
 
 
@@ -106,13 +107,14 @@ typedef enum sState {
  * Author: Bayer Jan
  * Description: struct for token
  * item 'string': text part of token (represents name)
- * item 'tTokenType': stores which type of token it is
+ * item 'tTokenType': stores which type of token it is 
  */
 typedef struct sToken {
     TokenKind type;
     char * str;
 }Token;
 
+int isoperator(char c);
 int copy_carray_to_token(Token *t, char *s);
 int copy_char_to_token(Token *t, char c);
 int copy_str_to_token(Token *t, string *s);

@@ -1,4 +1,4 @@
-/*
+/* 
  * File: scanner.c
  *
  * Description: lexical analyzer
@@ -23,7 +23,7 @@
  * Function: get_token
  * Author: Bayer Jan, Kopec Maros
  * Description: Scan input for next token
- *
+ * 
  * type: Token
  * param 'FILE * fp': file descriptor for input
  * returns: pointer to the next token
@@ -42,14 +42,13 @@ Token * get_token(FILE * fp) {
         free(token);
         return NULL;
     }
-
-    token->str = NULL;
-    token->type = KIN_UNKNOWN;
+    
+    * token = (Token){ 0 };
     char c;
-
+    
     while(1) {
         c = getc(fp);
-
+        
         switch(state) {
         /* ######################## S_START ################################# */
             case S_START:
@@ -61,7 +60,11 @@ Token * get_token(FILE * fp) {
                     }
                 }
                 else if (isdigit(c))    state = S_NUMBER;
-                else if (c == EOF)      cleanup(token, str_tmp);
+                else if (c == EOF) {
+                    token->type = END_OF_FILE;
+                    cleanup(NULL, str_tmp);
+                    return token;
+                }
                 else if (c == '(') {
                     token->type = KIN_L_ROUNDBRACKET;
                     cleanup(NULL, str_tmp);
@@ -92,6 +95,11 @@ Token * get_token(FILE * fp) {
                     cleanup(NULL, str_tmp);
                     return token;
                 }
+                else if (c == ';') {
+                    token->type = KIN_SEMICOLON;
+                    cleanup(NULL, str_tmp);
+                    return token;
+                }
                 else if (c == '/')    state = S_SLASH;
                 else if (c == '+')    state = S_PLUS;
                 else if (c == '-')    state = S_MINUS;
@@ -105,8 +113,8 @@ Token * get_token(FILE * fp) {
                     return token;
                 }
             break;
-
-        /* ######################### S_SLASH ################################ */
+        
+        /* ######################### S_SLASH ################################ */    
             case S_SLASH:
                 if (c == '*') {
                     state = S_COMMENT_BLOCK;
@@ -124,14 +132,23 @@ Token * get_token(FILE * fp) {
                     str_free(str_tmp);
                     return token;
                 }
+                else if (isoperator(c)) {
+                    ungetc(c, fp);
+                    token->type = KIN_IDENTIFIER;
+                    if (copy_str_to_token(token, str_tmp)) {
+                        cleanup(token, str_tmp);
+                    }
+                    str_free(str_tmp);
+                    return token;
+                }
                 else {
                     token->type = KIN_UNKNOWN;
                     str_free(str_tmp);
                     return token;
                 }
             break;
-
-        /* ######################### S_PLUS ################################ */
+            
+        /* ########################## S_PLUS ################################ */
         case S_PLUS:
             if (c == '+') {
                 token->type = KIN_PLUSPLUS;
@@ -146,13 +163,22 @@ Token * get_token(FILE * fp) {
                     str_free(str_tmp);
                     return token;
             }
-            else {
-                    token->type = KIN_UNKNOWN;
+            else if (isoperator(c)) {
+                    ungetc(c, fp);
+                    token->type = KIN_IDENTIFIER;
+                    if (copy_str_to_token(token, str_tmp)) {
+                        cleanup(token, str_tmp);
+                    }
                     str_free(str_tmp);
                     return token;
                 }
+            else {
+                token->type = KIN_UNKNOWN;
+                str_free(str_tmp);
+                return token;
+                }
         break;
-
+        
         /* ######################### S_MINUS ################################ */
         case S_MINUS:
             if (c == '-') {
@@ -174,18 +200,27 @@ Token * get_token(FILE * fp) {
                     cleanup(token, str_tmp);
                 }
             }
-            else {
-                    token->type = KIN_UNKNOWN;
+            else if (isoperator(c)) {
+                    ungetc(c, fp);
+                    token->type = KIN_IDENTIFIER;
+                    if (copy_str_to_token(token, str_tmp)) {
+                        cleanup(token, str_tmp);
+                    }
                     str_free(str_tmp);
                     return token;
                 }
+            else {
+                token->type = KIN_UNKNOWN;
+                str_free(str_tmp);
+                return token;
+                }
         break;
-
-
+        
+        
         /* ######################### S_GREATER ############################## */
         case S_GREATER:
             if (c == '>') {
-                token->type = KIN_CIN;
+                token->type = KIN_SCIN;
                 cleanup(NULL, str_tmp);
                 return token;
             }
@@ -202,17 +237,26 @@ Token * get_token(FILE * fp) {
                 str_free(str_tmp);
                 return token;
             }
-            else {
-                    token->type = KIN_UNKNOWN;
+            else if (isoperator(c)) {
+                    ungetc(c, fp);
+                    token->type = KIN_IDENTIFIER;
+                    if (copy_str_to_token(token, str_tmp)) {
+                        cleanup(token, str_tmp);
+                    }
                     str_free(str_tmp);
                     return token;
                 }
+            else {
+                token->type = KIN_UNKNOWN;
+                str_free(str_tmp);
+                return token;
+                }
         break;
-
+        
         /* ######################### S_SMALLER ############################## */
         case S_SMALLER:
             if (c == '<') {
-                token->type = KIN_COUT;
+                token->type = KIN_SCOUT;
                 cleanup(NULL, str_tmp);
                 return token;
             }
@@ -229,13 +273,22 @@ Token * get_token(FILE * fp) {
                 str_free(str_tmp);
                 return token;
             }
-            else {
-                    token->type = KIN_UNKNOWN;
+            else if (isoperator(c)) {
+                    ungetc(c, fp);
+                    token->type = KIN_IDENTIFIER;
+                    if (copy_str_to_token(token, str_tmp)) {
+                        cleanup(token, str_tmp);
+                    }
                     str_free(str_tmp);
                     return token;
                 }
+            else {
+                token->type = KIN_UNKNOWN;
+                str_free(str_tmp);
+                return token;
+                }
         break;
-
+        
         /* ########################## S_EQUAL ############################### */
         case S_EQUAL:
             if (c == '=') {
@@ -251,13 +304,22 @@ Token * get_token(FILE * fp) {
                 str_free(str_tmp);
                 return token;
             }
-            else {
-                    token->type = KIN_UNKNOWN;
+            else if (isoperator(c)) {
+                    ungetc(c, fp);
+                    token->type = KIN_IDENTIFIER;
+                    if (copy_str_to_token(token, str_tmp)) {
+                        cleanup(token, str_tmp);
+                    }
                     str_free(str_tmp);
                     return token;
                 }
+            else {
+                token->type = KIN_UNKNOWN;
+                str_free(str_tmp);
+                return token;
+                }
         break;
-
+        
         /* ######################### S_SCREAMER ############################# */
         case S_SCREAMER:
             if (c == '=') {
@@ -266,12 +328,12 @@ Token * get_token(FILE * fp) {
                 return token;
             }
             else {
-                    token->type = KIN_UNKNOWN;
-                    str_free(str_tmp);
-                    return token;
+                token->type = KIN_UNKNOWN;
+                str_free(str_tmp);
+                return token;
                 }
         break;
-
+        
         /* ########################### S_TEXT ############################### */
         /* Zatial nerozoznava escape sekvencie ani backslash tvary */
         case S_TEXT:
@@ -287,9 +349,9 @@ Token * get_token(FILE * fp) {
             str_free(str_tmp);
             return token;
         break;
-
-
-        /* ######################## S_NUMBER ################################ */
+        
+        
+        /* ######################## S_NUMBER ################################ */    
         case S_NUMBER:
             if (isdigit(c)) {
                 if (str_add_char(str_tmp, c)) {
@@ -301,27 +363,36 @@ Token * get_token(FILE * fp) {
                     cleanup(token, str_tmp);
                 }
                 token->type = KIN_FLOAT_NUMBER;
-                state = S_NUMBER_E;
+                state = S_NUM_E;
             }
             else if (c == '.') {
                 if (str_add_char(str_tmp, c)) {
                     cleanup(token, str_tmp);
                 }
                 token->type = KIN_FLOAT_NUMBER;
-                state = S_NUMBER_F;
+                state = S_NUM_F;
             }
+            else if (isoperator(c)) {
+                    ungetc(c, fp);
+                    token->type = KIN_IDENTIFIER;
+                    if (copy_str_to_token(token, str_tmp)) {
+                        cleanup(token, str_tmp);
+                    }
+                    str_free(str_tmp);
+                    return token;
+                }
             else {
                 token->type = KIN_NUMBER;
                 if (copy_str_to_token(token, str_tmp)) {
                     cleanup(token, str_tmp);
                 }
                 str_free(str_tmp);
-                return token;
-            }
+                return token;    
+            }  
         break;
-
-        /* ######################## S_NUMBER_E ############################## */
-        case S_NUMBER_E:
+        
+        /* ######################## S_NUMBER_E ############################## */    
+        case S_NUM_E:
             if (c == 'e' || c == 'E' || c == '.') {
                 token->type = KIN_UNKNOWN;
                 str_free(str_tmp);
@@ -332,17 +403,17 @@ Token * get_token(FILE * fp) {
                     cleanup(token, str_tmp);
                 }
             }
-            else {
+            else if (isoperator(c))  {
                 if (copy_str_to_token(token, str_tmp)) {
                     cleanup(token, str_tmp);
                 }
                 str_free(str_tmp);
-                return token;
-            }
+                return token;    
+            } 
         break;
-
-        /* ######################## S_NUMBER_F ############################## */
-        case S_NUMBER_F:
+        
+        /* ######################## S_NUMBER_F ############################## */    
+        case S_NUM_F:
             if (c == '.') {
                 token->type = KIN_UNKNOWN;
                 str_free(str_tmp);
@@ -358,22 +429,22 @@ Token * get_token(FILE * fp) {
                     cleanup(token, str_tmp);
                 }
                 token->type = KIN_FLOAT_NUMBER;
-                state = S_NUMBER_E;
+                state = S_NUM_E;
             }
             else {
                 if (copy_str_to_token(token, str_tmp)) {
                     cleanup(token, str_tmp);
                 }
                 str_free(str_tmp);
-                return token;
-            }
+                return token;    
+            } 
         break;
 
         /* ##################### S_COMMENT_LINE ############################# */
             case S_COMMENT_LINE:
                 if (c == '\n') state = S_START;
             break;
-
+        
         /* ##################### S_COMMENT_BLOCK ############################ */
             case S_COMMENT_BLOCK:
                 if (c == '*') {
@@ -385,11 +456,15 @@ Token * get_token(FILE * fp) {
                 }
             break;
 
-        /* ####################### S_IDENTIFIER ############################# */
+        /* ####################### S_IDENTIFIER ############################# */    
             case S_IDENTIFIER:
-                if ((isalnum(c) || c == '_') && str_add_char(str_tmp, c) )
-                    cleanup(token, str_tmp);
-                else if (isspace(c)) {
+                if (isalnum(c) || c == '_') {
+                    state = S_IDENTIFIER;
+                    if (str_add_char(str_tmp, c)) {
+                        cleanup(token, str_tmp);
+                    }
+                }
+                else if (isspace(c) || isoperator(c)) {
                     ungetc(c, fp);
                     int position;
                     if ((position = (str_find(str_tmp, keywords, KEYWORDS_SIZE))) != NOTFOUND) {
@@ -424,7 +499,7 @@ Token * get_token(FILE * fp) {
  * Function: copy_carray_to_token
  * Author: Kopec Maros
  * Description: copy array of characters to token string value
- *
+ * 
  * type: int
  * param 'Token *t': pointer to token to which string will be copied
  * param 'cahr *s': pointer to string that will be copied
@@ -445,7 +520,7 @@ int copy_carray_to_token(Token *t, char *s)
  * Function: copy_str_to_token
  * Author: Kopec Maros
  * Description: copy string to token string value
- *
+ * 
  * type: int
  * param 'Token *t': pointer to token to which string will be copied
  * param 'string *s': pointer to string that will be copied
@@ -466,7 +541,7 @@ int copy_str_to_token(Token *t, string *s)
  * Function: copy_char_to_token
  * Author: Kopec Maros
  * Description: copy one character to string value of token
- *
+ * 
  * type: int
  * param 'Token * t': pointer to token to which character will be copied
  * param 'char c': character that will be copied
@@ -483,10 +558,32 @@ int copy_char_to_token(Token *t, char c)
 
 
 /*
+ * Function: isoperator
+ * Author: Kopec Maros
+ * Description: Check if character is valid operator or command symbol
+ * 
+ * type: int
+ * param 'char c': character that will be compared
+ * returns: TRUE (1) if found, else FALSE (0)
+ */
+int isoperator(char c)
+{
+    int i;
+    char operators[] = {';', '*', '/', '+', '-', '>', '<', '=', '!', '(', ')',
+                        '{', '}', ',', EOF};
+    for (i = 0; i<strlen(operators); i++) {
+        if (c == operators[i])
+            return TRUE;
+    }
+    return FALSE;
+}
+
+
+/*
  * Function: cleanup
  * Author: Kopec Maros
  * Description: free memory after malloc if error is detected
- *
+ * 
  * type: Token
  * param 'Token * t': pointer to token that will be free'd
  * param 'string * s' pointer to string that will be free'd
