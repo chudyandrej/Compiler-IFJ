@@ -398,12 +398,12 @@ Token * get_token(FILE * fp) {
             }
             else if (isoperator(c)) {
                 ungetc(c, fp);
-                if ((count_e == 0) && (count_dot == 0)) {
-                    if (int isINT(c))   token->type = KIN_NUM_INT;
-                    else                token->type = KIN_NUM_DOUBLE;
-                }
                 if (copy_str_to_token(token, str_tmp)) {
                     cleanup(token, str_tmp);
+                }
+                if ((count_e == 0) && (count_dot == 0)) {
+                    if (isINT(token->str))   token->type = KIN_NUM_INT;
+                    else                     token->type = KIN_NUM_DOUBLE;
                 }
                 str_free(str_tmp);
                 return token;
