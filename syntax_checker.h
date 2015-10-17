@@ -29,6 +29,9 @@ int for_statement();
 int value();
 void errorMessage(const char *mesasge );
 int next_token();
+int value_identifier();
+int value_operator();
+int value_number_func();
 
 
 int bracket(int token);

@@ -2,5 +2,5 @@
 
 int main(){
 
-    andew((a+(b))*v,b);
+    fun(8*func()*8*a*);
 }

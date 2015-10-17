@@ -6,10 +6,10 @@ FILE *fp;
 
 int main(int argc, char *argv[]) {
 
-    fp = fopen("/home/andrej/ClionProjects/Compiler-IFJ/over_program.cpp","r");
-    start_syntax_analyz();
+    fp = fopen("/home/andrej/ClionProjects/Compiler-IFJ/test.cpp","r");
+    int exitcode = start_syntax_analyz();
     fclose(fp);
 
 
-    return 0;
+    return exitcode;
 }

@@ -3,6 +3,7 @@
 //
 
 
+
 #include "syntax_checker.h"
 
 int start_syntax_analyz(){
@@ -31,7 +32,12 @@ int dec_function(){
             if(parameters() == 0){
                 new_token = next_token();
                 if (new_token == KIN_SEMICOLON){ return 0;}
-                else if(new_token == KIN_L_BRACE){return body_funcion();}
+                else if(new_token == KIN_L_BRACE) {
+                    int exit_code = body_funcion();
+                    if (exit_code == 0) { return 0; }
+                    errorMessage("Error in body of program !");
+                    return 1;
+                }
                 else {
                     errorMessage("Error during declaration function !");
                     return 1;
@@ -55,21 +61,22 @@ int body_funcion(){
                 if (if_statement() == 0){ continue;} else{ return 1;}
             case KW_FOR:
                 if (for_statement() == 0){ continue;} else{ return 1;}
-            case KW_SORT:
             case KW_RETURN:
+                if(value() == KIN_SEMICOLON){ continue;} else{ return 1;}
+            case KW_SORT:
             case KW_LENGTH:
-                if (one_par_command() == 0){ continue;} else{ return 1;}
+                if (next_token() == KIN_L_ROUNDBRACKET &&
+                        parameters_used() == 1 && next_token() == KIN_SEMICOLON){continue;} else{return 1;}
             case KW_FIND:
             case KW_CONCAT:
-                if (two_par_command() == 0){ continue;} else{ return 1;}
+                if (next_token() == KIN_L_ROUNDBRACKET &&
+                        parameters_used() == 2  && next_token() == KIN_SEMICOLON){continue;} else{ return 1;}
             case KW_SUBSTR:
-                if (three_par_command() == 0){ continue;} else{ return 1;}
+                if (next_token() == KIN_L_ROUNDBRACKET &&
+                        parameters_used() == 3  && next_token() == KIN_SEMICOLON){continue;} else{ return 1;}
             case KIN_IDENTIFIER:
                 if (assing() == 0){ continue; } else{ return 1; }
-            case KW_AUTO:
-            case KW_DOUBLE:
-            case KW_INT:
-            case KW_STRING:
+            case KW_AUTO:   case KW_DOUBLE:  case KW_INT:  case KW_STRING:      //all datatypes
                 if (dec_variable() == KIN_SEMICOLON) { continue; } else { return 1; }
             case KIN_R_BRACE:
                 return 0;
@@ -133,7 +140,7 @@ int cin_cout(int op){
 
 int assing(){
     int new_token = next_token();
-    if ((new_token == KIN_L_ROUNDBRACKET) && (parameters_used() == 0) && (next_token() == KIN_SEMICOLON)) {
+    if ((new_token == KIN_L_ROUNDBRACKET) && (parameters_used() != 100) && (next_token() == KIN_SEMICOLON)) {
         return 0;
     }
     else if (new_token == KIN_ASSIGNEMENT) {
@@ -183,119 +190,37 @@ int parameters(){
 
 int parameters_used(){
     int status_bracket = 1;
+    int counter_of_arguments = 0;
     stackPush(bracket_stack, status_bracket);
     while(true) {
+        counter_of_arguments++;
         int exit_code_value = value();
         if(exit_code_value == KIN_COMMA) {
             continue;
         }
         else if(exit_code_value == KIN_R_ROUNDBRACKET){
-            return 0;
+            return counter_of_arguments;
         }
         errorMessage("Error in parameter used!");
-        return 1;
+        return 100;
     }
-}
-
-int one_par_command(){
-    if((next_token() == KIN_L_ROUNDBRACKET) && (next_token() == KIN_IDENTIFIER)&& (next_token() == KIN_R_ROUNDBRACKET)){
-        if (next_token() == KIN_SEMICOLON) {
-            return 0;
-        }
-    }
-    errorMessage("Error in one parameter func!");
-    return 1;
-}
-
-int two_par_command(){
-    if((next_token() == KIN_L_ROUNDBRACKET) && (next_token()== KIN_IDENTIFIER) && (next_token() == KIN_COMMA) &&
-            (next_token()== KIN_IDENTIFIER) && (next_token() == KIN_R_ROUNDBRACKET) && (next_token() == KIN_SEMICOLON)){
-        return 0;
-    }
-    errorMessage("Error in two parameter func!");
-    return 1;
-}
-
-int three_par_command(){
-    if((next_token() == KIN_L_ROUNDBRACKET) && (next_token() == KIN_IDENTIFIER) && (next_token() == KIN_COMMA) &&
-            (next_token() == KIN_IDENTIFIER) && (next_token() == KIN_COMMA) && (next_token()== KIN_IDENTIFIER) &&
-            (next_token() == KIN_R_ROUNDBRACKET) && (next_token() == KIN_SEMICOLON)){
-        return 0;
-    }
-    errorMessage("Error in three parameter func!");
-    return 1;
 }
 
 int value(){
     int new_token = next_token();
     switch(new_token){
         case KIN_IDENTIFIER:
-            new_token = next_token();
-            switch (new_token) {
-                case KIN_L_ROUNDBRACKET:
-                    return parameters_used();
-                case KIN_R_ROUNDBRACKET:
-                    return bracket(new_token);
-                case KIN_COMMA:
-                    return KIN_COMMA;
-                case KIN_MINUS:
-                case KIN_PLUS:
-                case KIN_DIV:
-                case KIN_MUL:
-                case KIN_GREATER:
-                case KIN_GREATER_EQ:
-                case KIN_SMALLER:
-                case KIN_SMALLER_EQ:
-                case KIN_EQ:
-                case KIN_NOT_EQ:
-                    return value();
-                default:
-                    errorMessage("Error hned po volani identyfikatora");
-                    return 1;
-            }
-        case KIN_NUMBER: {
-            new_token = next_token();
-            switch (new_token) {
-                case KIN_COMMA:
-                    return 0;
-                case KIN_MINUS:
-                case KIN_PLUS:
-                case KIN_DIV:
-                case KIN_MUL:
-                case KIN_GREATER:
-                case KIN_GREATER_EQ:
-                case KIN_SMALLER:
-                case KIN_SMALLER_EQ:
-                case KIN_EQ:
-                case KIN_NOT_EQ:
-                    return value();
-
-                case KIN_L_ROUNDBRACKET:
-                case KIN_R_ROUNDBRACKET:
-                    return bracket(new_token);
-                default:
-                    errorMessage("Error hned po volani KIN_NUNBER");
-                    return 1;
-            }
-        }
-        case KIN_MINUS:
-        case KIN_PLUS:
-        case KIN_DIV:
-        case KIN_MUL:
-        case KIN_GREATER:
-        case KIN_GREATER_EQ:
-        case KIN_SMALLER:
-        case KIN_SMALLER_EQ:
-        case KIN_EQ:
-        case KIN_NOT_EQ: {
-            return  value();
-
-        }
+            return value_identifier();
+        case KIN_NUM_INT:
+        case KIN_NUM_DOUBLE:
+            return value_number_func();
         case KIN_L_ROUNDBRACKET:
         case KIN_R_ROUNDBRACKET:
             return bracket(new_token);
         case KIN_COMMA:
             return KIN_COMMA;
+        case KIN_SEMICOLON:
+            return KIN_SEMICOLON;
         default:
             errorMessage("error pri volani vsetkeho ");
             printf("%d",new_token);
@@ -315,37 +240,69 @@ int bracket(int token){
             counter_bracket = stackPop(bracket_stack);
             printf("\n%d\n",counter_bracket);
             counter_bracket--;
-            if(counter_bracket == 0){
-                return KIN_R_ROUNDBRACKET;
-            }
-            else {
-                stackPush(bracket_stack, counter_bracket);
-                token = next_token();
-                switch(token){
-                    case KIN_MINUS:
-                    case KIN_PLUS:
-                    case KIN_DIV:
-                    case KIN_MUL:
-                    case KIN_GREATER:
-                    case KIN_GREATER_EQ:
-                    case KIN_SMALLER:
-                    case KIN_SMALLER_EQ:
-                    case KIN_EQ:
-                    case KIN_NOT_EQ:
-                        return value();
-                    case KIN_R_ROUNDBRACKET:
-                    case KIN_L_ROUNDBRACKET:
-                        return bracket(token);
-                    default:
-                        errorMessage("error pri operacii za zatvorkou ");
-                        return 1;
-                }
-            }
+            if(counter_bracket == 0){ return KIN_R_ROUNDBRACKET;}
+            else {return value_number_func();}
         default:
             errorMessage("error zatvoriek");
             return 1;
     }
 }
+
+int value_identifier(){
+    int new_token = next_token();
+    switch (new_token) {
+        case KIN_L_ROUNDBRACKET:
+            if(parameters_used() != 100) {
+                return value_number_func();
+            }
+        case KIN_R_ROUNDBRACKET:
+            return bracket(new_token);
+        case KIN_COMMA:
+            return KIN_COMMA;
+        case KIN_SEMICOLON:
+            return KIN_SEMICOLON;
+        case KIN_MINUS: case KIN_PLUS: case KIN_DIV: case KIN_MUL: case KIN_GREATER: case KIN_GREATER_EQ:
+        case KIN_SMALLER: case KIN_SMALLER_EQ: case KIN_EQ: case KIN_NOT_EQ:
+            return value_operator();
+        default:
+            errorMessage("Error hned po volani identyfikatora");
+            return 1;
+    }
+}
+int value_operator(){
+    int new_token = next_token();
+    switch(new_token) {
+        case KIN_L_ROUNDBRACKET:
+            return bracket(new_token);
+        case KIN_NUM_DOUBLE:
+        case KIN_NUM_INT:
+            return value_number_func();
+        case KIN_IDENTIFIER:
+            return value_identifier();
+        default:
+            return 1;
+    }
+}
+
+int value_number_func(){
+    int new_token = next_token();
+    switch (new_token) {
+        case KIN_COMMA:
+            return KIN_COMMA;
+        case KIN_SEMICOLON:
+            return KIN_SEMICOLON;
+        case KIN_MINUS: case KIN_PLUS: case KIN_DIV: case KIN_MUL: case KIN_GREATER:
+        case KIN_GREATER_EQ: case KIN_SMALLER: case KIN_SMALLER_EQ: case KIN_EQ:
+        case KIN_NOT_EQ:
+            return value_operator();
+        case KIN_R_ROUNDBRACKET:
+            return bracket(new_token);
+        default:
+            errorMessage("Error hned po volani KIN_NUNBER");
+            return 1;
+    }
+}
+
 
 void errorMessage(const char *mesasge ){
     printf("############ SYNTAX ERROR ############ \n");
