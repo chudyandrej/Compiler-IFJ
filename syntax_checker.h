@@ -6,15 +6,17 @@
 #define INTERPRET_SYNTAX_CHECKER_H
 
 #include "fake_skener.h"
+#include "stack.h"
 
 
 
+Stack *bracket_stack ;
 int start_syntax_analyz();
 int dec_function();
 
 int parameters();
 int body_funcion();
-int command(token_stract *new_token);
+
 int assing();
 int dec_variable();
 int one_par_command();
@@ -27,7 +29,9 @@ int for_statement();
 int value();
 void errorMessage(const char *mesasge );
 int next_token();
-int val_par();
+
+
+int bracket(int token);
 
 typedef enum TokenType {
     TT_ASSIGNEMENT = '=',

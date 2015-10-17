@@ -5,7 +5,12 @@
 #include <stdbool.h>
 #include "syntax_checker.h"
 
+
+
 int start_syntax_analyz(){
+
+    bracket_stack= stackCreate() ;
+
     int new_token = next_token();
     if(new_token == TYPE){
         return dec_function();
@@ -110,6 +115,9 @@ int cin_cout(int op){
                     return 1;
                 }
             }
+            else{
+                break;
+            }
         }
     }
     errorMessage("Error in cin or cout operator!");
@@ -165,9 +173,8 @@ int parameters(){
 }
 
 int parameters_used(){
-    if(next_token() == TT_RIGHTROUNDBRACKET) {
-        return 0;
-    }                                                /*means no parameters*/
+    int status_bracket = 1;
+    stackPush(bracket_stack, status_bracket);
     while(true) {
         int exit_code_value = value();
         if(exit_code_value == TT_COMMA) {
@@ -212,75 +219,89 @@ int three_par_command(){
 
 int value(){
     int new_token = next_token();
-    if(new_token == IDENTIFIER){
-        new_token = next_token();
-        switch (new_token){
-            case TT_LEFTROUNDBRACKET:
-                if(parameters_used() == 0) {
-                    return val_par();
-                }
-            case OPERATOR:
-                return val_par();
-            case TT_COMMA:
-                return TT_COMMA;
-            case TT_RIGHTROUNDBRACKET:
-                return 0;
-            default:
-                return 1;
-        }
-    }
-    else if(new_token == NUMBER){
-        int counter_bracket = 0;
-        while(true) {
-
+    switch(new_token){
+        case IDENTIFIER: {
             new_token = next_token();
-            switch(new_token){
-                case NUMBER:
-                    if(next_token() == OPERATOR){
-                        continue;
-                    }
+            switch (new_token) {
                 case TT_LEFTROUNDBRACKET:
-                    counter_bracket++;
-                    continue;
+                    return parameters_used();
                 case TT_RIGHTROUNDBRACKET:
-                    counter_bracket--;
-                    if(counter_bracket == -1){
-                        return TT_RIGHTROUNDBRACKET;
-                    }
-                    continue;
+                    return bracket(new_token);
                 case TT_COMMA:
-                    if(counter_bracket == 0){
-                        return TT_COMMA;
-                    }
-                    return 1;
-                case TT_SEMICOLON:
-                    if(counter_bracket == 0){
-                        return TT_SEMICOLON;
-                    }
-                    return 1;
+                    return TT_COMMA;
+                case OPERATOR:
+                    return value();
                 default:
-                    errorMessage("Error in value!");
+                    errorMessage("Error hned po volani identyfikatora");
                     return 1;
             }
         }
-    }
+        case NUMBER: {
+            new_token = next_token();
+            switch (new_token) {
+                case TT_COMMA:
+                    return 0;
+                case OPERATOR:
+                    return value();
 
+                case TT_LEFTROUNDBRACKET:
+                case TT_RIGHTROUNDBRACKET:
+                    return bracket(new_token);
+                default:
+                    errorMessage("Error hned po volani number");
+                    return 1;
+            }
+        }
+        case OPERATOR: {
+            return  value();
+
+        }
+        case TT_LEFTROUNDBRACKET:
+        case TT_RIGHTROUNDBRACKET:
+            return bracket(new_token);
+        case TT_COMMA:
+            return TT_COMMA;
+        default:
+            errorMessage("error pri volani vsetkeho ");
+            printf("%d",new_token);
+            return 1;
+    }
 }
 
-int val_par() {
-    int new_token = next_token();
-    if (new_token == TT_COMMA) {
-        return TT_COMMA;
+int bracket(int token){
+    int counter_bracket = 0;
+    switch(token){
+        case TT_LEFTROUNDBRACKET:
+            counter_bracket = stackPop(bracket_stack);
+            counter_bracket++;
+            stackPush(bracket_stack, counter_bracket);
+            return value();
+        case TT_RIGHTROUNDBRACKET:
+            counter_bracket = stackPop(bracket_stack);
+            printf("\n%d\n",counter_bracket);
+            counter_bracket--;
+            if(counter_bracket == 0){
+                return TT_RIGHTROUNDBRACKET;
+            }
+            else {
+                stackPush(bracket_stack, counter_bracket);
+                token = next_token();
+                switch(token){
+                    case OPERATOR:
+                        return value();
+                    case TT_RIGHTROUNDBRACKET:
+                    case TT_LEFTROUNDBRACKET:
+                        return bracket(token);
+                    default:
+                        errorMessage("error pri operacii za zatvorkou ");
+                        return 1;
+                }
+            }
+        default:
+            errorMessage("error zatvoriek");
+            return 1;
     }
-    else if (new_token == TT_RIGHTROUNDBRACKET){
-        return TT_RIGHTROUNDBRACKET;
-    }
-    else if (new_token == OPERATOR){
-        return val_par();
-    }
-    return 1;
 }
-
 
 void errorMessage(const char *mesasge ){
     printf("############ SYNTAX ERROR ############ \n");
