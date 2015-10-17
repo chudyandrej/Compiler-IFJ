@@ -26,12 +26,6 @@ nad nimi (pridani, vyhledavani ...)
 #define IAL_H_INCLUDED
 
 typedef struct {
-    tBSTEPtr Root;  // koren
-    tBSTEPtr Act;   // aktivni
-} tBST;
-
-
-typedef struct {
     char * key;     // klic pro porovnavani
     void * data;    // pointer na data:
                         //globalni TS: struktura tFunc
@@ -39,6 +33,11 @@ typedef struct {
     struct tBSTEPtr *lptr;   // levy element
     struct tBSTEPtr *rptr;   // pravy element
 } *tBSTEPtr;
+
+typedef struct {
+    tBSTEPtr Root;  // koren
+    tBSTEPtr Act;   // aktivni
+} tBST;
 
 void BSTInit (tBST *);
 void BSTAdd (tBST *, char *); //zaroven oznaci pridane za Aktualni
@@ -79,14 +78,14 @@ typedef struct tVarEl{
     int scope; //zanoreni, pri volani funkce zacina na 0
     char datatype; // obdobne jako u params v tFunc
     void * value; // NULL if not defined
-    tVarElPtr * ptr;    //pointer na pravy
+    struct tVarEl * ptr;    //pointer na pravy
                         //pri deklaraci se pridavaji prvky ZLEVA
 } *tVarElPtr;
 
 void LSTDispose (tBST *);
 int LSTAdd (tBST *, char type, int scope); //return 0 kdyz nebylo v zanorenim doposud definovano
 int LSTSet (tBST *, char type, void *); //return 0 kdyz nedoslo k nekompatibilite typu
-void LSTLeaveScope (tBTS *, int scope); 
+void LSTLeaveScope (tBST *, int scope); 
         //odstrani vsechny lokalni promene z daneho zanoreni
 
-#endif IAL_H_INCLUDED
+#endif // IAL_H_INCLUDED
