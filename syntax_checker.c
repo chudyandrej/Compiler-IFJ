@@ -2,32 +2,36 @@
 // Created by andrej on 15.10.2015.
 //
 
-#include <stdbool.h>
+
 #include "syntax_checker.h"
-
-
 
 int start_syntax_analyz(){
 
     bracket_stack= stackCreate() ;
-
     int new_token = next_token();
-    if(new_token == TYPE){
-        return dec_function();
-    }else{
-        errorMessage("Error on global scope !");
-        return 1;
+    switch(new_token){
+        case KW_AUTO:
+        case KW_DOUBLE:
+        case KW_INT:
+        case KW_STRING:
+            return dec_function();
+        case END_OF_FILE:
+            errorMessage("program file is empty !");
+            return 1;
+        default:
+            errorMessage("Error on global scope !");
+            return 1;
     }
 }
 
 int dec_function(){
     int new_token = next_token();
-    if (new_token == IDENTIFIER){
-        if (next_token() == TT_LEFTROUNDBRACKET){
+    if (new_token == KIN_IDENTIFIER){
+        if (next_token() == KIN_L_ROUNDBRACKET){
             if(parameters() == 0){
                 new_token = next_token();
-                if (new_token == TT_SEMICOLON){ return 0;}
-                else if(new_token == TT_LEFTBRACE){return body_funcion();}
+                if (new_token == KIN_SEMICOLON){ return 0;}
+                else if(new_token == KIN_L_BRACE){return body_funcion();}
                 else {
                     errorMessage("Error during declaration function !");
                     return 1;
@@ -43,28 +47,31 @@ int body_funcion(){
     while(true) {
         int  new_token = next_token();
         switch(new_token){
-            case C_CIN:
-                if (cin_cout(TT_SCIN) == 0){ continue;} else{ return 1;}
-            case C_COUT:
-                if (cin_cout(TT_SCOUT) == 0){ continue;} else{ return 1;}
-            case C_IF:
+            case KW_CIN:
+                if (cin_cout(KIN_SCIN) == 0){ continue;} else{ return 1;}
+            case KW_COUT:
+                if (cin_cout(KIN_SCOUT) == 0){ continue;} else{ return 1;}
+            case KW_IF:
                 if (if_statement() == 0){ continue;} else{ return 1;}
-            case C_FOR:
+            case KW_FOR:
                 if (for_statement() == 0){ continue;} else{ return 1;}
-            case C_SORT:
-            case C_RETURN:
-            case C_LENGTH:
+            case KW_SORT:
+            case KW_RETURN:
+            case KW_LENGTH:
                 if (one_par_command() == 0){ continue;} else{ return 1;}
-            case C_FIND:
-            case C_CONCAT:
+            case KW_FIND:
+            case KW_CONCAT:
                 if (two_par_command() == 0){ continue;} else{ return 1;}
-            case C_SUBSTR:
+            case KW_SUBSTR:
                 if (three_par_command() == 0){ continue;} else{ return 1;}
-            case IDENTIFIER:
+            case KIN_IDENTIFIER:
                 if (assing() == 0){ continue; } else{ return 1; }
-            case TYPE:
-                if (dec_variable() == TT_SEMICOLON) { continue; } else { return 1; }
-            case TT_RIGHTBRACE:
+            case KW_AUTO:
+            case KW_DOUBLE:
+            case KW_INT:
+            case KW_STRING:
+                if (dec_variable() == KIN_SEMICOLON) { continue; } else { return 1; }
+            case KIN_R_BRACE:
                 return 0;
             default:
                 errorMessage("Error in body of program !");
@@ -74,17 +81,17 @@ int body_funcion(){
 }
 
 int for_statement() {
-    if (next_token() == TT_LEFTROUNDBRACKET) {
+    if (next_token() == KIN_L_ROUNDBRACKET) {
         int new_token = next_token();
-        if (new_token == TYPE) {
-            if ((next_token() == IDENTIFIER) && (assing() == TT_SEMICOLON) && (value() == TT_SEMICOLON) &&
-                    (next_token() == IDENTIFIER) && (assing() == TT_RIGHTROUNDBRACKET)&& next_token() == TT_LEFTBRACE){
+        if((new_token == KW_AUTO) || (new_token == KW_DOUBLE) || (new_token == KW_INT) || (new_token == KW_STRING)) {
+            if ((next_token() == KIN_IDENTIFIER) && (assing() == KIN_SEMICOLON) && (value() == KIN_SEMICOLON) &&
+                    (next_token() == KIN_IDENTIFIER) && (assing() == KIN_R_ROUNDBRACKET)&& next_token() == KIN_L_BRACE){
                 return body_funcion();
             }
         }
-        else if (new_token == IDENTIFIER) {
-            if ((assing() ==TT_SEMICOLON) && (value() == TT_SEMICOLON) && (next_token() == IDENTIFIER) &&
-                    (assing() == TT_RIGHTROUNDBRACKET) && next_token() == TT_LEFTBRACE) {
+        else if (new_token == KIN_IDENTIFIER) {
+            if ((assing() == KIN_SEMICOLON) && (value() == KIN_SEMICOLON) && (next_token() == KIN_IDENTIFIER) &&
+                    (assing() == KIN_R_ROUNDBRACKET) && next_token() == KIN_L_BRACE) {
                 return body_funcion();
             }
         }
@@ -94,9 +101,9 @@ int for_statement() {
 }
 
 int if_statement(){
-    if((next_token()==TT_LEFTROUNDBRACKET) && (value()==TT_RIGHTROUNDBRACKET) &&
-            (next_token()==TT_LEFTBRACE) && (body_funcion() == 0)){
-        if ((next_token() == C_ELSE) && (next_token() == TT_LEFTBRACE)){
+    if((next_token()== KIN_L_ROUNDBRACKET) && (value()== KIN_R_ROUNDBRACKET) &&
+            (next_token()== KIN_L_BRACE) && (body_funcion() == 0)){
+        if ((next_token() == KW_ELSE) && (next_token() == KIN_L_BRACE)){
             return body_funcion();
         }
     }
@@ -106,10 +113,10 @@ int if_statement(){
 int cin_cout(int op){
     if (next_token() ==  op){
         while(true){
-            if (next_token() == IDENTIFIER) {
+            if (next_token() == KIN_IDENTIFIER) {
                 int new_token = next_token();
                 if (new_token == op) {continue; }
-                else if(new_token == TT_SEMICOLON){return 0;}
+                else if(new_token == KIN_SEMICOLON){return 0;}
                 else {
                     errorMessage("error in cin or cout command!");
                     return 1;
@@ -126,10 +133,10 @@ int cin_cout(int op){
 
 int assing(){
     int new_token = next_token();
-    if ((new_token == TT_LEFTROUNDBRACKET) && (parameters_used() == 0) && (next_token() == TT_SEMICOLON)) {
+    if ((new_token == KIN_L_ROUNDBRACKET) && (parameters_used() == 0) && (next_token() == KIN_SEMICOLON)) {
         return 0;
     }
-    else if (new_token == TT_ASSIGNEMENT) {
+    else if (new_token == KIN_ASSIGNEMENT) {
         return value();           //kontrola bidkociarky
     }
     errorMessage("Error in assing function!");
@@ -137,12 +144,12 @@ int assing(){
 }
 
 int dec_variable(){
-    if (next_token() == IDENTIFIER) {
+    if (next_token() == KIN_IDENTIFIER) {
         int new_token = next_token();
-        if (new_token == TT_SEMICOLON) {
+        if (new_token == KIN_SEMICOLON) {
             return 0;
         }
-        else if(new_token == TT_ASSIGNEMENT){
+        else if(new_token == KIN_ASSIGNEMENT){
             return value();
         }
     }
@@ -154,17 +161,19 @@ int dec_variable(){
 
 int parameters(){
     int new_token = next_token();
-    if(new_token == TT_RIGHTROUNDBRACKET) {
+    if(new_token == KIN_R_ROUNDBRACKET) {
         return 0;
     }                                                /*means no parameters*/
     while(true) {
-        if((new_token == TYPE) && (next_token() == IDENTIFIER)) {
-            new_token = next_token();
-            if (new_token == TT_RIGHTROUNDBRACKET) {
-                return 0;
-            }
-            else if (new_token == TT_COMMA) {
-                continue;
+        if((new_token == KW_AUTO) || (new_token == KW_DOUBLE) || (new_token == KW_INT) || (new_token == KW_STRING)) {
+            if (next_token() == KIN_IDENTIFIER) {
+                new_token = next_token();
+                if (new_token == KIN_R_ROUNDBRACKET) {
+                    return 0;
+                }
+                else if (new_token == KIN_COMMA) {
+                    continue;
+                }
             }
         }
         errorMessage("Error in declaration parameters!");
@@ -177,10 +186,10 @@ int parameters_used(){
     stackPush(bracket_stack, status_bracket);
     while(true) {
         int exit_code_value = value();
-        if(exit_code_value == TT_COMMA) {
+        if(exit_code_value == KIN_COMMA) {
             continue;
         }
-        else if(exit_code_value == TT_RIGHTROUNDBRACKET){
+        else if(exit_code_value == KIN_R_ROUNDBRACKET){
             return 0;
         }
         errorMessage("Error in parameter used!");
@@ -189,8 +198,8 @@ int parameters_used(){
 }
 
 int one_par_command(){
-    if((next_token() == TT_LEFTROUNDBRACKET) && (next_token() == IDENTIFIER )&& (next_token() == TT_RIGHTROUNDBRACKET)){
-        if (next_token() == TT_SEMICOLON) {
+    if((next_token() == KIN_L_ROUNDBRACKET) && (next_token() == KIN_IDENTIFIER)&& (next_token() == KIN_R_ROUNDBRACKET)){
+        if (next_token() == KIN_SEMICOLON) {
             return 0;
         }
     }
@@ -199,8 +208,8 @@ int one_par_command(){
 }
 
 int two_par_command(){
-    if((next_token() == TT_LEFTROUNDBRACKET) && (next_token()== IDENTIFIER) && (next_token() == TT_COMMA) &&
-            (next_token()== IDENTIFIER) && (next_token() == TT_RIGHTROUNDBRACKET) && (next_token() == TT_SEMICOLON)){
+    if((next_token() == KIN_L_ROUNDBRACKET) && (next_token()== KIN_IDENTIFIER) && (next_token() == KIN_COMMA) &&
+            (next_token()== KIN_IDENTIFIER) && (next_token() == KIN_R_ROUNDBRACKET) && (next_token() == KIN_SEMICOLON)){
         return 0;
     }
     errorMessage("Error in two parameter func!");
@@ -208,9 +217,9 @@ int two_par_command(){
 }
 
 int three_par_command(){
-    if((next_token() == TT_LEFTROUNDBRACKET) && (next_token() == IDENTIFIER) && (next_token() == TT_COMMA) &&
-            (next_token() == IDENTIFIER) && (next_token() == TT_COMMA) && (next_token()== IDENTIFIER) &&
-            (next_token() == TT_RIGHTROUNDBRACKET) && (next_token() == TT_SEMICOLON)){
+    if((next_token() == KIN_L_ROUNDBRACKET) && (next_token() == KIN_IDENTIFIER) && (next_token() == KIN_COMMA) &&
+            (next_token() == KIN_IDENTIFIER) && (next_token() == KIN_COMMA) && (next_token()== KIN_IDENTIFIER) &&
+            (next_token() == KIN_R_ROUNDBRACKET) && (next_token() == KIN_SEMICOLON)){
         return 0;
     }
     errorMessage("Error in three parameter func!");
@@ -220,47 +229,73 @@ int three_par_command(){
 int value(){
     int new_token = next_token();
     switch(new_token){
-        case IDENTIFIER: {
+        case KIN_IDENTIFIER:
             new_token = next_token();
             switch (new_token) {
-                case TT_LEFTROUNDBRACKET:
+                case KIN_L_ROUNDBRACKET:
                     return parameters_used();
-                case TT_RIGHTROUNDBRACKET:
+                case KIN_R_ROUNDBRACKET:
                     return bracket(new_token);
-                case TT_COMMA:
-                    return TT_COMMA;
-                case OPERATOR:
+                case KIN_COMMA:
+                    return KIN_COMMA;
+                case KIN_MINUS:
+                case KIN_PLUS:
+                case KIN_DIV:
+                case KIN_MUL:
+                case KIN_GREATER:
+                case KIN_GREATER_EQ:
+                case KIN_SMALLER:
+                case KIN_SMALLER_EQ:
+                case KIN_EQ:
+                case KIN_NOT_EQ:
                     return value();
                 default:
                     errorMessage("Error hned po volani identyfikatora");
                     return 1;
             }
-        }
-        case NUMBER: {
+        case KIN_NUMBER: {
             new_token = next_token();
             switch (new_token) {
-                case TT_COMMA:
+                case KIN_COMMA:
                     return 0;
-                case OPERATOR:
+                case KIN_MINUS:
+                case KIN_PLUS:
+                case KIN_DIV:
+                case KIN_MUL:
+                case KIN_GREATER:
+                case KIN_GREATER_EQ:
+                case KIN_SMALLER:
+                case KIN_SMALLER_EQ:
+                case KIN_EQ:
+                case KIN_NOT_EQ:
                     return value();
 
-                case TT_LEFTROUNDBRACKET:
-                case TT_RIGHTROUNDBRACKET:
+                case KIN_L_ROUNDBRACKET:
+                case KIN_R_ROUNDBRACKET:
                     return bracket(new_token);
                 default:
-                    errorMessage("Error hned po volani number");
+                    errorMessage("Error hned po volani KIN_NUNBER");
                     return 1;
             }
         }
-        case OPERATOR: {
+        case KIN_MINUS:
+        case KIN_PLUS:
+        case KIN_DIV:
+        case KIN_MUL:
+        case KIN_GREATER:
+        case KIN_GREATER_EQ:
+        case KIN_SMALLER:
+        case KIN_SMALLER_EQ:
+        case KIN_EQ:
+        case KIN_NOT_EQ: {
             return  value();
 
         }
-        case TT_LEFTROUNDBRACKET:
-        case TT_RIGHTROUNDBRACKET:
+        case KIN_L_ROUNDBRACKET:
+        case KIN_R_ROUNDBRACKET:
             return bracket(new_token);
-        case TT_COMMA:
-            return TT_COMMA;
+        case KIN_COMMA:
+            return KIN_COMMA;
         default:
             errorMessage("error pri volani vsetkeho ");
             printf("%d",new_token);
@@ -271,26 +306,35 @@ int value(){
 int bracket(int token){
     int counter_bracket = 0;
     switch(token){
-        case TT_LEFTROUNDBRACKET:
+        case KIN_L_ROUNDBRACKET:
             counter_bracket = stackPop(bracket_stack);
             counter_bracket++;
             stackPush(bracket_stack, counter_bracket);
             return value();
-        case TT_RIGHTROUNDBRACKET:
+        case KIN_R_ROUNDBRACKET:
             counter_bracket = stackPop(bracket_stack);
             printf("\n%d\n",counter_bracket);
             counter_bracket--;
             if(counter_bracket == 0){
-                return TT_RIGHTROUNDBRACKET;
+                return KIN_R_ROUNDBRACKET;
             }
             else {
                 stackPush(bracket_stack, counter_bracket);
                 token = next_token();
                 switch(token){
-                    case OPERATOR:
+                    case KIN_MINUS:
+                    case KIN_PLUS:
+                    case KIN_DIV:
+                    case KIN_MUL:
+                    case KIN_GREATER:
+                    case KIN_GREATER_EQ:
+                    case KIN_SMALLER:
+                    case KIN_SMALLER_EQ:
+                    case KIN_EQ:
+                    case KIN_NOT_EQ:
                         return value();
-                    case TT_RIGHTROUNDBRACKET:
-                    case TT_LEFTROUNDBRACKET:
+                    case KIN_R_ROUNDBRACKET:
+                    case KIN_L_ROUNDBRACKET:
                         return bracket(token);
                     default:
                         errorMessage("error pri operacii za zatvorkou ");
@@ -308,13 +352,14 @@ void errorMessage(const char *mesasge ){
     printf("Error message: %s \n",mesasge);
 
 }
+
 int next_token(){
-    token_stract *new_token = next_new_token();
+    Token *new_token = get_token(fp);
     if(new_token != NULL) {
-        if (new_token->category != END_OF_FILE) {
-            return new_token->category;
+        if (new_token->type != END_OF_FILE) {
+            printf("%d, ",new_token->type);
+            return new_token->type;
         }
     }
-
     return END_OF_FILE;
 }
