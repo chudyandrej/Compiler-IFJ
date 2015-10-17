@@ -1,13 +1,3 @@
 
 
-int main(){
-
-    if(func(a,a)*(53*P)){
-
-    }
-    else{
-        a = func();
-    }
-
-
-}
+int main(int a,int b,int c,auto p);

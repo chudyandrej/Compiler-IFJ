@@ -187,6 +187,7 @@ int parameters(){
                     return 0;
                 }
                 else if (new_token == KIN_COMMA) {
+                    new_token = next_token();
                     continue;
                 }
             }
