@@ -16,8 +16,7 @@ int dec_function();
 
 int parameters();
 int body_funcion();
-
-int assing();
+int assing(int PREDICT_EXIT);
 int dec_variable();
 int one_par_command();
 int two_par_command();

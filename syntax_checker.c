@@ -75,7 +75,7 @@ int body_funcion(){
                 if (next_token() == KIN_L_ROUNDBRACKET &&
                         parameters_used() == 3  && next_token() == KIN_SEMICOLON){continue;} else{ return 1;}
             case KIN_IDENTIFIER:
-                if (assing() == 0){ continue; } else{ return 1; }
+                if (assing(KIN_SEMICOLON) == 0){ continue; } else{ return 1; }
             case KW_AUTO:   case KW_DOUBLE:  case KW_INT:  case KW_STRING:      //all datatypes
                 if (dec_variable() == KIN_SEMICOLON) { continue; } else { return 1; }
             case KIN_R_BRACE:
@@ -91,14 +91,14 @@ int for_statement() {
     if (next_token() == KIN_L_ROUNDBRACKET) {
         int new_token = next_token();
         if((new_token == KW_AUTO) || (new_token == KW_DOUBLE) || (new_token == KW_INT) || (new_token == KW_STRING)) {
-            if ((next_token() == KIN_IDENTIFIER) && (assing() == KIN_SEMICOLON) && (value() == KIN_SEMICOLON) &&
-                    (next_token() == KIN_IDENTIFIER) && (assing() == KIN_R_ROUNDBRACKET)&& next_token() == KIN_L_BRACE){
+            if ((next_token() == KIN_IDENTIFIER) && (assing(KIN_SEMICOLON) == 0) && (value() == KIN_SEMICOLON) &&
+                    (next_token() == KIN_IDENTIFIER) && (assing(KIN_R_ROUNDBRACKET) == 0)&& next_token() == KIN_L_BRACE){
                 return body_funcion();
             }
         }
         else if (new_token == KIN_IDENTIFIER) {
-            if ((assing() == KIN_SEMICOLON) && (value() == KIN_SEMICOLON) && (next_token() == KIN_IDENTIFIER) &&
-                    (assing() == KIN_R_ROUNDBRACKET) && next_token() == KIN_L_BRACE) {
+            if ((assing(KIN_SEMICOLON) == 0)&& (value() == KIN_SEMICOLON) && (next_token() == KIN_IDENTIFIER) &&
+                (assing(KIN_R_ROUNDBRACKET) == 0) && next_token() == KIN_L_BRACE) {
                 return body_funcion();
             }
         }
@@ -138,13 +138,17 @@ int cin_cout(int op){
     return 1;
 }
 
-int assing(){
+int assing(int PREDICT_EXIT){
     int new_token = next_token();
     if ((new_token == KIN_L_ROUNDBRACKET) && (parameters_used() != 100) && (next_token() == KIN_SEMICOLON)) {
         return 0;
     }
-    else if ((new_token == KIN_ASSIGNEMENT) && (value() == KIN_SEMICOLON)){
-        return 0;           //kontrola bidkociarky
+    else if (new_token == KIN_ASSIGNEMENT){
+        int status_bracket = 1;
+        stackPush(bracket_stack, status_bracket);
+        if(value() == PREDICT_EXIT){
+            return 0;                               //kontrola bidkociarky
+        }
     }
     errorMessage("Error in assing function!");
     return 1;
@@ -234,7 +238,7 @@ int bracket(int token){
             return value();
         case KIN_R_ROUNDBRACKET:
             counter_bracket = stackPop(bracket_stack);
-            printf("\n%d\n",counter_bracket);
+            printf("\nsomt tu%d\n",counter_bracket);
             counter_bracket--;
             if(counter_bracket == 0){ return KIN_R_ROUNDBRACKET;}
             else {return value_number_func();}
