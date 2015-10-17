@@ -14,6 +14,7 @@ typedef struct
   int alloc_size;	// velikost alokovane pameti
 } string;
 
+enum {NOTFOUND = -1};
 
 int str_init(string *s);
 void str_free(string *s);
@@ -23,7 +24,9 @@ int str_add_char(string *s1, char c);
 int str_copy_string(string *s1, string *s2);
 int str_cmp_string(string *s1, string *s2);
 int str_cmp_const_str(string *s1, char *s2);
-int str_find(string *s1, char **s2, int size);
 
 char *str_get_str(string *s);
 int str_get_length(string *s);
+
+//Added by Kopec Maros
+int str_find(string *s1, char **s2, int size);

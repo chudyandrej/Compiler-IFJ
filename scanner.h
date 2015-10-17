@@ -5,7 +5,7 @@
  * Authors: Bayer Jan, Kopec Maros
  *
  * Created: 2015/10/6
- * Last time modified: 2015/10/16
+ * Last time modified: 2015/10/17
  */
 
 #ifndef SCANNER_H_INCLUDED
@@ -16,15 +16,14 @@
 #include "stable.h"
 #include "str.h"
 
-extern char * data_types[];
-extern char * commands[];
-extern char garbage[];
+extern char * keywords[];
 extern FILE * fp; /* Pointer to the source file */
 
 enum {APOSTROPH = 39};
 
+
 /*
- * Typedef: tsTokenKind
+ * Typedef: TokenKind
  * Author: Bayer Jan, Kopec Maros
  * Description: Type of tokens, which can be found
  */
@@ -38,16 +37,16 @@ typedef enum sTokenKind {
     /* 106 */   KIN_NOT_EQ,                 /* != */
     /* 107 */   KIN_SCOUT,                  /* << */    
     /* 108 */   KIN_SCIN,                   /* >> */
-    /* 109 */   KIN_LEFTROUNDBRACKET,       /* ( */    
-    /* 110 */   KIN_RIGHTROUNDBRACKET,      /* ) */    
-    /* 111 */   KIN_LEFTBRACE,              /* { */    
-    /* 112 */   KIN_RIGHTBRACE,             /* } */    
+    /* 109 */   KIN_L_ROUNDBRACKET,         /* ( */    
+    /* 110 */   KIN_R_ROUNDBRACKET,         /* ) */    
+    /* 111 */   KIN_L_BRACE,                /* { */    
+    /* 112 */   KIN_R_BRACE,                /* } */    
     /* 113 */   KIN_SEMICOLON,              /* ; */    
-    /* 114 */   KIN_INT,                    /* data type */
-    /* 115 */   KIN_STRING,                 /* data type */
+    /* 114 */   KIN_IDENTIFIER,             /* identifier */
+    /* 115 */   KIN_AUTO,                   /* data type */
     /* 116 */   KIN_DOUBLE,                 /* data type */
-    /* 117 */   KIN_AUTO,                   /* data type */
-    /* 118 */   KIN_IDENTIFIER,             /* identifier */
+    /* 117 */   KIN_INT,                    /* data type */
+    /* 118 */   KIN_STRING,                 /* data type */
     /* 119 */   KIN_CIN,                    /* command */
     /* 120 */   KIN_COUT,                   /* command */
     /* 121 */   KIN_ELSE,                   /* command */
@@ -66,52 +65,56 @@ typedef enum sTokenKind {
     /* 134 */   KIN_DIV,                    /* / */
     /* 135 */   KIN_MUL,                    /* * */
     /* 136 */   KIN_TEXT,                   /* String value "example" */
-    /* 137 */   KIN_UNKNOWN,                /*LEX_ERR*/                   
-    /* 138 */   END_OF_FILE                 /* EOF */                    
+    /* 137 */   KIN_NUMBER,                 /* 42; 42e42; 4E2 */
+    /* 138 */   KIN_FLOAT_NUMBER,           /* 42.42; 4e-2 */
+    /* 139 */   KIN_COMMA,                  /* , */
+    /* 139 */   KIN_UNKNOWN,                /*LEX_ERR*/                   
+    /* 140 */   END_OF_FILE                 /* EOF */                    
 
-}tsTokenKind;
-
+}TokenKind;
 
 
 /*
- * Typedef: tsToken
+ * Typedef: State
+ * Author: Bayer Jan
+ * Description: states for finite-state machine
+ */
+typedef enum sState {
+    /* 200 */   S_START = 200,              
+    /* 201 */   S_SMALLER,                   
+    /* 202 */   S_GREATER,                   
+    /* 203 */   S_EQUAL,                    
+    /* 204 */   S_PLUS,                     
+    /* 205 */   S_MINUS,                    
+    /* 206 */   S_SLASH,             
+    /* 207 */   S_SCREAMER,         /* '!' */     
+    /* 208 */   S_IDENTIFIER,               
+    /* 209 */   S_TEXT,                     
+    /* 210 */   S_COMMENT_LINE,             
+    /* 211 */   S_COMMENT_BLOCK,
+    /* 212 */   S_PUNCT,            /* punctuation character */
+    /* 213 */   S_NUMBER,
+    /* 214 */   S_NUMBER_E,         /* detected exponent */
+    /* 215 */   S_NUMBER_F          /* detected floating point */
+}State;
+
+
+/*
+ * Typedef: Token
  * Author: Bayer Jan
  * Description: struct for token
  * item 'string': text part of token (represents name)
  * item 'tTokenType': stores which type of token it is 
  */
 typedef struct sToken {
-    tsTokenKind type;
+    TokenKind type;
     char * str;
-}tsToken;
+}Token;
 
-
-/*
- * Typedef: tsState
- * Author: Bayer Jan
- * Description: states for finite-state machine
- */
-typedef enum sState {
-    /* 200 */   S_START = 200,              
-    /* 201 */   S_LESSER,                   
-    /* 202 */   S_BIGGER,                   
-    /* 203 */   S_EQUAL,                    
-    /* 204 */   S_PLUS,                     
-    /* 205 */   S_MINUS,                    
-    /* 206 */   S_SLASH,
-    /* 207 */   S_STAR,         /* '*' */                 
-    /* 208 */   S_SCREAMER,     /* '!' */     
-    /* 209 */   S_IDENTIFIER,               
-    /* 210 */   S_TEXT,                     
-    /* 211 */   S_COMMENT_LINE,             
-    /* 212 */   S_COMMENT_BLOCK,
-    /* 213 */   S_PUNCT     /* punctuation character */
-}tsState;
-
-
-int copy_char_to_token(tsToken *t, char c);
-int copy_str_to_token(tsToken *t, string *s);
-tsToken * get_token(FILE * fp);
-tsToken * cleanup();
+int copy_carray_to_token(Token *t, char *s);
+int copy_char_to_token(Token *t, char c);
+int copy_str_to_token(Token *t, string *s);
+Token * get_token(FILE * fp);
+Token * cleanup();
 
 #endif // SCANNER_H_INCLUDED

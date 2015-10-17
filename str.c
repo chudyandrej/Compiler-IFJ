@@ -18,7 +18,6 @@
 #define STR_ERROR   1
 #define STR_SUCCESS 0
 
-enum {NOTFOUND = 0, FOUND = 1};
 
 int str_init(string *s)
 // funkce vytvori novy retezec
@@ -97,7 +96,7 @@ int str_cmp_const_str(string *s1, char* s2)
  * param 'string *s1': searched string
  * param 'char **s2': array of strings in which is searched
  * param 'int size': number of strings in array
- * returns: FOUND (1) if founded else NOTFOUND (0) if string is not in array
+ * returns: position if founded else NOTFOUND (-1) if string is not in array
  */
 int str_find(string *s1, char **s2, int size)
 {
@@ -106,7 +105,7 @@ int str_find(string *s1, char **s2, int size)
     {
         if (!strcmp(s1->str, s2[i]))
         {
-            return FOUND;
+            return i;
         }
     }
     return NOTFOUND;
