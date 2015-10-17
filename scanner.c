@@ -1,4 +1,4 @@
-/* 
+/*
  * File: scanner.c
  *
  * Description: lexical analyzer
@@ -23,7 +23,7 @@
  * Function: get_token
  * Author: Bayer Jan, Kopec Maros
  * Description: Scan input for next token
- * 
+ *
  * type: Token
  * param 'FILE * fp': file descriptor for input
  * returns: pointer to the next token
@@ -42,13 +42,14 @@ Token * get_token(FILE * fp) {
         free(token);
         return NULL;
     }
-    
-    * token = (Token){ 0 };
+
+    token->str = NULL;
+    token->type = KIN_UNKNOWN;
     char c;
-    
+
     while(1) {
         c = getc(fp);
-        
+
         switch(state) {
         /* ######################## S_START ################################# */
             case S_START:
@@ -59,17 +60,9 @@ Token * get_token(FILE * fp) {
                         cleanup(token, str_tmp);
                     }
                 }
-                else if (ispunct(c)) {
-                    state = S_PUNCT;
-                    ungetc(c, fp);
-                }
                 else if (isdigit(c))    state = S_NUMBER;
                 else if (c == EOF)      cleanup(token, str_tmp);
-            break;        
-            
-        /* ########################## S_PUNCT ############################### */
-            case S_PUNCT:
-                if (c == '(') {
+                else if (c == '(') {
                     token->type = KIN_L_ROUNDBRACKET;
                     cleanup(NULL, str_tmp);
                     return token;
@@ -112,8 +105,8 @@ Token * get_token(FILE * fp) {
                     return token;
                 }
             break;
-        
-        /* ######################### S_SLASH ################################ */    
+
+        /* ######################### S_SLASH ################################ */
             case S_SLASH:
                 if (c == '*') {
                     state = S_COMMENT_BLOCK;
@@ -137,7 +130,7 @@ Token * get_token(FILE * fp) {
                     return token;
                 }
             break;
-            
+
         /* ######################### S_PLUS ################################ */
         case S_PLUS:
             if (c == '+') {
@@ -159,7 +152,7 @@ Token * get_token(FILE * fp) {
                     return token;
                 }
         break;
-        
+
         /* ######################### S_MINUS ################################ */
         case S_MINUS:
             if (c == '-') {
@@ -187,8 +180,8 @@ Token * get_token(FILE * fp) {
                     return token;
                 }
         break;
-        
-        
+
+
         /* ######################### S_GREATER ############################## */
         case S_GREATER:
             if (c == '>') {
@@ -215,7 +208,7 @@ Token * get_token(FILE * fp) {
                     return token;
                 }
         break;
-        
+
         /* ######################### S_SMALLER ############################## */
         case S_SMALLER:
             if (c == '<') {
@@ -242,7 +235,7 @@ Token * get_token(FILE * fp) {
                     return token;
                 }
         break;
-        
+
         /* ########################## S_EQUAL ############################### */
         case S_EQUAL:
             if (c == '=') {
@@ -264,7 +257,7 @@ Token * get_token(FILE * fp) {
                     return token;
                 }
         break;
-        
+
         /* ######################### S_SCREAMER ############################# */
         case S_SCREAMER:
             if (c == '=') {
@@ -278,7 +271,7 @@ Token * get_token(FILE * fp) {
                     return token;
                 }
         break;
-        
+
         /* ########################### S_TEXT ############################### */
         /* Zatial nerozoznava escape sekvencie ani backslash tvary */
         case S_TEXT:
@@ -294,9 +287,9 @@ Token * get_token(FILE * fp) {
             str_free(str_tmp);
             return token;
         break;
-        
-        
-        /* ######################## S_NUMBER ################################ */    
+
+
+        /* ######################## S_NUMBER ################################ */
         case S_NUMBER:
             if (isdigit(c)) {
                 if (str_add_char(str_tmp, c)) {
@@ -323,11 +316,11 @@ Token * get_token(FILE * fp) {
                     cleanup(token, str_tmp);
                 }
                 str_free(str_tmp);
-                return token;    
-            }  
+                return token;
+            }
         break;
-        
-        /* ######################## S_NUMBER_E ############################## */    
+
+        /* ######################## S_NUMBER_E ############################## */
         case S_NUMBER_E:
             if (c == 'e' || c == 'E' || c == '.') {
                 token->type = KIN_UNKNOWN;
@@ -344,11 +337,11 @@ Token * get_token(FILE * fp) {
                     cleanup(token, str_tmp);
                 }
                 str_free(str_tmp);
-                return token;    
-            } 
+                return token;
+            }
         break;
-        
-        /* ######################## S_NUMBER_F ############################## */    
+
+        /* ######################## S_NUMBER_F ############################## */
         case S_NUMBER_F:
             if (c == '.') {
                 token->type = KIN_UNKNOWN;
@@ -372,15 +365,15 @@ Token * get_token(FILE * fp) {
                     cleanup(token, str_tmp);
                 }
                 str_free(str_tmp);
-                return token;    
-            } 
+                return token;
+            }
         break;
 
         /* ##################### S_COMMENT_LINE ############################# */
             case S_COMMENT_LINE:
                 if (c == '\n') state = S_START;
             break;
-        
+
         /* ##################### S_COMMENT_BLOCK ############################ */
             case S_COMMENT_BLOCK:
                 if (c == '*') {
@@ -392,14 +385,10 @@ Token * get_token(FILE * fp) {
                 }
             break;
 
-        /* ####################### S_IDENTIFIER ############################# */    
+        /* ####################### S_IDENTIFIER ############################# */
             case S_IDENTIFIER:
-                if (isalnum(c) || c == '_') {
-                    state = S_IDENTIFIER;
-                    if (str_add_char(str_tmp, c)) {
-                        cleanup(token, str_tmp);
-                    }
-                }
+                if ((isalnum(c) || c == '_') && str_add_char(str_tmp, c) )
+                    cleanup(token, str_tmp);
                 else if (isspace(c)) {
                     ungetc(c, fp);
                     int position;
@@ -435,7 +424,7 @@ Token * get_token(FILE * fp) {
  * Function: copy_carray_to_token
  * Author: Kopec Maros
  * Description: copy array of characters to token string value
- * 
+ *
  * type: int
  * param 'Token *t': pointer to token to which string will be copied
  * param 'cahr *s': pointer to string that will be copied
@@ -456,7 +445,7 @@ int copy_carray_to_token(Token *t, char *s)
  * Function: copy_str_to_token
  * Author: Kopec Maros
  * Description: copy string to token string value
- * 
+ *
  * type: int
  * param 'Token *t': pointer to token to which string will be copied
  * param 'string *s': pointer to string that will be copied
@@ -477,7 +466,7 @@ int copy_str_to_token(Token *t, string *s)
  * Function: copy_char_to_token
  * Author: Kopec Maros
  * Description: copy one character to string value of token
- * 
+ *
  * type: int
  * param 'Token * t': pointer to token to which character will be copied
  * param 'char c': character that will be copied
@@ -497,7 +486,7 @@ int copy_char_to_token(Token *t, char c)
  * Function: cleanup
  * Author: Kopec Maros
  * Description: free memory after malloc if error is detected
- * 
+ *
  * type: Token
  * param 'Token * t': pointer to token that will be free'd
  * param 'string * s' pointer to string that will be free'd

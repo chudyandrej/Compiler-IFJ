@@ -1,4 +1,4 @@
-/* 
+/*
  * File: scanner.h
  *
  * Description: header file for lexical analyzer
@@ -35,13 +35,13 @@ typedef enum sTokenKind {
     /* 104 */   KIN_SMALLER_EQ,             /* <= */
     /* 105 */   KIN_EQ,                     /* == */
     /* 106 */   KIN_NOT_EQ,                 /* != */
-    /* 107 */   KIN_SCOUT,                  /* << */    
+    /* 107 */   KIN_SCOUT,                  /* << */
     /* 108 */   KIN_SCIN,                   /* >> */
-    /* 109 */   KIN_L_ROUNDBRACKET,         /* ( */    
-    /* 110 */   KIN_R_ROUNDBRACKET,         /* ) */    
-    /* 111 */   KIN_L_BRACE,                /* { */    
-    /* 112 */   KIN_R_BRACE,                /* } */    
-    /* 113 */   KIN_SEMICOLON,              /* ; */    
+    /* 109 */   KIN_L_ROUNDBRACKET,         /* ( */
+    /* 110 */   KIN_R_ROUNDBRACKET,         /* ) */
+    /* 111 */   KIN_L_BRACE,                /* { */
+    /* 112 */   KIN_R_BRACE,                /* } */
+    /* 113 */   KIN_SEMICOLON,              /* ; */
     /* 114 */   KIN_IDENTIFIER,             /* identifier */
     /* 115 */   KIN_AUTO,                   /* data type */
     /* 116 */   KIN_DOUBLE,                 /* data type */
@@ -68,8 +68,8 @@ typedef enum sTokenKind {
     /* 137 */   KIN_NUMBER,                 /* 42; 42e42; 4E2 */
     /* 138 */   KIN_FLOAT_NUMBER,           /* 42.42; 4e-2 */
     /* 139 */   KIN_COMMA,                  /* , */
-    /* 139 */   KIN_UNKNOWN,                /*LEX_ERR*/                   
-    /* 140 */   END_OF_FILE                 /* EOF */                    
+    /* 139 */   KIN_UNKNOWN,                /*LEX_ERR*/
+    /* 140 */   END_OF_FILE                 /* EOF */
 
 }TokenKind;
 
@@ -80,22 +80,21 @@ typedef enum sTokenKind {
  * Description: states for finite-state machine
  */
 typedef enum sState {
-    /* 200 */   S_START = 200,              
-    /* 201 */   S_SMALLER,                   
-    /* 202 */   S_GREATER,                   
-    /* 203 */   S_EQUAL,                    
-    /* 204 */   S_PLUS,                     
-    /* 205 */   S_MINUS,                    
-    /* 206 */   S_SLASH,             
-    /* 207 */   S_SCREAMER,         /* '!' */     
-    /* 208 */   S_IDENTIFIER,               
-    /* 209 */   S_TEXT,                     
-    /* 210 */   S_COMMENT_LINE,             
+    /* 200 */   S_START = 200,
+    /* 201 */   S_SMALLER,
+    /* 202 */   S_GREATER,
+    /* 203 */   S_EQUAL,
+    /* 204 */   S_PLUS,
+    /* 205 */   S_MINUS,
+    /* 206 */   S_SLASH,
+    /* 207 */   S_SCREAMER,         /* '!' */
+    /* 208 */   S_IDENTIFIER,
+    /* 209 */   S_TEXT,
+    /* 210 */   S_COMMENT_LINE,
     /* 211 */   S_COMMENT_BLOCK,
-    /* 212 */   S_PUNCT,            /* punctuation character */
-    /* 213 */   S_NUMBER,
-    /* 214 */   S_NUMBER_E,         /* detected exponent */
-    /* 215 */   S_NUMBER_F          /* detected floating point */
+    /* 212 */   S_NUMBER,
+    /* 213 */   S_NUMBER_E,         /* detected exponent */
+    /* 214 */   S_NUMBER_F          /* detected floating point */
 }State;
 
 
@@ -104,7 +103,7 @@ typedef enum sState {
  * Author: Bayer Jan
  * Description: struct for token
  * item 'string': text part of token (represents name)
- * item 'tTokenType': stores which type of token it is 
+ * item 'tTokenType': stores which type of token it is
  */
 typedef struct sToken {
     TokenKind type;
