@@ -31,6 +31,7 @@ int next_token();
 int value_identifier();
 int value_operator();
 int value_number_func();
+int value_call_bracket(int PREDICT_EXIT);
 
 
 int bracket(int token);

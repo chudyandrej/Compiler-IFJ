@@ -108,7 +108,7 @@ int for_statement() {
 }
 
 int if_statement(){
-    if((next_token()== KIN_L_ROUNDBRACKET) && (value()== KIN_R_ROUNDBRACKET) &&
+    if((next_token()== KIN_L_ROUNDBRACKET) && (value_call_bracket(KIN_R_ROUNDBRACKET)== 0) &&
             (next_token()== KIN_L_BRACE) && (body_funcion() == 0)){
         if ((next_token() == KW_ELSE) && (next_token() == KIN_L_BRACE)){
             return body_funcion();
@@ -144,15 +144,21 @@ int assing(int PREDICT_EXIT){
         return 0;
     }
     else if (new_token == KIN_ASSIGNEMENT){
-        int status_bracket = 1;
-        stackPush(bracket_stack, status_bracket);
-        if(value() == PREDICT_EXIT){
-            return 0;                               //kontrola bidkociarky
-        }
+        return value_call_bracket(PREDICT_EXIT);
     }
     errorMessage("Error in assing function!");
     return 1;
 }
+
+int value_call_bracket(int PREDICT_EXIT){
+    int status_bracket = 1;
+    stackPush(bracket_stack, status_bracket);
+    if(value() == PREDICT_EXIT){
+        return 0;                               //kontrola bidkociarky
+    }
+    return 1;
+}
+
 
 int dec_variable(){
     if (next_token() == KIN_IDENTIFIER) {
@@ -238,10 +244,12 @@ int bracket(int token){
             return value();
         case KIN_R_ROUNDBRACKET:
             counter_bracket = stackPop(bracket_stack);
-            printf("\nsomt tu%d\n",counter_bracket);
             counter_bracket--;
+            printf("\n%d\n",counter_bracket);
             if(counter_bracket == 0){ return KIN_R_ROUNDBRACKET;}
-            else {return value_number_func();}
+            else {
+                stackPush(bracket_stack, counter_bracket);
+                return value_number_func();}
         default:
             errorMessage("error zatvoriek");
             return 1;
