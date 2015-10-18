@@ -63,15 +63,14 @@ typedef struct tFunc{
         // i = int
         // s = string
         // prvni je navratova hodnota, zbyvajici parametry v danem poradi
-    int def; //BOOL definovano, default = False
-    int order_def; //poradi definice 
-    int order_dec; //poradi dkelarace
+    int orderDef; //poradi definice 
+    int orderDec; //poradi dkelarace
     void * TAC; //pointer na list 3AC 
     /*! zmenit void az bude 3AC*/
 } *tFuncPtr;
 
 void GSTDispose(tBSTPtr);
-int GSTAllDef(tBSTPtr); // return 0 kdyz vsechny deklarovane funkce byly definovany
+int GSTAllDef(tBSTEPtr rootPtr); // return 1 kdyz vsechny deklarovane funkce byly definovany
 int GSTDeclare(tBSTPtr, char *, int); //return 0 kdyz parametry odpovidaji (nebo byly prazdne)
 int GSTDefine(tBSTPtr, void * TAC, int); //vzdy volat declare pred define!!!
                                         //return 0 kdyz jde o prvni definici

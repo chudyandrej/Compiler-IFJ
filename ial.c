@@ -67,7 +67,7 @@ void BSTAdd (tBSTPtr T, char * key){
         interError();
         return;
     }
-    node->key = malloc(strlen(key));
+    node->key = malloc(strlen(key)+1);
     if (node->key==NULL) {
         interError();
         return;
@@ -75,6 +75,7 @@ void BSTAdd (tBSTPtr T, char * key){
     strcpy(node->key, key);
     node->lptr=NULL;
     node->rptr=NULL;
+    node->data=NULL;
 
     T->Act = T->Root;
     BSTInsert(node, T);
@@ -107,11 +108,60 @@ int BSTActive (tBSTPtr T){
 /***************/
 /* Globalni TS */
 /***************/
+void funcFree(tBSTEPtr ptr){
+    if(ptr==NULL) return;
+    funcFree(ptr->lptr);
+    funcFree(ptr->rptr);
+    if(ptr->data!=NULL){
+        free(((struct tFunc *)ptr->data)->params);
+        free(((struct tFunc *)ptr->data)->TAC);
+        free(ptr->data);
+    }
+    free(ptr->key);
+    free(ptr);
+}
 
-void GSTDispose(tBSTPtr T){return ;}
-int GSTAllDef(tBSTPtr T){return 0;}  
-int GSTDeclare(tBSTPtr T, char * params, int dec){return 0;}  
-int GSTDefine(tBSTPtr T, void * TAC, int def){return 0;}  
+void GSTDispose(tBSTPtr T){
+    funcFree(T->Root);
+    T->Root=NULL;
+    T->Act=NULL;
+}
+int GSTAllDef(tBSTEPtr tmp){
+    if(tmp==NULL) return 1;
+    if(tmp->data==NULL) return 2;
+    if(((struct tFunc *)tmp->data)->orderDef==-1) return 0;
+    int a = GSTAllDef(tmp->lptr);
+    if(a!=1) return a;
+    a = GSTAllDef(tmp->rptr);
+    return a;
+}  
+int GSTDeclare(tBSTPtr T, char * params, int dec){
+    if(T->Act==NULL) return 2;
+    if(T->Act->data==NULL){
+        tFuncPtr node = malloc(sizeof(struct tFunc));
+        node->params = malloc(strlen(params)+1);
+        if (node->params==NULL) {
+            interError();
+            return 2;
+        }
+        strcpy(node->params, params); 
+        node->TAC = NULL;
+        node->orderDec = dec;
+        node->orderDef = -1;  
+        T->Act->data = node;
+    } else {
+        if(strcmp(params,((struct tFunc *)T->Act->data)->params)!=0)
+            return 1;
+    }
+    return 0;
+}  
+int GSTDefine(tBSTPtr T, void * TAC, int def){
+    if(T->Act==NULL || T->Act->data==NULL) return 2;
+    if(((struct tFunc *)T->Act->data)->TAC != NULL) return 1;
+    ((struct tFunc *)T->Act->data)->TAC = TAC;
+    ((struct tFunc *)T->Act->data)->orderDef = def;
+    return 0;
+}  
                                          
 
 
