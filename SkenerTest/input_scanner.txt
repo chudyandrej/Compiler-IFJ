@@ -1,0 +1,35 @@
+return 4*4;
+return 4+4;
+return 4-4;
+return 4<1;
+return 4>4;
+return 4==4;
+return 4<=8;    
+return 4>=3;
+return 4!=4; //dslkfj
+return a;
+auto
+dobule
+int
+strin
+cin
+cout
+else
+for 
+if
+return 
+length
+substr
+concat
+find
+sort
+(5+5-4*3-(4/3/5)/2)
+(5 +  5 - 4 *  /*ignoruj*/   3-( 4/ 3/ 5) /2  )
+(5+5-4*3- ( 4 / 3 / 5   ) / 2 )
+a=4;
+int a=8;
+a=(5+5-4*3- ( 4 / 3 / 5   ) / 2 );
+a=(5+5-4*3-(4/3/5)/2);
+a= (5+ 5-4*3- ( 4 / 3 / 5) /2);
+for();
+if(){}else{};
