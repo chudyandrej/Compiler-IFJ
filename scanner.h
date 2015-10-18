@@ -1,4 +1,4 @@
-/* 
+/*
  * File: scanner.h
  *
  * Description: header file for lexical analyzer
@@ -80,21 +80,39 @@ typedef enum sTokenKind {
  * Description: states for finite-state machine
  */
 typedef enum sState {
-    /* 200 */   S_START = 200,              
-    /* 201 */   S_SMALLER,                   
-    /* 202 */   S_GREATER,                   
-    /* 203 */   S_EQUAL,                    
-    /* 204 */   S_PLUS,                     
-    /* 205 */   S_MINUS,                    
-    /* 206 */   S_SLASH,             
-    /* 207 */   S_SCREAMER,         /* '!' */     
-    /* 208 */   S_IDENTIFIER,               
-    /* 209 */   S_TEXT,                     
-    /* 210 */   S_COMMENT_LINE,             
+    /* 200 */   S_START = 200,
+    /* 201 */   S_SMALLER,
+    /* 202 */   S_GREATER,
+    /* 203 */   S_EQUAL,
+    /* 204 */   S_PLUS,
+    /* 205 */   S_MINUS,
+    /* 206 */   S_SLASH,
+    /* 207 */   S_SCREAMER,         /* '!' */
+    /* 208 */   S_IDENTIFIER,
+    /* 209 */   S_TEXT,
+    /* 210 */   S_COMMENT_LINE,
     /* 211 */   S_COMMENT_BLOCK,
     /* 212 */   S_PUNCT,            /* punctuation character */
     /* 213 */   S_NUMBER
 }State;
+
+char * keywords[] = {
+    "auto",
+    "double",
+    "int",
+    "string",
+    "cin",
+    "cout",
+    "else",
+    "for",
+    "if",
+    "return",
+    "length",
+    "substr",
+    "concat",
+    "find",
+    "sort"
+};
 
 
 /*
@@ -102,7 +120,7 @@ typedef enum sState {
  * Author: Bayer Jan
  * Description: struct for token
  * item 'string': text part of token (represents name)
- * item 'tTokenType': stores which type of token it is 
+ * item 'tTokenType': stores which type of token it is
  */
 typedef struct sToken {
     TokenKind type;
@@ -110,6 +128,7 @@ typedef struct sToken {
 }Token;
 
 int isoperator(char c);
+int isINT(char * c);
 int copy_carray_to_token(Token *t, char *s);
 int copy_char_to_token(Token *t, char c);
 int copy_str_to_token(Token *t, string *s);
@@ -117,3 +136,4 @@ Token * get_token(FILE * fp);
 Token * cleanup();
 
 #endif // SCANNER_H_INCLUDED
+
