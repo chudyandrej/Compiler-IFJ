@@ -77,7 +77,7 @@ int body_funcion(){
             case KIN_IDENTIFIER:
                 if (assing(KIN_SEMICOLON) == 0){ continue; } else{ return 1; }
             case KW_AUTO:   case KW_DOUBLE:  case KW_INT:  case KW_STRING:      //all datatypes
-                if (dec_variable() == KIN_SEMICOLON) { continue; } else { return 1; }
+                if (dec_variable() == 0) { continue; } else { return 1; }
             case KIN_R_BRACE:
                 return 0;
             default:
