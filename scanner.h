@@ -110,7 +110,6 @@ typedef struct sToken {
 }Token;
 
 int isoperator(char c);
-int isINT(char * c);
 int copy_carray_to_token(Token *t, char *s);
 int copy_char_to_token(Token *t, char c);
 int copy_str_to_token(Token *t, string *s);
