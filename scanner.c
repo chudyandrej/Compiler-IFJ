@@ -8,8 +8,6 @@
  * Last time modified: 2015/10/18
  */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include "scanner.h"
 
 #define DATA_TYPES_SIZE 4
@@ -222,7 +220,7 @@ Token * get_token(FILE * fp) {
             }
             else {
                 ungetc(c, fp);
-                token->type = KIN_GREATER;
+                token->type = KIN_ASSIGNEMENT;
                 str_free(str_tmp);
                 return token;
             }
