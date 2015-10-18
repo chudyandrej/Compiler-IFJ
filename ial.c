@@ -13,7 +13,7 @@
 * Popis: Globalni tabulka symbolu (funkci) a jednotlive lokalni 
 tabulky spolu sdileji zakladni strukturu a funkce 
 nad nimi (pridani, vyhledavani ...)
-* Globalni BST: elementy typu tVarEl
+* Globalni BST: elementy typu tVar
 * Lokalni BST: kazde element je double-linked list
 ***************************************************************
 */
@@ -168,8 +168,67 @@ int GSTDefine(tBSTPtr T, void * TAC, int def){
 /**************/
 /* Lokalni TS */
 /**************/
+void scopeFree(tVarPtr ptr){
+    if (ptr==NULL) return;
+    scopeFree(ptr->ptr);
+    if (ptr->value != NULL)
+        free(ptr->value);
+    free(ptr);
+}
 
-void LSTDispose (tBSTPtr T){return ;}
-int LSTAdd (tBSTPtr T, char type, int scope){return 0;}  
-int LSTSet (tBSTPtr T, char type, void * value){return 0;}  
-void LSTLeaveScope (tBSTPtr T, int scope){return ;} 
+void varFree(tBSTEPtr ptr){
+    if(ptr==NULL) return;
+    varFree(ptr->lptr);
+    varFree(ptr->rptr);
+    scopeFree(ptr->data);
+    free(ptr->key);
+    free(ptr);
+}
+
+void LSTDispose (tBSTPtr T){
+    varFree(T->Root);
+    T->Root=NULL;
+    T->Act=NULL;
+}
+
+int LSTAdd (tBSTPtr T, char type, int scope){
+    if (T->Act->data!=NULL)
+        if(((struct tVar *)T->Act->data)->scope == scope) return 1;
+    tVarPtr node = malloc(sizeof(struct tVar));
+    if (node==NULL) {
+        interError();
+        return 2;
+    }
+    node->scope = scope;
+    node->datatype = type;
+    node->value = NULL;
+    tVarPtr tmp = T->Act->data;
+    T->Act->data = node;
+    node->ptr = tmp;
+    return 0;
+}  
+int LSTSet (tBSTPtr T, char type, void * value){
+    if (T->Act->data==NULL)
+        return 1;
+    if (((struct tVar *)T->Act->data)->datatype != type)
+        return 2;
+    if (((struct tVar *)T->Act->data)->value != NULL)
+        free (((struct tVar *)T->Act->data)->value);
+    ((struct tVar *)T->Act->data)->value = value;
+    return 0;
+}  
+
+void LSTLeaveScope (tBSTEPtr ptr, int scope){
+    if(ptr==NULL) return;
+    if(ptr->data!=NULL)
+        if(((struct tVar *)ptr->data)->scope == scope){
+            tVarPtr tmp = ptr->data;
+            ptr->data = ((struct tVar *)ptr->data)->ptr;
+            if (tmp->value != NULL)
+                free(tmp->value);
+            free(tmp);
+        }
+    LSTLeaveScope(ptr->lptr, scope);
+    LSTLeaveScope(ptr->rptr, scope);
+    return ;
+} 

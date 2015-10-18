@@ -3,8 +3,57 @@
 #include <stdlib.h>
 #include "ial.h"
 
+void global();
+void local();
 
 int main(){
+    global();
+    local();
+    printf("END\n");
+    return 0;
+}
+
+void local(){
+    printf("\n\n\n**INIT LOCAL SYMBOL TABLE**\n");
+    tBSTPtr T = malloc(sizeof(struct tBST));
+    BSTInit(T);
+    printf("active: %d\n", BSTActive(T));
+    BSTAdd(T, "FML");
+    printf("add FML\n");
+    BSTAdd(T, "FOO");
+    printf("add FOO\n");
+    BSTAdd(T, "BAR");
+    printf("add BAR\n");
+    printf("Act: %s\n", T->Act->key);
+    printf("add int BAR scope 0: %d\n", LSTAdd(T, 'i', 0));
+    int * v = malloc(sizeof(int));
+    *v = 6;
+    printf("set double BAR scope 0 to 6: %d\n", LSTSet(T, 'i', v));
+    printf("add double BAR scope 1: %d\n", LSTAdd(T, 'd', 1));
+    printf("add incorrectly int BAR scope 1: %d\n", LSTAdd(T, 'i', 1));
+    double * value = malloc(sizeof(double));
+    *value = 5.0;
+    printf("set double BAR scope 1 to 5.0: %d\n", LSTSet(T, 'd', value));
+    double * val = malloc(sizeof(double));
+    *val = 3.0;
+    printf("re-set double BAR scope 1 to 3.0: %d\n", LSTSet(T, 'd', val));
+    printf("Value of BAR: %g\n", (*(double *)((struct tVar *)T->Act->data)->value));
+    int * valu = malloc(sizeof(int));
+    *valu = 3.0;
+    printf("incorrect set double BAR scope 1 to 3 (int): %d\n", LSTSet(T, 'i', valu));
+    free(valu);
+    printf("Value of BAR: %g\n", (*(double *)((struct tVar *)T->Act->data)->value));
+    LSTLeaveScope(T->Root, 1);
+    printf("Leave scope 1\n");
+    BSTFind(T, "BAR");
+    printf("act->key: %s\n", T->Act->key);
+    printf("Value of BAR: %d\n", (*(int *)((struct tVar *)T->Act->data)->value));
+    LSTDispose (T);
+    free(T);
+}
+
+
+void global(){ //tested, everything passed
     tBSTPtr T = malloc(sizeof(struct tBST));
     BSTInit(T);
     printf("**INIT GLOBAL SYMBOL TABLE**\n");
@@ -42,7 +91,7 @@ int main(){
     printf("declare FN,ii,4: %d\n", GSTDeclare(T, "ii", 4));
     BSTFind(T, "FML");
     printf("re-declare correctlty FML,iii,5: %d\n", GSTDeclare(T, "iii", 5));
-    printf("re-declare incorrectlty FML,isi,6: %d\n", GSTDeclare(T, "isi", 6));
+    printf("re-declare incorrectly FML,isi,6: %d\n", GSTDeclare(T, "isi", 6));
     printf("everything defined: %d\n", GSTAllDef(T->Root));
     BSTFind(T, "FNO");
     printf("declare not added FNO,ii,7: %d\n", GSTDeclare(T, "ii", 7));
@@ -78,6 +127,4 @@ int main(){
     printf("dispose Tree\n");
     GSTDispose(T);
     free(T);
-    printf("END\n");
-    return 0;
 }

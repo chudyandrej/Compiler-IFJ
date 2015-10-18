@@ -17,7 +17,7 @@
 * Popis: Globalni tabulka symbolu (funkci) a jednotlive lokalni 
 tabulky spolu sdileji zakladni strukturu a funkce 
 nad nimi (pridani, vyhledavani ...)
-* Globalni BST: elementy typu tVarEl
+* Globalni BST: elementy typu tVar
 * Lokalni BST: kazde element je double-linked list
 ***************************************************************
 */
@@ -80,18 +80,19 @@ int GSTDefine(tBSTPtr, void * TAC, int); //vzdy volat declare pred define!!!
 /* Lokalni TS */
 /**************/
 /*! osetrit datatype auto*/
-typedef struct tVarEl{
+typedef struct tVar{
     int scope; //zanoreni, pri volani funkce zacina na 0
     char datatype; // obdobne jako u params v tFunc
     void * value; // NULL if not defined
-    struct tVarEl * ptr;    //pointer na pravy
+    struct tVar * ptr;    //pointer na pravy
                         //pri deklaraci se pridavaji prvky ZLEVA
-} *tVarElPtr;
+} *tVarPtr;
 
 void LSTDispose (tBSTPtr);
 int LSTAdd (tBSTPtr, char type, int scope); //return 0 kdyz nebylo v zanorenim doposud definovano
 int LSTSet (tBSTPtr, char type, void *); //return 0 kdyz nedoslo k nekompatibilite typu
-void LSTLeaveScope (tBSTPtr, int scope); 
+                            //vzdy nastavuje aktivni prvek v poslednim zanoreni!!
+void LSTLeaveScope (tBSTEPtr root, int scope); 
         //odstrani vsechny lokalni promene z daneho zanoreni
 
 #endif // IAL_H_INCLUDED
