@@ -151,5 +151,7 @@ int main(int argc, char *argv[]){
     printf("%d\n", find(a, c));
     sort(a);  
     printf("%s\n", a);
+    free(a);
+    free(c);
     return 0;
 }
