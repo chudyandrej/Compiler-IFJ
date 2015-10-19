@@ -1,4 +1,4 @@
-/* 
+/*
  * File: scanner.c
  *
  * Description: lexical analyzer
@@ -24,7 +24,7 @@ int count_dot;
  * Function: get_token
  * Author: Bayer Jan, Kopec Maros
  * Description: Scan input for next token
- * 
+ *
  * type: Token
  * param 'FILE * fp': file descriptor for input
  * returns: pointer to the next token
@@ -43,13 +43,14 @@ Token * get_token(FILE * fp) {
         free(token);
         return NULL;
     }
-    
+
     * token = (Token){ 0 };
     char c;
-    
+
     while(1) {
         c = getc(fp);
-        
+        if (c == '\n') printf("\n");
+
         switch(state) {
         /* ######################## S_START ################################# */
             case S_START:
@@ -122,8 +123,8 @@ Token * get_token(FILE * fp) {
                     return token;
                 }
             break;
-        
-        /* ######################### S_SLASH ################################ */    
+
+        /* ######################### S_SLASH ################################ */
             case S_SLASH:
                 if (c == '*') {
                     state = S_COMMENT_BLOCK;
@@ -140,7 +141,7 @@ Token * get_token(FILE * fp) {
                     return token;
                 }
             break;
-            
+
         /* ########################## S_PLUS ################################ */
         case S_PLUS:
             if (c == '+') {
@@ -155,7 +156,7 @@ Token * get_token(FILE * fp) {
                 return token;
             }
         break;
-        
+
         /* ######################### S_MINUS ################################ */
         case S_MINUS:
             if (c == '-') {
@@ -170,7 +171,7 @@ Token * get_token(FILE * fp) {
                 return token;
             }
         break;
-        
+
         /* ######################### S_GREATER ############################## */
         case S_GREATER:
             if (c == '>') {
@@ -190,7 +191,7 @@ Token * get_token(FILE * fp) {
                 return token;
             }
         break;
-        
+
         /* ######################### S_SMALLER ############################## */
         case S_SMALLER:
             if (c == '<') {
@@ -205,12 +206,12 @@ Token * get_token(FILE * fp) {
             }
             else {
                 ungetc(c, fp);
-                token->type = KIN_GREATER;
+                token->type = KIN_SMALLER;
                 str_free(str_tmp);
                 return token;
             }
         break;
-        
+
         /* ########################## S_EQUAL ############################### */
         case S_EQUAL:
             if (c == '=') {
@@ -225,7 +226,7 @@ Token * get_token(FILE * fp) {
                 return token;
             }
         break;
-        
+
         /* ######################### S_SCREAMER ############################# */
         case S_SCREAMER:
             if (c == '=') {
@@ -239,7 +240,7 @@ Token * get_token(FILE * fp) {
                 return token;
                 }
         break;
-        
+
         /* ########################### S_TEXT ############################### */
         /* Zatial nerozoznava escape sekvencie ani backslash tvary */
         case S_TEXT:
@@ -256,9 +257,9 @@ Token * get_token(FILE * fp) {
             str_free(str_tmp);
             return token;
         break;
-        
-        
-        /* ######################## S_NUMBER ################################ */    
+
+
+        /* ######################## S_NUMBER ################################ */
         case S_NUMBER:
             if (isdigit(c) || (enable_op && (c == '+' || c == '-'))) {
                 if ((c == '+' || c == '-')) {
@@ -296,7 +297,7 @@ Token * get_token(FILE * fp) {
                     cleanup(NULL, str_tmp);
                     return token;
                 }
-                
+
                 enable_op = TRUE;
                 if (str_add_char(str_tmp, c)) {
                     cleanup(token, str_tmp);
@@ -320,7 +321,7 @@ Token * get_token(FILE * fp) {
             case S_COMMENT_LINE:
                 if (c == '\n') state = S_START;
             break;
-        
+
         /* ##################### S_COMMENT_BLOCK ############################ */
             case S_COMMENT_BLOCK:
                 if (c == '*') {
@@ -332,7 +333,7 @@ Token * get_token(FILE * fp) {
                 }
             break;
 
-        /* ####################### S_IDENTIFIER ############################# */    
+        /* ####################### S_IDENTIFIER ############################# */
             case S_IDENTIFIER:
                 if (isalnum(c) || c == '_') {
                     state = S_IDENTIFIER;
@@ -371,7 +372,7 @@ Token * get_token(FILE * fp) {
  * Function: isoperator
  * Author: Kopec Maros
  * Description: Check if character is valid operator or command symbol
- * 
+ *
  * type: int
  * param 'char c': character that will be compared
  * returns: TRUE (1) if found, else FALSE (0)
@@ -393,7 +394,7 @@ int isoperator(char c)
  * Function: copy_carray_to_token
  * Author: Kopec Maros
  * Description: copy array of characters to token string value
- * 
+ *
  * type: int
  * param 'Token *t': pointer to token to which string will be copied
  * param 'cahr *s': pointer to string that will be copied
@@ -414,7 +415,7 @@ int copy_carray_to_token(Token *t, char *s)
  * Function: copy_str_to_token
  * Author: Kopec Maros
  * Description: copy string to token string value
- * 
+ *
  * type: int
  * param 'Token *t': pointer to token to which string will be copied
  * param 'string *s': pointer to string that will be copied
@@ -435,7 +436,7 @@ int copy_str_to_token(Token *t, string *s)
  * Function: copy_char_to_token
  * Author: Kopec Maros
  * Description: copy one character to string value of token
- * 
+ *
  * type: int
  * param 'Token * t': pointer to token to which character will be copied
  * param 'char c': character that will be copied
@@ -455,7 +456,7 @@ int copy_char_to_token(Token *t, char c)
  * Function: cleanup
  * Author: Kopec Maros
  * Description: free memory after malloc if error is detected
- * 
+ *
  * type: Token
  * param 'Token * t': pointer to token that will be free'd
  * param 'string * s' pointer to string that will be free'd

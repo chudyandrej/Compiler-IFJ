@@ -1,7 +1,7 @@
-/* 
+/*
  * File: main.c
  *
- * Authors: 
+ * Authors:
  *
  * Created: 2015/10/6
  * Last time modified: 2015/10/17
@@ -18,28 +18,73 @@ char * data[] = {
     "int",
     "string"
 };
- */ 
+ */
 
 
 int main() {
-    
+    char * token_kinds[] = {
+       "=",
+       ">",
+       ">=",
+       "<",
+       "<=",
+       "==",
+       "!=",
+       "<<",
+       ">>",
+       "(",
+       ")",
+       "{",
+       "}",
+       ";",
+       "ID",
+       "auto",
+       "double",
+       "int",
+       "string",
+       "cin",
+       "cout",
+       "else",
+       "for",
+       "if",
+       "return",
+       "length",
+       "substr",
+       "concat",
+       "find",
+       "sort",
+       "+",
+       "++",
+       "-",
+       "--",
+       "/",
+       "*",
+       "string_val",
+       "int",
+       "num_double",
+       ",",
+       "LEX_ERR",
+       "EOF",
+ };
+
     FILE * fp;
-    fp=fopen("/home/maros/NetBeansProjects/scanner/test.ifj15", "r");
+    fp=fopen("test.ifj15", "r");
     int t;
-    
+
     //char * string = "AHOJ";
     //Token * token = get_token(fp);
-    
+
     //printf("%d\n", KIN_UNKNOWN);
     //printf("%s",get_token(fp)->str);
     //printf("%s",string);
-    
+
     while ((t = get_token(fp)->type) != END_OF_FILE) {
-        printf("%d\n",t);
+        //printf("%s(%d) ",token_kinds[t-100],t);
+        printf("%s ",token_kinds[t-100]);
     }
     //printf("%s",data[0]);
     //printf("\n#################################################################");
-    
+
     fclose(fp);
     //return  token->type;
     return (EXIT_SUCCESS);
