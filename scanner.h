@@ -95,8 +95,7 @@ typedef enum sState {
     /* 210 */   S_TEXT_ESC,
     /* 211 */   S_COMMENT_LINE,
     /* 212 */   S_COMMENT_BLOCK,
-    /* 213 */   S_PUNCT,            /* punctuation character */
-    /* 214 */   S_NUMBER
+    /* 213 */   S_NUMBER,
 }State;
 
 

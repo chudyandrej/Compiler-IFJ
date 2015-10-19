@@ -292,10 +292,7 @@ Token * get_token(FILE * fp) {
         case S_NUMBER:
             if (isdigit(c) || (enable_op && (c == '+' || c == '-'))) {
                 if ((c == '+' || c == '-')) {
-                    if (isdigit(getc(fp))) {
-                        ungetc(c, fp);
-                    }
-                    else {
+                    if (!isdigit(c = getc(fp))) {
                         ungetc(c, fp);
                         token->type = KIN_UNKNOWN;
                         cleanup(NULL, str_tmp);
@@ -308,28 +305,35 @@ Token * get_token(FILE * fp) {
                 }
             }
             else if (c == '.') {
-                if (++count_dot > 1  && count_e != 0) {
-                    ungetc(c, fp);
+                if ((++count_dot > 1  && count_e != 0) || !isdigit(c = getc(fp))) {
                     token->type = KIN_UNKNOWN;
                     cleanup(NULL, str_tmp);
                     return token;
                 }
+                ungetc(c,fp);
                 enable_op = FALSE;
                 if (str_add_char(str_tmp, c)) {
                     cleanup(token, str_tmp);
                 }
             }
-            else if (c == 'e' || c == 'E') {
-                if (++count_e > 1) {
-                    ungetc(c, fp);
+            else if (isalpha(c)) {
+                if ( c == 'e' || c == 'E') {
+                    if (++count_e > 1) {
+                        ungetc(c, fp);
+                        token->type = KIN_UNKNOWN;
+                        cleanup(NULL, str_tmp);
+                        return token;
+                    }
+
+                    enable_op = TRUE;
+                    if (str_add_char(str_tmp, c)) {
+                        cleanup(token, str_tmp);
+                    }
+                }
+                else {
                     token->type = KIN_UNKNOWN;
                     cleanup(NULL, str_tmp);
                     return token;
-                }
-
-                enable_op = TRUE;
-                if (str_add_char(str_tmp, c)) {
-                    cleanup(token, str_tmp);
                 }
             }
             else {
@@ -354,7 +358,7 @@ Token * get_token(FILE * fp) {
         /* ##################### S_COMMENT_BLOCK ############################ */
             case S_COMMENT_BLOCK:
                 if (c == '*') {
-                    if (getc(fp) == '/') {
+                    if (c = getc(fp) == '/') {
                         state = S_START;
                     }
                     else
