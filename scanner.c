@@ -50,7 +50,6 @@ Token * get_token(FILE * fp) {
     int test;
 
     while(1) {
-        bool esc_ok = false;
         c = getc(fp);
         if (c == '\n') printf("\n");
 
@@ -252,14 +251,14 @@ Token * get_token(FILE * fp) {
                 if (str_add_char(str_tmp, c)) {
                     cleanup(token, str_tmp);
                 }
-                else {
-                    if (esc_ok) token->type = KIN_TEXT_ESCERR;
-                    else token->type = KIN_TEXT;
-                    if (copy_str_to_token(token, str_tmp)) {
-                        cleanup(token, str_tmp);
-                    }
-                    str_free(str_tmp);
-                    return token;
+            }
+            else {
+                token->type = KIN_TEXT;
+                if (copy_str_to_token(token, str_tmp)) {
+                    cleanup(token, str_tmp);
+                }
+                str_free(str_tmp);
+                return token;
             }
         break;
 
@@ -277,7 +276,6 @@ Token * get_token(FILE * fp) {
                 hex[1] = getc(fp);
 
                 if (isxdigit(hex[0]) && isxdigit(hex[1])) {
-                    esc_ok = true;
                     if (str_add_char(str_tmp,strtol(hex,NULL,16)))
                         cleanup(token, str_tmp);
                 }

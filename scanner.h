@@ -15,7 +15,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <stdbool.h>
 #include "str.h"
 
 extern char * keywords[];
@@ -69,12 +68,11 @@ typedef enum sTokenKind {
     /* 134 */   KIN_DIV,                    /* / */
     /* 135 */   KIN_MUL,                    /* * */
     /* 136 */   KIN_TEXT,                   /* String value "example" */
-    /* 137 */   KIN_TEXT_ESCERR,            /* String with escape sequence error */
-    /* 138 */   KIN_NUM_INT,                /* range: <−32767, +32767>  */
-    /* 139 */   KIN_NUM_DOUBLE,             /* 42.42; 4e-2 */
-    /* 140 */   KIN_COMMA,                  /* , */
-    /* 141 */   KIN_UNKNOWN,                /*LEX_ERR*/
-    /* 142 */   END_OF_FILE,                /* EOF */
+    /* 137 */   KIN_NUM_INT,                /* range: <−32767, +32767>  */
+    /* 138 */   KIN_NUM_DOUBLE,             /* 42.42; 4e-2 */
+    /* 139 */   KIN_COMMA,                  /* , */
+    /* 140 */   KIN_UNKNOWN,                /*LEX_ERR*/
+    /* 141 */   END_OF_FILE,                /* EOF */
 }TokenKind;
 
 
