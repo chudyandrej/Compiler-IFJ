@@ -252,15 +252,14 @@ Token * get_token(FILE * fp) {
                 if (str_add_char(str_tmp, c)) {
                     cleanup(token, str_tmp);
                 }
-            }
-            else if (copy_str_to_token(token, str_tmp)) {
-                cleanup(token, str_tmp);
-            }
-            else {
-                if (esc_ok) token->type = KIN_TEXT_ESCERR;
-                else token->type = KIN_TEXT;
-                str_free(str_tmp);
-                return token;
+                else {
+                    if (esc_ok) token->type = KIN_TEXT_ESCERR;
+                    else token->type = KIN_TEXT;
+                    if (copy_str_to_token(token, str_tmp)) {
+                        cleanup(token, str_tmp);
+                    }
+                    str_free(str_tmp);
+                    return token;
             }
         break;
 
@@ -279,7 +278,8 @@ Token * get_token(FILE * fp) {
 
                 if (isxdigit(hex[0]) && isxdigit(hex[1])) {
                     esc_ok = true;
-                    if (str_add_char(str_tmp,strtol(hex,NULL,16))) cleanup(token, str_tmp);
+                    if (str_add_char(str_tmp,strtol(hex,NULL,16)))
+                        cleanup(token, str_tmp);
                 }
                 else {
                     ungetc(hex[0],fp);
