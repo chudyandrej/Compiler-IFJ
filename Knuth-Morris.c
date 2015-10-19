@@ -65,27 +65,6 @@ int swap(char *s, int i, int j){
     return 0;
 }
 
-int down_top_heapify(char *s, int length){
-    int swap_controll=0; 
-    int index; 
-    int j=0;
-
-    do{
-        index=(length-1)/2;
-        for(j=1; j < 3; j++){
-            if(s[index]<s[index*2+j]){
-                swap(s, index, index*2+j); 
-                swap_controll=1;                
-            }
-            if(index*2+2 == length+1) { break; }//menas only one child exist
-        }
-
-        length=length-2;
-    }while(length>0);
-
-    return swap_controll;
-}
-
 /*Heapify function = creates max heap from given array*/
 int heapify(char *s, int length){
     int index;      /*parents' indexes*/
@@ -96,6 +75,7 @@ int heapify(char *s, int length){
     /*Find left_child => parent_index*2+1 */
     /*Find right_child => parent_index*2+2 */
     while(swap_controll){
+        swap_controll=0;
         for(index = 0; index <= (length-1)/2; index++){
            
             for(j=1; j < 3; j++){
@@ -103,12 +83,9 @@ int heapify(char *s, int length){
                     swap(s, index, index*2+j);  
                     swap_controll=1;              
                 }
-                if(index*2+2 == length+1) { break; }//menas only one child exist
+                if(index*2+2 == length+1) { break; }/*menas only one child exist*/
             }
-        }
-        if(swap_controll){ 
-            swap_controll = down_top_heapify(s, length);
-        }             
+        }      
     }
  
     return 0;
@@ -118,28 +95,27 @@ int heapify(char *s, int length){
 int shift_down(char *s, int length){
     int index=0;
 
-    printf("1. %c last %c\n", s[0],s[length]);
     while(index <= ((length-1)/2)){
         if(index*2+2 < length+1){   /*two childs*/
-            if(s[index*2+1] < s[index*2+2] && s[index] < s[index*2+2]){
+            if(s[index*2+1] <= s[index*2+2] && s[index] < s[index*2+2]){
                 swap(s, index, index*2+2);
                 index=index*2+2;
             }
-            else if(s[index*2+1] > s[index*2+2] && s[index] < s[index*2+1]){
+            else if(s[index*2+1] >= s[index*2+2] && s[index] < s[index*2+1]){
                 swap(s, index, index*2+1);
                 index=index*2+1;
             }
             else{
-                index=index=index*2+1; 
+                break;
             }
         }
         else{       /*one child*/
             if(s[index] < s[index*2+1]){
                 swap(s, index, index*2+1);
                 index=index*2+1;
-            }
+            } 
             else{
-                index=index=index*2+1; 
+                break; 
             }
         }
     }
@@ -151,30 +127,29 @@ int sort(char *s){
     int length = strlen(s)-1; /*index of last item */ 
     
     heapify(s, length);     /*heap sort needs max heap*/
-    printf("heapify: %s\n", s);
    
    for(length; length > 0; ){
-        //swap first and last
+        /*swap first and last*/
         swap(s, 0, length);
         length--;
-        printf("po swap %s index novy: %d\n", s, length);
-        //shift down      
-       if(length>1) { shift_down(s, length-1); }
+        /*shift down*/       
+       if(length>=1) { shift_down(s, length); }
     }
     return 0;
 }
 
-int main(){
-    char *a=malloc(sizeof(char));
-    char *b=malloc(sizeof(char));
-    char *c=malloc(20);
-    strcpy(c, "abcdefghijklmnoprst");
+int main(int argc, char *argv[]){
+    char *a=malloc(strlen(argv[1])*sizeof(char));
+    char *c=malloc(strlen(argv[2])*sizeof(char));
+
+    strcpy(a, argv[1]);
+    strcpy(c, argv[2]);
     /*strcpy(a, "abrakasabraabrakadabra");
     strcpy(b, "abrakadabra");
     printf("%d\n", find(a,b));
     */
-  
-    printf("%d\n", sort(c));
-    printf("%s\n", c);
+    printf("%d\n", find(a, c));
+    sort(a);  
+    printf("%s\n", a);
     return 0;
 }
