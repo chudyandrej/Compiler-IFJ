@@ -43,7 +43,7 @@ void str_clear(string *s)
    s->length = 0;
 }
 
-int str_add_char(string *s1, char c,Token * t)
+int str_add_char(string *s1, char c)
 // prida na konec retezce jeden znak
 {
    if (s1->length + 1 >= s1->alloc_size)
