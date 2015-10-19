@@ -1,4 +1,4 @@
-/* 
+/*
  * File: str.c
  *
  * Description: simple string library
@@ -43,7 +43,7 @@ void str_clear(string *s)
    s->length = 0;
 }
 
-int str_add_char(string *s1, char c)
+int str_add_char(string *s1, char c,Token * t)
 // prida na konec retezce jeden znak
 {
    if (s1->length + 1 >= s1->alloc_size)
@@ -91,7 +91,7 @@ int str_cmp_const_str(string *s1, char* s2)
  * Function: str_find
  * Author: Kopec Maros
  * Description: Find if string is in array of strings
- * 
+ *
  * type: int
  * param 'string *s1': searched string
  * param 'char **s2': array of strings in which is searched
@@ -101,7 +101,7 @@ int str_cmp_const_str(string *s1, char* s2)
 int str_find(string *s1, char **s2, int size)
 {
     int i;
-    for (i = 0; i<size; i++) 
+    for (i = 0; i<size; i++)
     {
         if (!strcmp(s1->str, s2[i]))
         {

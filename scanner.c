@@ -51,7 +51,6 @@ Token * get_token(FILE * fp) {
 
     while(1) {
         c = getc(fp);
-        if (c == '\n') printf("\n");
 
         switch(state) {
         /* ######################## S_START ################################# */
@@ -318,7 +317,7 @@ Token * get_token(FILE * fp) {
             }
             else if (isalpha(c)) {
                 if ( c == 'e' || c == 'E') {
-                    if (++count_e > 1) {
+                    if (++count_e > 1 || !isdigit(c = getc(fp))) {
                         ungetc(c, fp);
                         token->type = KIN_UNKNOWN;
                         cleanup(NULL, str_tmp);
@@ -396,6 +395,7 @@ Token * get_token(FILE * fp) {
                 }
             break;
         }
+    if (c == '\n') printf("\n");
     }
 }
 

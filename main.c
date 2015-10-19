@@ -81,7 +81,7 @@ int main() {
     while ((t = get_token(fp)) && t->type!= END_OF_FILE) {
         //printf("%s(%d) ",token_kinds[t-100],t);
         printf("%s ",token_kinds[t->type-100]);
-        if (t->type == KIN_TEXT) printf(":%s ",t->str);
+        if (t->type == KIN_TEXT) printf("\":%s\" ",t->str);
     }
 
     //printf("%s",data[0]);
