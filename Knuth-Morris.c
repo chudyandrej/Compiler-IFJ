@@ -3,8 +3,7 @@
 #include <string.h>
 
 
-/*Knuth-Morris algorithm for string matching*/
-
+/*Knuth-Morris-Pratt algorithm for string matching*/
 int find(char *s, char *search){       
     int pattern_length = strlen(search);    
     
@@ -56,13 +55,90 @@ int find(char *s, char *search){
     return -1;    
 }
 
+/*Swap two array item*/
+int swap(char *s, int i, int j){
+    char swap;
+    swap = s[i];
+    s[i] = s[j];
+    s[j] = swap;
+
+    return 0;
+}
+
+/*Heapify function = creates max heap from given array*/
+int heapify(char *s, int length){
+    int index;      /*parents' indexes*/
+    int j;          /*just counter*/
+    
+    /*Find index of the last parent => round((size-1)/2) (indexing from 0) */
+    /*Find left_child => parent_index*2+1 */
+    /*Find right_child => parent_index*2+2 */
+    for(index = 0; index <= (length-1)/2; index++){
+       
+        for(j=1; j < 3; j++){
+            if(s[index]<s[index*2+j]){
+                swap(s, index, index*2+j);                
+                if(index*2+2 == length+1) { break; }//menas only one child exist
+            }
+        }
+    }
+ 
+    return 0;
+}
+
+/*Shift the first item down till array is ordered*/
+int shift_down(char *s, int length){
+    int index=0;
+
+    while(index <= ((length-1)/2)){
+        if(index*2+2 < length+1){   /*two childs*/
+            if(s[index*2+1] < s[index*2+2] && s[index] < s[index*2+2]){
+                swap(s, index, index*2+2);
+                index=index*2+2;
+            }
+            else if(s[index*2+1] > s[index*2+2] && s[index] < s[index*2+1]){
+                swap(s, index, index*2+1);
+                index=index*2+1;
+            }
+        }
+        else{       /*one child*/
+            if(s[index] < s[index*2+1]){
+                swap(s, index, index*2+1);
+                index=index*2+1;
+            }
+        }
+    }
+    return 0;
+}
+
+/*Heap sort algorithm*/
+int sort(char *s){
+    int length = strlen(s)-1; /*index of last item */ 
+    
+    heapify(s, length);     /*heap sort needs max heap*/
+    printf("heapify: %s\n", s);
+   
+   for(length; length > 0; ){
+        //swap first and last
+        swap(s, 0, length);
+        length--;
+        //shift down      
+       if(length>1) { shift_down(s, length-1); }
+    }
+    return 0;
+}
+
 int main(){
     char *a=malloc(sizeof(char));
     char *b=malloc(sizeof(char));
-
-    strcpy(a, "abrakasabraabrakadabra");
+    char *c=malloc(20);
+    strcpy(c, "abcd");
+    /*strcpy(a, "abrakasabraabrakadabra");
     strcpy(b, "abrakadabra");
     printf("%d\n", find(a,b));
-    
+    */
+  
+    printf("%d\n", sort(c));
+    printf("%s\n", c);
     return 0;
 }
