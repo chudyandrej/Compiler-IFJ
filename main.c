@@ -69,7 +69,7 @@ int main() {
 
     FILE * fp;
     fp=fopen("test.ifj15", "r");
-    int t;
+    Token * t;
 
     //char * string = "AHOJ";
     //Token * token = get_token(fp);
@@ -78,10 +78,12 @@ int main() {
     //printf("%s",get_token(fp)->str);
     //printf("%s",string);
 
-    while ((t = get_token(fp)->type) != END_OF_FILE) {
+    while ((t = get_token(fp)) && t->type!= END_OF_FILE) {
         //printf("%s(%d) ",token_kinds[t-100],t);
-        printf("%s ",token_kinds[t-100]);
+        printf("%s ",token_kinds[t->type-100]);
+        if (t->type == KIN_TEXT) printf(":%s ",t->str);
     }
+
     //printf("%s",data[0]);
     //printf("\n#################################################################");
 

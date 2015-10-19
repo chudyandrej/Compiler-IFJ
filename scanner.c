@@ -5,11 +5,12 @@
  * Authors: Bayer Jan, Kopec Maros
  *
  * Created: 2015/10/6
- * Last time modified: 2015/10/18
+ * Last time modified: 2015/10/19
  */
 
 #include "scanner.h"
 
+#define ESC_HEX_MAX 2
 #define DATA_TYPES_SIZE 4
 #define COMMANDS_SIZE 11
 #define KEYWORDS_SIZE 15
@@ -46,8 +47,10 @@ Token * get_token(FILE * fp) {
 
     * token = (Token){ 0 };
     char c;
+    int test;
 
     while(1) {
+        bool esc_ok = false;
         c = getc(fp);
         if (c == '\n') printf("\n");
 
@@ -242,20 +245,48 @@ Token * get_token(FILE * fp) {
         break;
 
         /* ########################### S_TEXT ############################### */
-        /* Zatial nerozoznava escape sekvencie ani backslash tvary */
+
         case S_TEXT:
-            ungetc(c, fp);
-            while ((c = getc(fp)) != '"') {
+            if (c == '\\') state = S_TEXT_ESC;
+            else if(c != '"') {
                 if (str_add_char(str_tmp, c)) {
                     cleanup(token, str_tmp);
                 }
             }
-            if (copy_str_to_token(token, str_tmp)) {
+            else if (copy_str_to_token(token, str_tmp)) {
                 cleanup(token, str_tmp);
             }
-            token->type = KIN_TEXT;
-            str_free(str_tmp);
-            return token;
+            else {
+                if (esc_ok) token->type = KIN_TEXT_ESCERR;
+                else token->type = KIN_TEXT;
+                str_free(str_tmp);
+                return token;
+            }
+        break;
+
+        /* ######################## S_TEXT_ESC ############################## */
+
+        case S_TEXT_ESC:
+            if (c == '"' || c == 'n' || c == 't' || c == '\\') {
+                if (str_add_char(str_tmp, '\\') || str_add_char(str_tmp, c)) {
+                    cleanup(token, str_tmp);
+                }
+            }
+            else if (c == 'x') {
+                char hex[ESC_HEX_MAX];
+                hex[0] = getc(fp);
+                hex[1] = getc(fp);
+
+                if (isxdigit(hex[0]) && isxdigit(hex[1])) {
+                    esc_ok = true;
+                    if (str_add_char(str_tmp,strtol(hex,NULL,16))) cleanup(token, str_tmp);
+                }
+                else {
+                    ungetc(hex[0],fp);
+                    ungetc(hex[1],fp);
+                }
+            }
+            state = S_TEXT;
         break;
 
 
@@ -462,6 +493,9 @@ int copy_char_to_token(Token *t, char c)
  * param 'string * s' pointer to string that will be free'd
  * returns: NULL
  */
+
+
+
 Token * cleanup(Token * t, string * s) {
     if (s != NULL) str_free(s);
     if (t != NULL) free(t);

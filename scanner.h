@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdbool.h>
 #include "str.h"
 
 extern char * keywords[];
@@ -68,11 +69,12 @@ typedef enum sTokenKind {
     /* 134 */   KIN_DIV,                    /* / */
     /* 135 */   KIN_MUL,                    /* * */
     /* 136 */   KIN_TEXT,                   /* String value "example" */
-    /* 137 */   KIN_NUM_INT,                /* range: <−32767, +32767>  */
-    /* 138 */   KIN_NUM_DOUBLE,             /* 42.42; 4e-2 */
-    /* 139 */   KIN_COMMA,                  /* , */
-    /* 140 */   KIN_UNKNOWN,                /*LEX_ERR*/
-    /* 141 */   END_OF_FILE,                /* EOF */
+    /* 137 */   KIN_TEXT_ESCERR,            /* String with escape sequence error */
+    /* 138 */   KIN_NUM_INT,                /* range: <−32767, +32767>  */
+    /* 139 */   KIN_NUM_DOUBLE,             /* 42.42; 4e-2 */
+    /* 140 */   KIN_COMMA,                  /* , */
+    /* 141 */   KIN_UNKNOWN,                /*LEX_ERR*/
+    /* 142 */   END_OF_FILE,                /* EOF */
 }TokenKind;
 
 
@@ -92,10 +94,11 @@ typedef enum sState {
     /* 207 */   S_SCREAMER,         /* '!' */
     /* 208 */   S_IDENTIFIER,
     /* 209 */   S_TEXT,
-    /* 210 */   S_COMMENT_LINE,
-    /* 211 */   S_COMMENT_BLOCK,
-    /* 212 */   S_PUNCT,            /* punctuation character */
-    /* 213 */   S_NUMBER
+    /* 210 */   S_TEXT_ESC,
+    /* 211 */   S_COMMENT_LINE,
+    /* 212 */   S_COMMENT_BLOCK,
+    /* 213 */   S_PUNCT,            /* punctuation character */
+    /* 214 */   S_NUMBER
 }State;
 
 
