@@ -47,6 +47,7 @@ Token * get_token(FILE * fp) {
 
     * token = (Token){ 0 };
     char c;
+    char tc; /* temporary character */
     int test;
 
     while(1) {
@@ -309,12 +310,12 @@ Token * get_token(FILE * fp) {
                 }
             }
             else if (c == '.') {
-                if (++count_dot > 1  || !isdigit(c = getc(fp))) {
+                if (!isdigit(tc = getc(fp)) || (++count_dot > 1 || count_e != 0 )) {
                     token->type = KIN_UNKNOWN;
                     cleanup(NULL, str_tmp);
                     return token;
                 }
-                ungetc(c,fp);
+                ungetc(tc,fp);
                 enable_op = FALSE;
                 if (str_add_char(str_tmp, c)) {
                     cleanup(token, str_tmp);
@@ -322,13 +323,13 @@ Token * get_token(FILE * fp) {
             }
             else if (isalpha(c)) {
                 if ( c == 'e' || c == 'E') {
-                    if (++count_e > 1 || !isdigit(c = getc(fp))) {
-                        ungetc(c, fp);
+                    if (++count_e > 1 || !isdigit(tc = getc(fp))) {
+                        ungetc(tc, fp);
                         token->type = KIN_UNKNOWN;
                         cleanup(NULL, str_tmp);
                         return token;
                     }
-
+                    ungetc(tc, fp);
                     enable_op = TRUE;
                     if (str_add_char(str_tmp, c)) {
                         cleanup(token, str_tmp);
