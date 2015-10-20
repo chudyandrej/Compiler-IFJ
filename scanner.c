@@ -304,7 +304,7 @@ Token * get_token(FILE * fp) {
                 }
             }
             else if (c == '.') {
-                if ((++count_dot > 1  && count_e != 0) || !isdigit(c = getc(fp))) {
+                if (++count_dot > 1  || !isdigit(c = getc(fp))) {
                     token->type = KIN_UNKNOWN;
                     cleanup(NULL, str_tmp);
                     return token;
