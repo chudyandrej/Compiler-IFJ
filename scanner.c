@@ -73,42 +73,42 @@ Token * get_token(FILE * fp) {
                 }
                 else if (c == EOF) {
                     token->type = END_OF_FILE;
-                    str_free(str_tmp);
+                    cleanup(NULL, str_tmp);
                     return token;
                 }
                 else if (c == '(') {
                     token->type = KIN_L_ROUNDBRACKET;
-                    str_free(str_tmp);
+                    cleanup(NULL, str_tmp);
                     return token;
                 }
                 else if (c == ')') {
                     token->type = KIN_R_ROUNDBRACKET;
-                    str_free(str_tmp);
+                    cleanup(NULL, str_tmp);
                     return token;
                 }
                 else if (c == '{') {
                     token->type = KIN_L_BRACE;
-                    str_free(str_tmp);
+                    cleanup(NULL, str_tmp);
                     return token;
                 }
                 else if (c == '}') {
                     token->type = KIN_R_BRACE;
-                    str_free(str_tmp);
+                    cleanup(NULL, str_tmp);
                     return token;
                 }
                 else if (c == ',') {
                     token->type = KIN_COMMA;
-                    str_free(str_tmp);
+                    cleanup(NULL, str_tmp);
                     return token;
                 }
                 else if (c == '*') {
                     token->type = KIN_MUL;
-                    str_free(str_tmp);
+                    cleanup(NULL, str_tmp);
                     return token;
                 }
                 else if (c == ';') {
                     token->type = KIN_SEMICOLON;
-                    str_free(str_tmp);
+                    cleanup(NULL, str_tmp);
                     return token;
                 }
                 else if (c == '/')    state = S_SLASH;
@@ -147,7 +147,7 @@ Token * get_token(FILE * fp) {
         case S_PLUS:
             if (c == '+') {
                 token->type = KIN_PLUSPLUS;
-                str_free(str_tmp);
+                cleanup(NULL, str_tmp);
                 return token;
             }
             else {
@@ -162,7 +162,7 @@ Token * get_token(FILE * fp) {
         case S_MINUS:
             if (c == '-') {
                 token->type = KIN_MINUSMINUS;
-                str_free(str_tmp);
+                cleanup(NULL, str_tmp);
                 return token;
             }
             else {
@@ -177,12 +177,12 @@ Token * get_token(FILE * fp) {
         case S_GREATER:
             if (c == '>') {
                 token->type = KIN_SCIN;
-                str_free(str_tmp);
+                cleanup(NULL, str_tmp);
                 return token;
             }
             else if (c == '=') {
                 token->type = KIN_GREATER_EQ;
-                str_free(str_tmp);
+                cleanup(NULL, str_tmp);
                 return token;
             }
             else {
@@ -197,12 +197,12 @@ Token * get_token(FILE * fp) {
         case S_SMALLER:
             if (c == '<') {
                 token->type = KIN_SCOUT;
-                str_free(str_tmp);
+                cleanup(NULL, str_tmp);
                 return token;
             }
             else if (c == '=') {
                 token->type = KIN_SMALLER_EQ;
-                str_free(str_tmp);
+                cleanup(NULL, str_tmp);
                 return token;
             }
             else {
@@ -217,7 +217,7 @@ Token * get_token(FILE * fp) {
         case S_EQUAL:
             if (c == '=') {
                 token->type = KIN_EQ;
-                str_free(str_tmp);
+                cleanup(NULL, str_tmp);
                 return token;
             }
             else {
@@ -232,7 +232,7 @@ Token * get_token(FILE * fp) {
         case S_SCREAMER:
             if (c == '=') {
                 token->type = KIN_NOT_EQ;
-                str_free(str_tmp);
+                cleanup(NULL, str_tmp);
                 return token;
             }
             else {
@@ -245,17 +245,16 @@ Token * get_token(FILE * fp) {
         /* ########################### S_TEXT ############################### */
 
         case S_TEXT:
-            if (c == '\\') state = S_TEXT_ESC;
+            if (c == EOF) {
+                token->type = KIN_UNKNOWN;
+                str_free(str_tmp);
+                return token;
+            }
+            else if (c == '\\') state = S_TEXT_ESC;
             else if(c != '"') {
                 if (str_add_char(str_tmp, c)) {
                     cleanup(token, str_tmp);
                 }
-            }
-            else if(c == EOF) {
-                ungetc(c, fp);
-                token->type = KIN_UNKNOWN;
-                str_free(str_tmp);
-                return token;
             }
             else {
                 token->type = KIN_TEXT;
@@ -300,7 +299,7 @@ Token * get_token(FILE * fp) {
                     if (!isdigit(c = getc(fp))) {
                         ungetc(c, fp);
                         token->type = KIN_UNKNOWN;
-                        str_free(str_tmp);
+                        cleanup(NULL, str_tmp);
                         return token;
                     }
                 }
@@ -310,9 +309,9 @@ Token * get_token(FILE * fp) {
                 }
             }
             else if (c == '.') {
-                if (!isdigit(c = getc(fp) && (++count_dot > 1 || count_e != 0))) {
+                if (++count_dot > 1  || !isdigit(c = getc(fp))) {
                     token->type = KIN_UNKNOWN;
-                    str_free(str_tmp);
+                    cleanup(NULL, str_tmp);
                     return token;
                 }
                 ungetc(c,fp);
@@ -326,7 +325,7 @@ Token * get_token(FILE * fp) {
                     if (++count_e > 1 || !isdigit(c = getc(fp))) {
                         ungetc(c, fp);
                         token->type = KIN_UNKNOWN;
-                        str_free(str_tmp);
+                        cleanup(NULL, str_tmp);
                         return token;
                     }
 
@@ -337,7 +336,7 @@ Token * get_token(FILE * fp) {
                 }
                 else {
                     token->type = KIN_UNKNOWN;
-                    str_free(str_tmp);
+                    cleanup(NULL, str_tmp);
                     return token;
                 }
             }
@@ -401,7 +400,7 @@ Token * get_token(FILE * fp) {
                 }
             break;
         }
-    //if (c == '\n') printf("\n");
+    if (c == '\n') printf("\n");
     }
 }
 
@@ -528,3 +527,4 @@ char * keywords[] = {
     "find",
     "sort"
 };
+
