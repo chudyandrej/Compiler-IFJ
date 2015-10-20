@@ -245,7 +245,12 @@ Token * get_token(FILE * fp) {
         /* ########################### S_TEXT ############################### */
 
         case S_TEXT:
-            if (c == '\\') state = S_TEXT_ESC;
+            if (c == EOF) {
+                token->type = KIN_UNKNOWN;
+                str_free(str_tmp);
+                return token;
+            }
+            else if (c == '\\') state = S_TEXT_ESC;
             else if(c != '"') {
                 if (str_add_char(str_tmp, c)) {
                     cleanup(token, str_tmp);
