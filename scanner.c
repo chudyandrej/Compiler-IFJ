@@ -73,42 +73,42 @@ Token * get_token(FILE * fp) {
                 }
                 else if (c == EOF) {
                     token->type = END_OF_FILE;
-                    cleanup(NULL, str_tmp);
+                    str_free(str_tmp);
                     return token;
                 }
                 else if (c == '(') {
                     token->type = KIN_L_ROUNDBRACKET;
-                    cleanup(NULL, str_tmp);
+                    str_free(str_tmp);
                     return token;
                 }
                 else if (c == ')') {
                     token->type = KIN_R_ROUNDBRACKET;
-                    cleanup(NULL, str_tmp);
+                    str_free(str_tmp);
                     return token;
                 }
                 else if (c == '{') {
                     token->type = KIN_L_BRACE;
-                    cleanup(NULL, str_tmp);
+                    str_free(str_tmp);
                     return token;
                 }
                 else if (c == '}') {
                     token->type = KIN_R_BRACE;
-                    cleanup(NULL, str_tmp);
+                    str_free(str_tmp);
                     return token;
                 }
                 else if (c == ',') {
                     token->type = KIN_COMMA;
-                    cleanup(NULL, str_tmp);
+                    str_free(str_tmp);
                     return token;
                 }
                 else if (c == '*') {
                     token->type = KIN_MUL;
-                    cleanup(NULL, str_tmp);
+                    str_free(str_tmp);
                     return token;
                 }
                 else if (c == ';') {
                     token->type = KIN_SEMICOLON;
-                    cleanup(NULL, str_tmp);
+                    str_free(str_tmp);
                     return token;
                 }
                 else if (c == '/')    state = S_SLASH;
@@ -147,7 +147,7 @@ Token * get_token(FILE * fp) {
         case S_PLUS:
             if (c == '+') {
                 token->type = KIN_PLUSPLUS;
-                cleanup(NULL, str_tmp);
+                str_free(str_tmp);
                 return token;
             }
             else {
@@ -162,7 +162,7 @@ Token * get_token(FILE * fp) {
         case S_MINUS:
             if (c == '-') {
                 token->type = KIN_MINUSMINUS;
-                cleanup(NULL, str_tmp);
+                str_free(str_tmp);
                 return token;
             }
             else {
@@ -177,12 +177,12 @@ Token * get_token(FILE * fp) {
         case S_GREATER:
             if (c == '>') {
                 token->type = KIN_SCIN;
-                cleanup(NULL, str_tmp);
+                str_free(str_tmp);
                 return token;
             }
             else if (c == '=') {
                 token->type = KIN_GREATER_EQ;
-                cleanup(NULL, str_tmp);
+                str_free(str_tmp);
                 return token;
             }
             else {
@@ -197,12 +197,12 @@ Token * get_token(FILE * fp) {
         case S_SMALLER:
             if (c == '<') {
                 token->type = KIN_SCOUT;
-                cleanup(NULL, str_tmp);
+                str_free(str_tmp);
                 return token;
             }
             else if (c == '=') {
                 token->type = KIN_SMALLER_EQ;
-                cleanup(NULL, str_tmp);
+                str_free(str_tmp);
                 return token;
             }
             else {
@@ -217,7 +217,7 @@ Token * get_token(FILE * fp) {
         case S_EQUAL:
             if (c == '=') {
                 token->type = KIN_EQ;
-                cleanup(NULL, str_tmp);
+                str_free(str_tmp);
                 return token;
             }
             else {
@@ -232,7 +232,7 @@ Token * get_token(FILE * fp) {
         case S_SCREAMER:
             if (c == '=') {
                 token->type = KIN_NOT_EQ;
-                cleanup(NULL, str_tmp);
+                str_free(str_tmp);
                 return token;
             }
             else {
@@ -250,6 +250,12 @@ Token * get_token(FILE * fp) {
                 if (str_add_char(str_tmp, c)) {
                     cleanup(token, str_tmp);
                 }
+            }
+            else if(c == EOF) {
+                ungetc(c, fp);
+                token->type = KIN_UNKNOWN;
+                str_free(str_tmp);
+                return token;
             }
             else {
                 token->type = KIN_TEXT;
@@ -294,7 +300,7 @@ Token * get_token(FILE * fp) {
                     if (!isdigit(c = getc(fp))) {
                         ungetc(c, fp);
                         token->type = KIN_UNKNOWN;
-                        cleanup(NULL, str_tmp);
+                        str_free(str_tmp);
                         return token;
                     }
                 }
@@ -304,9 +310,9 @@ Token * get_token(FILE * fp) {
                 }
             }
             else if (c == '.') {
-                if ((++count_dot > 1  && count_e != 0) || !isdigit(c = getc(fp))) {
+                if (!isdigit(c = getc(fp) && (++count_dot > 1 || count_e != 0))) {
                     token->type = KIN_UNKNOWN;
-                    cleanup(NULL, str_tmp);
+                    str_free(str_tmp);
                     return token;
                 }
                 ungetc(c,fp);
@@ -320,7 +326,7 @@ Token * get_token(FILE * fp) {
                     if (++count_e > 1 || !isdigit(c = getc(fp))) {
                         ungetc(c, fp);
                         token->type = KIN_UNKNOWN;
-                        cleanup(NULL, str_tmp);
+                        str_free(str_tmp);
                         return token;
                     }
 
@@ -331,7 +337,7 @@ Token * get_token(FILE * fp) {
                 }
                 else {
                     token->type = KIN_UNKNOWN;
-                    cleanup(NULL, str_tmp);
+                    str_free(str_tmp);
                     return token;
                 }
             }
@@ -395,7 +401,7 @@ Token * get_token(FILE * fp) {
                 }
             break;
         }
-    if (c == '\n') printf("\n");
+    //if (c == '\n') printf("\n");
     }
 }
 

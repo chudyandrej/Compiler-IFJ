@@ -64,7 +64,7 @@ int main() {
        "num_double",
        ",",
        "LEX_ERR",
-       "EOF",
+       "EOF"
  };
 
     FILE * fp;
