@@ -401,7 +401,6 @@ Token * get_token(FILE * fp) {
                 }
             break;
         }
-    if (c == '\n') printf("\n");
     }
 }
 
