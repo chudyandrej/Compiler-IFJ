@@ -5,15 +5,15 @@
 #include <stdlib.h>
 
 typedef struct tDLElem{
-	void *data; 			/*points to any data*/
+    void *data;             /*points to any data*/
     struct tDLElem *lptr;   /*points to left element*/
-    struct tDLElem *rptr; 	/*points to right element*/
+    struct tDLElem *rptr;   /*points to right element*/
 } *tDLElemPtr;
 
 typedef struct{
-	tDLElemPtr First;	/*points to firts element in the list*/
-	tDLElemPtr Last;	/*points to last element in the list*/
-	tDLElemPtr Active;	/*points to active element in the list*/
+    tDLElemPtr First;   /*points to firts element in the list*/
+    tDLElemPtr Last;    /*points to last element in the list*/
+    tDLElemPtr Active;  /*points to active element in the list*/
 } tDLList;
 
 void init_list(tDLList *L);
