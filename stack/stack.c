@@ -124,5 +124,8 @@ void *copy_last(tDLList *L){
    
     if(L->Last != NULL){
         return L->Last->data;
-    }   
+    }
+    else {
+        return NULL;
+    }
 }
