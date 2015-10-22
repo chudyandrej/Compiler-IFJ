@@ -3,33 +3,45 @@
 #include "stack.h"
 
 int main(){
-	tDLList L;
+    tDLList *L = malloc(sizeof(tDLList));
 
 
-	init_list(&L);
-	printf("init done\n");
-	dispose_list(&L);
-	printf("dispose empty list done\n");
-	int *a=malloc(sizeof(int));
-	int *b=malloc(sizeof(int));
-	int *c=malloc(sizeof(int));
-	*a=9;
-	*c=10;
-	insert_last(&L, a);
-	printf("insert last done\n");
-	copy_last(&L, b);
-	printf("last item is: %d\n", *b );
+    init_list(L);
+    printf("init done\n");
+    dispose_list(L);
+    printf("dispose empty list done\n");
+    int *a=malloc(sizeof(int));
+    void *b;
+    int *c=malloc(sizeof(int));
+    *a=9;
+   
+    insert_last(L, a);
+    printf("insert last done\n");
+    printf("last item is: %d\n\n",  *(int*)copy_last(L) );
+    
+    *c=10;
+    activate_last(L);
+    post_insert(L, c);
+    printf("activate last and post insert done\n");
+    printf("last item is: %d\n",  *(int*)copy_last(L) );
+    insert_last(L, a);
+    printf("insert last done\n");
+    printf("last item is: %d\n\n",  *(int*)copy_last(L) );
+    
+    *c=54;
+    shift_active_right(L);
+    printf("shift activate done\n");
+    post_insert(L, c);
+    printf("post insert done\n");
+    printf("last item is: %d\n\n",  *(int*)copy_last(L) );
 
-	//activate_last(&L);
-	//post_insert(&L, c);
+    delete_last(L);
+    printf("delete last complete\n");
+    printf("last item is: %d\n",  *(int*)copy_last(L) );
 
-	//copy_last(&L, b);
-	//printf("last item is: %d\n", *b);
-
-
-	dispose_list(&L);
-	free(a);
-	free(b);
-	free(c);
-	return 0;
+    dispose_list(L);
+    free(L);
+    free(a);
+    free(c);
+    return 0;
 }

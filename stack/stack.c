@@ -1,16 +1,17 @@
 #include "stack.h"
 
-
+/*Function initialize list to NULL*/
 void init_list(tDLList *L){
 
-	L->First=NULL;
-	L->Last=NULL;
-	L->Active=NULL;
+    L->First=NULL;
+    L->Last=NULL;
+    L->Active=NULL;
 }
 
+/*Function frees all elements in list and set list to NULL*/
 void dispose_list(tDLList *L){
 
-	tDLElemPtr temp; 
+    tDLElemPtr temp; 
    
     while(L->First != NULL){
         
@@ -23,11 +24,12 @@ void dispose_list(tDLList *L){
     L->Last = NULL;
 }
 
+/*Function create new element and inserts its as last element*/
 void insert_last(tDLList *L, void *data){
 
-	tDLElemPtr new = malloc(sizeof(struct tDLElem)); 
+    tDLElemPtr new = malloc(sizeof(struct tDLElem)); 
 
-	if (new == NULL){
+    if (new == NULL){
         data = NULL;
     }
     else{  
@@ -38,7 +40,7 @@ void insert_last(tDLList *L, void *data){
             L->First=new;
             L->Last=new;
             new->rptr=NULL;
-            new->lptr=NULL;            
+            new->lptr=NULL; 
         }
         else {                  /*One or more elements in list*/
             new->lptr=L->Last;
@@ -49,9 +51,10 @@ void insert_last(tDLList *L, void *data){
     }
 }
 
+/*Function frees last element in list if exists*/
 void delete_last(tDLList *L){
 
-	if(L->First != NULL){   /*Non-empty list*/
+    if(L->First != NULL){   /*Non-empty list*/
     
         if(L->Last == L->Active){
             L->Active = NULL;
@@ -74,13 +77,15 @@ void delete_last(tDLList *L){
     }    
 }
 
+/*Function create new element and inserts its behind active element,*/
+/*on the right side of active one, if acitve exist, otherwise does nothing*/
 void post_insert(tDLList *L, void *data){
 
- 	if(L->Active != NULL){     /*Exist active element*/
+    if(L->Active != NULL){     /*Exist active element*/
       
         tDLElemPtr new = malloc(sizeof(struct tDLElem)); 
         if(new == NULL){
-           	data = NULL;
+            data = NULL;
         }
         else{
             new->data=data;
@@ -97,20 +102,27 @@ void post_insert(tDLList *L, void *data){
     }
 }
 
+/*Function activates last element in list*/
+/*If list is empty, Active still points to NULL*/
 void activate_last(tDLList *L){
 
-	L->Active = L->Last;
+    L->Active = L->Last;
 }
 
+/*Function shifts active element to the right*/
+/*if active doesn't exist, function does nothing*/
 void shift_active_right(tDLList *L){
-	
-	if(L->Active != L->Last && L->Active != NULL){
-		L->Active = L->Active->rptr;
-	}
+    
+    if(L->Active != L->Last && L->Active != NULL){
+        L->Active = L->Active->rptr;
+    }
 }
 
-void copy_last(tDLList *L, void *data){
-	
-	data=L->Last->data;
-	
+/*Function returns void pointer on Last element*/
+/*If list is empty, function does nothing*/
+void *copy_last(tDLList *L){
+   
+    if(L->Last != NULL){
+        return L->Last->data;
+    }   
 }
