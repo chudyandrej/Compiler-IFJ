@@ -1,0 +1,5 @@
+a=4/0;
+a=4+3+"text";
+//dat do spravnych testov pretypovanie z int na double
+a=find("blaaaara", "aaa")+sort("sort it"); // pridat spravne testy na navratove hodnoty z funkcii a pouzit ich vo vyrazoch
+a=;
