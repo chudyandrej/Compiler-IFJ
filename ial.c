@@ -3,7 +3,12 @@
 #include <string.h>
 
 
-/*Knuth-Morris-Pratt algorithm for string matching*/
+/**
+ * Knuth-Morris-Pratt algorithm for string matching
+ * @param  s      string array which is searched
+ * @param  search string array which is used to search in s
+ * @return        starting index of search string in s array (indexed from 0) 
+ */
 int find(char *s, char *search){       
     int pattern_length = strlen(search);    
     
@@ -55,18 +60,25 @@ int find(char *s, char *search){
     return -1;    
 }
 
-/*Swap two array item*/
-int swap(char *s, int i, int j){
+/**
+ * Swap two array items given by indexes
+ * @param  s pointer to char array
+ * @param  i index the first item in array to exchange
+ * @param  j index the second item in array to exchange
+ */
+void swap(char *s, int i, int j){
     char swap;
     swap = s[i];
     s[i] = s[j];
     s[j] = swap;
-
-    return 0;
 }
 
-/*Heapify function = creates max heap from given array*/
-int heapify(char *s, int length){
+/**
+ * Heapify function creates max heap from given array
+ * @param  s      pointer to char array
+ * @param  length length of array
+ */
+void heapify(char *s, int length){
     int index;      /*parents' indexes*/
     int j;          /*just counter*/
     int swap_controll=1;
@@ -83,20 +95,22 @@ int heapify(char *s, int length){
                     swap(s, index, index*2+j);  
                     swap_controll=1;              
                 }
-                if(index*2+2 == length+1) { break; }/*menas only one child exist*/
+                if(index*2+2 == length+1) { break; }/*means only one child exist*/
             }
         }      
     }
- 
-    return 0;
 }
 
-/*Shift the first item down till array is ordered*/
-int shift_down(char *s, int length){
+/**
+ * Shift the first item down till array is ordered
+ * @param s      pointer to char array
+ * @param length length of array
+ */
+void shift_down(char *s, int length){
     int index=0;
 
     while(index <= ((length-1)/2)){
-        if(index*2+2 < length+1){   /*two childs*/
+        if(index*2+2 < length+1){   /*two children*/
             if(s[index*2+1] <= s[index*2+2] && s[index] < s[index*2+2]){
                 swap(s, index, index*2+2);
                 index=index*2+2;
@@ -119,23 +133,25 @@ int shift_down(char *s, int length){
             }
         }
     }
-    return 0;
 }
 
-/*Heap sort algorithm*/
-int sort(char *s){
+/**
+ * Heap sort algorithm
+ * @param  s pointer to char array
+ */
+void sort(char *s){
     int length = strlen(s)-1; /*index of last item */ 
     
     heapify(s, length);     /*heap sort needs max heap*/
    
-   for(length; length > 0; ){
-        /*swap first and last*/
-        swap(s, 0, length);
+   for(length; length > 0; ){      
+        swap(s, 0, length);   /*swap first and last*/
         length--;
-        /*shift down*/       
-       if(length>=1) { shift_down(s, length); }
+                     
+        if(length>=1){           /*shift down*/ 
+            shift_down(s, length); 
+        }
     }
-    return 0;
 }
 
 int main(int argc, char *argv[]){
