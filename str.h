@@ -9,9 +9,9 @@
 
 typedef struct
 {
-  char* str;		// misto pro dany retezec ukonceny znakem '\0'
-  int length;		// skutecna delka retezce
-  int alloc_size;	// velikost alokovane pameti
+    char* str;		// misto pro dany retezec ukonceny znakem '\0'
+    int length;		// skutecna delka retezce
+    int alloc_size;	// velikost alokovane pameti
 } string;
 
 enum {NOTFOUND = -1};

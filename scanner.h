@@ -1,20 +1,22 @@
-/* 
- * File: scanner.h
- *
- * Description: header file for lexical analyzer
- * Authors: Bayer Jan, Kopec Maros
- *
- * Created: 2015/10/6
- * Last time modified: 2015/10/17
- */
+/*
+* File: scanner.h
+        *
+        * Description: header file for lexical analyzer
+* Authors: Bayer Jan, Kopec Maros
+*
+* Created: 2015/10/6
+* Last time modified: 2015/10/17
+*/
 
 #ifndef SCANNER_H_INCLUDED
 #define SCANNER_H_INCLUDED
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include "str.h"
-#include <stdio.h>
+
 extern char * keywords[];
 extern FILE * fp; /* Pointer to the source file */
 
@@ -90,10 +92,10 @@ typedef enum sState {
     /* 207 */   S_SCREAMER,         /* '!' */
     /* 208 */   S_IDENTIFIER,
     /* 209 */   S_TEXT,
-    /* 210 */   S_COMMENT_LINE,
-    /* 211 */   S_COMMENT_BLOCK,
-    /* 212 */   S_PUNCT,            /* punctuation character */
-    /* 213 */   S_NUMBER
+    /* 210 */   S_TEXT_ESC,
+    /* 211 */   S_COMMENT_LINE,
+    /* 212 */   S_COMMENT_BLOCK,
+    /* 213 */   S_NUMBER,
 }State;
 
 
@@ -102,15 +104,14 @@ typedef enum sState {
  * Author: Bayer Jan
  * Description: struct for token
  * item 'string': text part of token (represents name)
- * item 'tTokenType': stores which type of token it is 
+ * item 'tTokenType': stores which type of token it is
  */
 typedef struct sToken {
-    TokenKind type;
+    int type;
     char * str;
 }Token;
 
 int isoperator(char c);
-int isINT(char * c);
 int copy_carray_to_token(Token *t, char *s);
 int copy_char_to_token(Token *t, char c);
 int copy_str_to_token(Token *t, string *s);

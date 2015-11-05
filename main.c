@@ -4,12 +4,11 @@
 
 FILE *fp;
 
-int main(int argc, char *argv[]) {
+int main() {
 
-    fp = fopen("/home/andrej/ClionProjects/Compiler-IFJ/test.cpp","r");
-    int exitcode = start_syntax_analyz();
+    fp = fopen("/Users/andrejchudy/Workspace/Compiler-IFJ/test.cpp","r");
+    int exit_code = start_syntax_analyz();
     fclose(fp);
 
-
-    return exitcode;
+    return exit_code;
 }

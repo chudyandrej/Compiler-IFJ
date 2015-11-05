@@ -17,7 +17,7 @@ int start_syntax_analyz(){
         case KW_STRING:
             return dec_function();
         case END_OF_FILE:
-            errorMessage("program file is empty !");
+            errorMessage("Program file is empty !");
             return 1;
         default:
             errorMessage("Error on global scope !");

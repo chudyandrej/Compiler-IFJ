@@ -49,7 +49,7 @@ size_t stackSize(Stack *stack)
 
 StackItem stackTop(Stack *stack)
 {
-	return stack->top->item;
+	return (char) stack->top->item;
 }
 
 bool stackPush(Stack *stack, int item)
@@ -68,14 +68,14 @@ bool stackPush(Stack *stack, int item)
 
 int stackPop(Stack *stack)
 {
-	StackNode *oldTop;
+	StackNode *oldTop = NULL;
 	StackItem item;
 	
 	if(stack->top == NULL)
 		return 0; /** @todo Make a better way to return this error. **/
 	
 	oldTop = stack->top;
-	item = oldTop->item;
+	item = (char) oldTop->item;
 	stack->top = oldTop->next;
 	free(oldTop);
 	oldTop = NULL;
