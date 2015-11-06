@@ -1,12 +1,15 @@
 
 #include "syntax_checker.h"
 
-
 FILE *fp;
 
-int main() {
+int main(int argc, char *argv[]){
+    if(argc == 0){
+	printf("give argument!\n");
+    return 1;	
+    }
 
-    fp = fopen("/Users/andrejchudy/Workspace/Compiler-IFJ/test.cpp","r");
+    fp = fopen(argv[1],"r");
     int exit_code = start_syntax_analyz();
     fclose(fp);
 
