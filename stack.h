@@ -1,26 +1,37 @@
-#ifndef STACK_H_INCLUDED
-#define STACK_H_INCLUDED
+//
+// Created by Andrej Oliver Chudý on 07/11/15.
+//
 
+#ifndef IJF_STACK_H
+#define IJF_STACK_H
+
+#include <stdio.h>
 #include <stdlib.h>
+#include "precedence.h"
 
-#if !defined(__bool_true_false_are_defined) && !defined(__cplusplus)
-typedef int bool;
-#define true 1
-#define false 0
-#define __bool_true_false_are_defined
-#endif
+typedef struct tDLElem{
+    void *data;             /*points to any data*/
+    struct tDLElem *lptr;   /*points to left element*/
+    struct tDLElem *rptr;   /*points to right element*/
 
-#define StackItem char
+} *tDLElemPtr;
 
-typedef struct Stack Stack;
+typedef struct{
+    tDLElemPtr First;   /*points to firts element in the list*/
+    tDLElemPtr Last;    /*points to last element in the list*/
+    tDLElemPtr Active;  /*points to active element in the list*/
+    tDLElemPtr LastNode;
+    tDLElemPtr LastToken;
+} tDLList;
 
-Stack *stackCreate();
-void stackDestroy(Stack *stack);
-void stackClean(Stack *stack);
-bool stackIsEmpty(Stack *stack);
-size_t stackSize(Stack *stack);
-StackItem stackTop(Stack *stack);
-bool stackPush(Stack *stack, int item);
-int stackPop(Stack *stack);
-
-#endif
+void init_list(tDLList *L);
+void dispose_list(tDLList *L);
+void insert_last(tDLList *L, void *data);
+void delete_last(tDLList *L);
+void post_insert(tDLList *L, void *data);
+void activate_last(tDLList *L);
+void shift_active_right(tDLList *L);
+void *copy_last(tDLList *L);
+void insert_last_desc(tDLList *L, void *data,unsigned int description );
+void preinsert_lastNode(tDLList *L, void *data);
+#endif //IJF_STACK_H

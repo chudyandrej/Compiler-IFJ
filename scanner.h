@@ -1,15 +1,9 @@
-/*
-* File: scanner.h
-        *
-        * Description: header file for lexical analyzer
-* Authors: Bayer Jan, Kopec Maros
-*
-* Created: 2015/10/6
-* Last time modified: 2015/10/17
-*/
+//
+// Created by Andrej Oliver Chudý on 07/11/15.
+//
 
-#ifndef SCANNER_H_INCLUDED
-#define SCANNER_H_INCLUDED
+#ifndef IJF_SCANNER_H
+#define IJF_SCANNER_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,50 +23,54 @@ enum {TRUE = 1, FALSE = 0};
  * Description: Type of tokens, which can be found
  */
 typedef enum sTokenKind {
-    /* 100 */   KIN_ASSIGNEMENT = 100,      /* = */
-    /* 101 */   KIN_GREATER,                /* > */
-    /* 102 */   KIN_GREATER_EQ,             /* >= */
-    /* 103 */   KIN_SMALLER,                /* < */
-    /* 104 */   KIN_SMALLER_EQ,             /* <= */
-    /* 105 */   KIN_EQ,                     /* == */
-    /* 106 */   KIN_NOT_EQ,                 /* != */
-    /* 107 */   KIN_SCOUT,                  /* << */
-    /* 108 */   KIN_SCIN,                   /* >> */
-    /* 109 */   KIN_L_ROUNDBRACKET,         /* ( */
-    /* 110 */   KIN_R_ROUNDBRACKET,         /* ) */
-    /* 111 */   KIN_L_BRACE,                /* { */
-    /* 112 */   KIN_R_BRACE,                /* } */
-    /* 113 */   KIN_SEMICOLON,              /* ; */
-    /* 114 */   KIN_IDENTIFIER,             /* identifier */
+    /*################### OPERATORS VALUE ###################*/
+    /* 0 */   KIN_NUM_INT = 0,          /* range: <−32767, +32767>  */
+    /* 1 */   KIN_NUM_DOUBLE,             /* 42.42; 4e-2 */
+    /* 2 */   KIN_PLUS,                   /* + */
+    /* 3 */   KIN_MINUS,                  /* - */
+    /* 4 */   KIN_MUL,                    /* * */
+    /* 5 */   KIN_DIV,                    /* / */
+    /* 6 */   KIN_PLUSPLUS,               /* ++ */
+    /* 7 */   KIN_MINUSMINUS,             /* -- */
+    /* 8 */   KIN_IDENTIFIER,             /* identifier */
+    /* 9 */   KIN_L_ROUNDBRACKET,         /* ( */
+    /* 10 */   KIN_R_ROUNDBRACKET,         /* ) */
+    /* 11 */   KIN_EQ,                     /* == */
+    /* 12 */   KIN_SMALLER,                /* < */
+    /* 13 */   KIN_GREATER,                /* > */
+    /* 14 */   KIN_SMALLER_EQ,             /* <= */
+    /* 15 */   KIN_GREATER_EQ,             /* >= */
+    /* 16 */   KIN_NOT_EQ,                 /* != */
+    /* 17 */   KIN_DOLLAR,                 /* $ */
+    /*######################################################*/
+    /* 18 */   KIN_ASSIGNEMENT,            /* = */
+    /* 19 */   KIN_SCOUT,                  /* << */
+    /* 20 */   KIN_SCIN,                   /* >> */
+    /* 21 */   KIN_L_BRACE,                /* { */
+    /* 22 */   KIN_R_BRACE,                /* } */
+    /* 23 */   KIN_SEMICOLON,              /* ; */
     /*################## KEYWORDS ########################*/
-    /* 115 */   KW_AUTO,                   /* data type */
-    /* 116 */   KW_DOUBLE,                 /* data type */
-    /* 117 */   KW_INT,                    /* data type */
-    /* 118 */   KW_STRING,                 /* data type */
-    /* 119 */   KW_CIN,                    /* command */
-    /* 120 */   KW_COUT,                   /* command */
-    /* 121 */   KW_ELSE,                   /* command */
-    /* 122 */   KW_FOR,                    /* command */
-    /* 123 */   KW_IF,                     /* command */
-    /* 124 */   KW_RETURN,                 /* command */
-    /* 125 */   KW_LENGTH,                 /* command */
-    /* 126 */   KW_SUBSTR,                 /* command */
-    /* 127 */   KW_CONCAT,                 /* command */
-    /* 128 */   KW_FIND,                   /* command */
-    /* 129 */   KW_SORT,                   /* command */
+    /* 24 */   KW_AUTO,                   /* data type */
+    /* 25 */   KW_DOUBLE,                 /* data type */
+    /* 26 */   KW_INT,                    /* data type */
+    /* 27 */   KW_STRING,                 /* data type */
+    /* 28 */   KW_CIN,                    /* command */
+    /* 29 */   KW_COUT,                   /* command */
+    /* 30 */   KW_ELSE,                   /* command */
+    /* 31 */   KW_FOR,                    /* command */
+    /* 32 */   KW_IF,                     /* command */
+    /* 33 */   KW_RETURN,                 /* command */
+    /* 34 */   KW_LENGTH,                 /* command */
+    /* 35 */   KW_SUBSTR,                 /* command */
+    /* 36 */   KW_CONCAT,                 /* command */
+    /* 37 */   KW_FIND,                   /* command */
+    /* 38 */   KW_SORT,                   /* command */
     /*###################################################*/
-    /* 130 */   KIN_PLUS,                   /* + */
-    /* 131 */   KIN_PLUSPLUS,               /* ++ */
-    /* 132 */   KIN_MINUS,                  /* - */
-    /* 133 */   KIN_MINUSMINUS,             /* -- */
-    /* 134 */   KIN_DIV,                    /* / */
-    /* 135 */   KIN_MUL,                    /* * */
-    /* 136 */   KIN_TEXT,                   /* String value "example" */
-    /* 137 */   KIN_NUM_INT,                /* range: <−32767, +32767>  */
-    /* 138 */   KIN_NUM_DOUBLE,             /* 42.42; 4e-2 */
-    /* 139 */   KIN_COMMA,                  /* , */
-    /* 140 */   KIN_UNKNOWN,                /*LEX_ERR*/
-    /* 141 */   END_OF_FILE,                /* EOF */
+    /* 39 */   KIN_TEXT,                   /* String value "example" */
+    /* 40 */   KIN_COMMA,                  /* , */
+    /* 41 */   KIN_UNKNOWN,                /*LEX_ERR*/
+    /* 42 */   END_OF_FILE,                /* EOF */
+
 }TokenKind;
 
 
@@ -118,4 +116,4 @@ int copy_str_to_token(Token *t, string *s);
 Token * get_token(FILE * fp);
 Token * cleanup(Token * t, string * s);
 
-#endif // SCANNER_H_INCLUDED
+#endif //IJF_SCANNER_H

@@ -1,3 +1,7 @@
+//
+// Created by Andrej Oliver Chudý on 07/11/15.
+//
+
 /*
  * File: scanner.c
  *
@@ -517,3 +521,4 @@ char * keywords[] = {
         "find",
         "sort"
 };
+

@@ -1,11 +1,7 @@
-/*
- * File: str.c
- *
- * Description: simple string library
- * Authors: Brno University of Technology
- */
+//
+// Created by Andrej Oliver Chudý on 07/11/15.
+//
 
-//jednoducha knihovna pro praci s nekonecne dlouhymi retezci
 #include <string.h>
 #include <stdlib.h>
 #include "str.h"

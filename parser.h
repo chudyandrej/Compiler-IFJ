@@ -1,16 +1,18 @@
 //
-// Created by andrej on 15.10.2015.
+// Created by Andrej Oliver Chudý on 07/11/15.
 //
 
-#ifndef INTERPRET_SYNTAX_CHECKER_H
-#define INTERPRET_SYNTAX_CHECKER_H
+#ifndef IJF_PARSER_H
+#define IJF_PARSER_H
+
 
 #include "scanner.h"
 #include "stack.h"
+#include <stdbool.h>
 
 
 
-Stack *bracket_stack ;
+
 int start_syntax_analyz();
 int dec_function();
 
@@ -33,5 +35,4 @@ int value_call_bracket(int PREDICT_EXIT);
 
 int bracket(int token);
 
-
-#endif //INTERPRET_SYNTAX_CHECKER_H
+#endif //IJF_PARSER_H

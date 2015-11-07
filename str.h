@@ -1,11 +1,9 @@
-/* 
- * File: str.h
- *
- * Description: header file for simple string library
- * Authors: Brno University of Technology
- */
+//
+// Created by Andrej Oliver Chudý on 07/11/15.
+//
 
-//hlavickovy soubor pro praci s nekonecne dlouhymi retezci
+#ifndef IJF_STR_H
+#define IJF_STR_H
 
 typedef struct
 {
@@ -30,3 +28,5 @@ int str_get_length(string *s);
 
 //Added by Kopec Maros
 int str_find(string *s1, char **s2, int size);
+
+#endif //IJF_STR_H
