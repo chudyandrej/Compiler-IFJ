@@ -63,16 +63,16 @@ typedef struct tFunc{
         // i = int
         // s = string
         // prvni je navratova hodnota, zbyvajici parametry v danem poradi
-    int orderDef; //poradi definice 
-    int orderDec; //poradi dkelarace
     void * TAC; //pointer na list 3AC 
+    char * names; //rozdelene mezerami
     /*! zmenit void az bude 3AC*/
 } *tFuncPtr;
 
+
 void GSTDispose(tBSTPtr);
 int GSTAllDef(tBSTEPtr rootPtr); // return 1 kdyz vsechny deklarovane funkce byly definovany
-int GSTDeclare(tBSTPtr, char *, int); //return 0 kdyz parametry odpovidaji (nebo byly prazdne)
-int GSTDefine(tBSTPtr, void * TAC, int); //vzdy volat declare pred define!!!
+int GSTDeclare(tBSTPtr, char *); //return 0 kdyz parametry odpovidaji (nebo byly prazdne)
+int GSTDefine(tBSTPtr, void * TACs); //vzdy volat declare pred define!!!
                                         //return 0 kdyz jde o prvni definici
 
 
@@ -80,19 +80,28 @@ int GSTDefine(tBSTPtr, void * TAC, int); //vzdy volat declare pred define!!!
 /* Lokalni TS */
 /**************/
 /*! osetrit datatype auto*/
+
+union Value{
+    int i;
+    double d;
+    char *s;
+};
+
 typedef struct tVar{
     int scope; //zanoreni, pri volani funkce zacina na 0
     char datatype; // obdobne jako u params v tFunc
-    void * value; // NULL if not defined
+    char assigned;
+    union Value value; 
     struct tVar * ptr;    //pointer na pravy
                         //pri deklaraci se pridavaji prvky ZLEVA
 } *tVarPtr;
 
 void LSTDispose (tBSTPtr);
 int LSTAdd (tBSTPtr, char type, int scope); //return 0 kdyz nebylo v zanorenim doposud definovano
-int LSTSet (tBSTPtr, char type, void *); //return 0 kdyz nedoslo k nekompatibilite typu
+int LSTSet (tBSTPtr, char type, union Value v); //return 0 kdyz nedoslo k nekompatibilite typu
                             //vzdy nastavuje aktivni prvek v poslednim zanoreni!!
 void LSTLeaveScope (tBSTEPtr root, int scope); 
         //odstrani vsechny lokalni promene z daneho zanoreni
+char LSTGet (tBSTPtr, union Value * v);
 
 #endif // IAL_H_INCLUDED
