@@ -21,7 +21,7 @@ int str_init(string *s)
     if ((s->str = (char*) malloc(STR_LEN_INC)) == NULL)
         return STR_ERROR;
     s->str[0] = '\0';
-    s->length = 0;
+s->length = 0;
     s->alloc_size = STR_LEN_INC;
     return STR_SUCCESS;
 }

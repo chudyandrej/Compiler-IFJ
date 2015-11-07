@@ -201,3 +201,15 @@ void *copy_last(tDLList *L){
         return NULL;
     }
 }
+
+void *pop(tDLList *L){
+    void *data;
+    data = copy_last(L);
+    if(data == NULL){
+        return NULL;
+    }
+    else{
+        delete_last(L);
+        return data;
+    }
+}

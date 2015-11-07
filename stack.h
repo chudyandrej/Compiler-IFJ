@@ -34,4 +34,5 @@ void shift_active_right(tDLList *L);
 void *copy_last(tDLList *L);
 void insert_last_desc(tDLList *L, void *data,unsigned int description );
 void preinsert_lastNode(tDLList *L, void *data);
+void *pop(tDLList *L);
 #endif //IJF_STACK_H
