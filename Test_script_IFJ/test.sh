@@ -36,7 +36,7 @@ echo "--------FUNCTIONALITY_TEST_DONE-----------"
 echo "\n----------ERROR_VALUES_TEST-------------"
 echo "Output of the test needs to be check by human!\n  - log_invalid_values_test.txt"
 
-bash ./Errors/invalid_values_test.sh "$1"
+bash ./Errors/invalid_values_test.sh "$1" "$controll"
 if [ $? != 0 ]; then 
     if [ $controll -eq 0 ]; then
         echo "!!! ERROR !!!"
