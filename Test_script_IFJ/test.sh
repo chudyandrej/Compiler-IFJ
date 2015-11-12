@@ -1,39 +1,77 @@
 #!/bin/sh
 
-if [ $? -ne 1 ]; then 
-    echo "Wrong number of parameters"
-    echo "Use a file to compile as parameter"
+if [ $# -eq 0 ]; then 
+    echo "\nWrong number of parameters"
+    echo "Use a file to compile as parameter\n"
     exit 1
 fi
 
+if [ "$2" = "-all" ]; then
+   controll=1
+else 
+   controll=0
+fi
 
-echo "--------Functionality test-----------"
+exit_code=0
 
-bash ./Functionality/functionality_test.sh "$1"
+
+echo "-----------FUNCTIONALITY_TEST-------------"
+
+bash ./Functionality/functionality_test.sh "$1" "$controll"
 if [ $? != 0 ]; then 
-    echo "!!! ERROR !!!"
-    exit 1
+    
+    if [ $controll -eq 0 ]; then
+        echo "!!! ERROR !!!"
+        exit 1
+    else
+        exit_code=1
+    fi
 fi
 
-echo "------Functionality test done--------"
+echo "--------FUNCTIONALITY_TEST_DONE-----------"
 
 
 
-echo "\n--------Error values test----------"
+
+echo "\n----------ERROR_VALUES_TEST-------------"
 echo "Output of the test needs to be check by human!\n  - log_invalid_values_test.txt"
 
 bash ./Errors/invalid_values_test.sh "$1"
+if [ $? != 0 ]; then 
+    if [ $controll -eq 0 ]; then
+        echo "!!! ERROR !!!"
+        exit 1
+    else
+        exit_code=1
+    fi
+fi
 
-echo "------Error values test done---------"
+echo "---------ERROR_VALUES_TEST_DONE-----------"
 
 
 
-echo "\n--------Other error test-----------"
+
+echo "\n-----------OTHER_ERROR_TEST-------------"
 
 bash ./Errors/other_error_test.sh "$1"
+if [ $? != 0 ]; then 
+    if [ $controll -eq 0 ]; then
+        echo "!!! ERROR !!!"
+        exit 1
+    else
+        exit_code=1
+    fi
+fi
 
-echo "------Other error test done---------"
+echo "----------OTHER_ERROR_TEST_DONE-----------"
 
-echo "\n---Test complete, check log_invalid_values_test.txt. and"
-echo "if everything is OK, made more tests up!!!"
 
+
+if [ $exit_code -eq 1]; then
+    echo "TEST FAILD, check where!"
+else
+    echo "\n---Test complete, check log_invalid_values_test.txt. and"
+    echo "if everything is OK, made more tests up!!!"
+fi
+
+exit exit_code
