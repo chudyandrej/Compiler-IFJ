@@ -1,5 +1,39 @@
 a=4/0;
-a=4+3+"text";
-//dat do spravnych testov pretypovanie z int na double
-a=find("blaaaara", "aaa")+sort("sort it"); // pridat spravne testy na navratove hodnoty z funkcii a pouzit ich vo vyrazoch
+a=4+3+"text"; //dat do spravnych testov pretypovanie z int na double
 a=;
+ int length(int i){ int a=5; return1; } // do spravnych testov daj deklaraciu
+ length(4);
+ length("ao", "ah");
+ length("sjfdsjfa);
+ length();
+ string a; a=length("text");
+string substr(string s, int i , int n){  int a=5; return1; }
+substr(1,5,4);
+substr("ad","a",4);
+int a; a=substr("jfdsa", 1, 2);
+substr("jfdsa, 1, 2);
+substr("sdf",4,4,4);
+substr();
+substr("sdf",4);
+ string concat(string s, string s2){  int a=5; return1; }
+ concat(4,5);
+ concat("st", 4);
+ concat("str", "sttr);
+ concat("asdf", "asdfa","dsfasd");
+ int a; a=concat("slkf","sjfa");
+ concat(); 
+int find(string s, string s2){  int a=5; return1; }
+find("jsk",4);
+find(4,"jdfs");
+find(4,4);
+find("sdf","dfasd","dsafs");
+find();
+string s=find("asdf","sd");
+ string sort(string s){  int a=5; return1; }
+ sort("asdf","sadf");
+ sort(4654);
+ sort();
+ int a=sort("asdlfja");
+
+
+
