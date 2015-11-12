@@ -1,6 +1,17 @@
-//#include <iostream>
-//#include <vector>
-//using namespace std;
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int factorial(int n);
+
+int main() {
+    int vysl;
+
+    vysl = factorial(5);
+    cout << vysl << "\n";
+
+    return 0;
+}
 
 int factorial( int n) {
     int temp_result;
@@ -14,13 +25,3 @@ int factorial( int n) {
         return n * temp_result;
     }
 }
-
-int main() {
-    int vysl;
-
-    vysl = factorial(5);
-    cout << vysl << "\n";
-
-    return 0;
-}
-
