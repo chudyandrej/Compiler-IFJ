@@ -8,7 +8,7 @@
 
 #ifndef IAL_H_INCLUDED
 #define IAL_H_INCLUDED
-
+#include "stack/stack.h"
 
 /*
 ***************************************************************
@@ -63,7 +63,7 @@ typedef struct tFunc{
         // i = int
         // s = string
         // prvni je navratova hodnota, zbyvajici parametry v danem poradi
-    void * TAC; //pointer na list 3AC 
+    tDLElemPtr TAC; //pointer na list 3AC 
     char * names; //rozdelene mezerami
     /*! zmenit void az bude 3AC*/
 } *tFuncPtr;
