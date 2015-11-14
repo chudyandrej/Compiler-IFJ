@@ -2,6 +2,7 @@
 // Created by Andrej Oliver Chudý on 07/11/15.
 //
 
+#include <stdbool.h>
 #include "stack.h"
 
 
@@ -68,19 +69,14 @@ void insert_last(tDLList *L, void *data){
     }
 }
 
-void insert_last_desc(tDLList *L, void *data,unsigned int description ){
+void insert_last_desc(tDLList *L, void *data,bool NODE ){
     insert_last(L,data);
-    if(description == NODE){
+    if(NODE == true){
         L->LastNode = L->Last;
     }
-    else if (description == TOKEN){
+    else{
         L->LastToken = L->Last;
     }
-    else {
-        printf("Stack error");
-        return;
-    }
-
 }
 
 /**
@@ -199,17 +195,5 @@ void *copy_last(tDLList *L){
     }
     else {
         return NULL;
-    }
-}
-
-void *pop(tDLList *L){
-    void *data;
-    data = copy_last(L);
-    if(data == NULL){
-        return NULL;
-    }
-    else{
-        delete_last(L);
-        return data;
     }
 }

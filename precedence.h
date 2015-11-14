@@ -8,23 +8,19 @@
 
 #include "stack.h"
 #include "scanner.h"
+#include "tac.h"
 
 
-const char PrecedentTable[18][18];
+const char PrecedentTable[19][19];
 
 typedef struct dTreeElement{
-    unsigned int description;
-    unsigned int rule;
-    Token *token;             /*points to any data*/
-    struct dTreeElement *l;   /*points to left element*/
-    struct dTreeElement *r;   /*points to right element*/
+    enum sTokenKind description;
+    enum Type type;
+    union Address data;
 } *dTreeElementPtr;
 
-typedef enum sElement {
-    /* 10 */   NODE = 10,
-    /* 11 */   TOKEN,
-    /* 11 */   STOPPER,
-}Element;
+extern unsigned int tmp_counter;
+extern tDLList *THC;
 
 typedef enum {
     /* 1 */  RULE_1 = 1, /* E -> ID    */
@@ -47,9 +43,11 @@ typedef enum {
 
 }PrecedenceRules;
 
-dTreeElementPtr create_tree_element(Token *token);
-int expression_process();
-Token* create_fake_token(unsigned int type);
+dTreeElementPtr create_stack_element(enum sTokenKind description, Token *token);
+dTreeElementPtr load_token_node(dTreeElementPtr new_element, Token *token);
+dTreeElementPtr load_unterm_char(dTreeElementPtr new_element, enum sTokenKind description);
+void gen_instruction(enum Instruction ction_inst, union Address op1,union Address op2,enum Type t_op1,enum Type t_op2);
+int expression_process(enum sTokenKind end_char);
 int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3);
 
 #endif //IJF_PRECEDENCE_H

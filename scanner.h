@@ -24,49 +24,52 @@ enum {TRUE = 1, FALSE = 0};
  */
 typedef enum sTokenKind {
     /*################### OPERATORS VALUE ###################*/
-    /* 0 */   KIN_NUM_INT = 0,          /* range: <−32767, +32767>  */
-    /* 1 */   KIN_NUM_DOUBLE,             /* 42.42; 4e-2 */
-    /* 2 */   KIN_PLUS,                   /* + */
-    /* 3 */   KIN_MINUS,                  /* - */
-    /* 4 */   KIN_MUL,                    /* * */
-    /* 5 */   KIN_DIV,                    /* / */
-    /* 6 */   KIN_PLUSPLUS,               /* ++ */
-    /* 7 */   KIN_MINUSMINUS,             /* -- */
-    /* 8 */   KIN_IDENTIFIER,             /* identifier */
-    /* 9 */   KIN_L_ROUNDBRACKET,         /* ( */
-    /* 10 */   KIN_R_ROUNDBRACKET,         /* ) */
-    /* 11 */   KIN_EQ,                     /* == */
-    /* 12 */   KIN_SMALLER,                /* < */
-    /* 13 */   KIN_GREATER,                /* > */
-    /* 14 */   KIN_SMALLER_EQ,             /* <= */
-    /* 15 */   KIN_GREATER_EQ,             /* >= */
-    /* 16 */   KIN_NOT_EQ,                 /* != */
-    /* 17 */   KIN_DOLLAR,                 /* $ */
+    /* 0 */    KIN_NUM_INT = 0,          /* range: <−32767, +32767>  */
+    /* 1 */    KIN_NUM_DOUBLE,             /* 42.42; 4e-2 */
+    /* 2 */    KIN_TEXT,                   /* String value "example" */
+    /* 3 */    KIN_PLUS,                   /* + */
+    /* 4 */    KIN_MINUS,                  /* - */
+    /* 5 */    KIN_MUL,                    /* * */
+    /* 6 */    KIN_DIV,                    /* / */
+    /* 7 */    KIN_PLUSPLUS,               /* ++ */
+    /* 8 */    KIN_MINUSMINUS,             /* -- */
+    /* 9 */    KIN_IDENTIFIER,             /* identifier */
+    /* 10 */   KIN_L_ROUNDBRACKET,         /* ( */
+    /* 11 */   KIN_R_ROUNDBRACKET,         /* ) */
+    /* 12 */   KIN_EQ,                     /* == */
+    /* 13 */   KIN_SMALLER,                /* < */
+    /* 14 */   KIN_GREATER,                /* > */
+    /* 15 */   KIN_SMALLER_EQ,             /* <= */
+    /* 16 */   KIN_GREATER_EQ,             /* >= */
+    /* 17 */   KIN_NOT_EQ,                 /* != */
+    /*################# DERIVATE ELEMENT ##################*/
+    /* 18 */   D_DOLLAR,
+    /* 19 */   D_STOPER,
+    /* 20 */   D_NODE,
     /*######################################################*/
-    /* 18 */   KIN_ASSIGNEMENT,            /* = */
-    /* 19 */   KIN_SCOUT,                  /* << */
-    /* 20 */   KIN_SCIN,                   /* >> */
-    /* 21 */   KIN_L_BRACE,                /* { */
-    /* 22 */   KIN_R_BRACE,                /* } */
-    /* 23 */   KIN_SEMICOLON,              /* ; */
+    /* 19 */   KIN_ASSIGNEMENT,            /* = */
+    /* 20 */   KIN_SCOUT,                  /* << */
+    /* 21 */   KIN_SCIN,                   /* >> */
+    /* 22 */   KIN_L_BRACE,                /* { */
+    /* 23 */   KIN_R_BRACE,                /* } */
+    /* 24 */   KIN_SEMICOLON,              /* ; */
     /*################## KEYWORDS ########################*/
-    /* 24 */   KW_AUTO,                   /* data type */
-    /* 25 */   KW_DOUBLE,                 /* data type */
-    /* 26 */   KW_INT,                    /* data type */
-    /* 27 */   KW_STRING,                 /* data type */
-    /* 28 */   KW_CIN,                    /* command */
-    /* 29 */   KW_COUT,                   /* command */
-    /* 30 */   KW_ELSE,                   /* command */
-    /* 31 */   KW_FOR,                    /* command */
-    /* 32 */   KW_IF,                     /* command */
-    /* 33 */   KW_RETURN,                 /* command */
-    /* 34 */   KW_LENGTH,                 /* command */
-    /* 35 */   KW_SUBSTR,                 /* command */
-    /* 36 */   KW_CONCAT,                 /* command */
-    /* 37 */   KW_FIND,                   /* command */
-    /* 38 */   KW_SORT,                   /* command */
+    /* 25 */   KW_AUTO,                   /* data type */
+    /* 26 */   KW_DOUBLE,                 /* data type */
+    /* 27 */   KW_INT,                    /* data type */
+    /* 28 */   KW_STRING,                 /* data type */
+    /* 29 */   KW_CIN,                    /* command */
+    /* 30 */   KW_COUT,                   /* command */
+    /* 31 */   KW_ELSE,                   /* command */
+    /* 32 */   KW_FOR,                    /* command */
+    /* 33 */   KW_IF,                     /* command */
+    /* 34 */   KW_RETURN,                 /* command */
+    /* 35 */   KW_LENGTH,                 /* command */
+    /* 36 */   KW_SUBSTR,                 /* command */
+    /* 37 */   KW_CONCAT,                 /* command */
+    /* 38 */   KW_FIND,                   /* command */
+    /* 39 */   KW_SORT,                   /* command */
     /*###################################################*/
-    /* 39 */   KIN_TEXT,                   /* String value "example" */
     /* 40 */   KIN_COMMA,                  /* , */
     /* 41 */   KIN_UNKNOWN,                /*LEX_ERR*/
     /* 42 */   END_OF_FILE,                /* EOF */
@@ -105,7 +108,7 @@ typedef enum sState {
  * item 'tTokenType': stores which type of token it is
  */
 typedef struct sToken {
-    int type;
+    enum sTokenKind type;
     char * str;
 }Token;
 

@@ -20,8 +20,6 @@ typedef struct{
     tDLElemPtr First;   /*points to firts element in the list*/
     tDLElemPtr Last;    /*points to last element in the list*/
     tDLElemPtr Active;  /*points to active element in the list*/
-    tDLElemPtr LastNode;
-    tDLElemPtr LastToken;
 } tDLList;
 
 void init_list(tDLList *L);
@@ -32,7 +30,11 @@ void post_insert(tDLList *L, void *data);
 void activate_last(tDLList *L);
 void shift_active_right(tDLList *L);
 void *copy_last(tDLList *L);
-void insert_last_desc(tDLList *L, void *data,unsigned int description );
 void preinsert_lastNode(tDLList *L, void *data);
-void *pop(tDLList *L);
+void delete_element(tDLList *L, tDLElemPtr element);
+
+
+
+void *find_last(tDLList *L, bool NODE );
+
 #endif //IJF_STACK_H

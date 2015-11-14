@@ -34,6 +34,10 @@ int dec_function(){
         if (next_token() == KIN_L_ROUNDBRACKET){
             if(parameters() == 0){
                 new_token = next_token();
+                if (new_token == KIN_IDENTIFIER){
+                    if (next_token() == KIN_L_ROUNDBRACKET){
+                        if(parameters() == 0){
+                            new_token = next_token();
                 if (new_token == KIN_SEMICOLON){ return 0;}
                 else if(new_token == KIN_L_BRACE) {
                     int exit_code = body_funcion();
@@ -81,6 +85,8 @@ int body_funcion(){
                 if (assing(KIN_SEMICOLON) == 0){ continue; } else{ return 1; }
             case KW_AUTO:   case KW_DOUBLE:  case KW_INT:  case KW_STRING:      //all datatypes
                 if (dec_variable() == 0) { continue; } else { return 1; }
+            case KIN_PLUSPLUS:
+
             case KIN_R_BRACE:
                 return 0;
             default:
@@ -88,6 +94,14 @@ int body_funcion(){
                 return 1;
         }
     }
+}
+
+int unary_operation(int operator){
+
+
+
+
+
 }
 
 int for_statement() {
@@ -114,7 +128,7 @@ int if_statement(){
     if((next_token()== KIN_L_ROUNDBRACKET) && (value_call_bracket(KIN_R_ROUNDBRACKET)== 0) &&
        (next_token()== KIN_L_BRACE) && (body_funcion() == 0)){
         if ((next_token() == KW_ELSE) && (next_token() == KIN_L_BRACE)){
-            return body_funcion();
+                return body_funcion();
         }
     }
     return 1;
@@ -148,6 +162,12 @@ int assing(int PREDICT_EXIT){
     }
     else if (new_token == KIN_ASSIGNEMENT){
         return value_call_bracket(PREDICT_EXIT);
+    }
+    else if (new_token == KIN_PLUSPLUS){
+        //generácia inštrukcii
+    }
+    else if (new_token == KIN_MINUSMINUS){
+        //generácia inštrukcii
     }
     errorMessage("Error in assing function!");
     return 1;
