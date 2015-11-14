@@ -6,11 +6,11 @@ unsigned int tmp_counter = 0;
 int main() {
     init_list(THC);
 
-   expression_process();
 
-   // fp = fopen("/Users/andrejchudy/Workspace/Compiler-IFJ/test.cpp","r");
-    /*int exit_code = start_syntax_analyz();
-    fclose(fp);*/
 
-    return 1;
+    fp = fopen("/Users/andrejchudy/Workspace/Compiler-IFJ/test.txt","r");
+    int exit_code = expression_process(KIN_SEMICOLON);
+    fclose(fp);
+
+    return exit_code;
 }

@@ -15,8 +15,7 @@ void init_list(tDLList *L){
     L->First=NULL;
     L->Last=NULL;
     L->Active=NULL;
-    L->LastNode=NULL;
-    L->LastToken=NULL;
+
 }
 
 /**
@@ -69,15 +68,6 @@ void insert_last(tDLList *L, void *data){
     }
 }
 
-void insert_last_desc(tDLList *L, void *data,bool NODE ){
-    insert_last(L,data);
-    if(NODE == true){
-        L->LastNode = L->Last;
-    }
-    else{
-        L->LastToken = L->Last;
-    }
-}
 
 /**
  * Function frees last element in list if exists
@@ -138,25 +128,84 @@ void post_insert(tDLList *L, void *data){
 }
 
 
+int length_list(tDLList *L){
+    int count = 0;
+    tDLElemPtr temp = L->First;
+
+    while(temp != NULL){
+        count++;
+        temp = temp->rptr;
+    }
+
+    return count;
+}
+
+
+void *find_last(tDLList *L, bool NODE){
+
+    tDLElemPtr temp = L->Last;
+
+    while(temp != NULL){
+
+        if(!((((dTreeElementPtr) temp->data)->description == D_NODE) ^ NODE)){
+            return temp->data;
+        }
+        else{
+            temp = temp->lptr;
+        }
+    }
+
+    return NULL;
+}
+
 void preinsert_lastNode(tDLList *L, void *data){
 
-    if(L->LastNode != NULL){     /*Exist active element*/
+    tDLElemPtr last_node = find_last(L, TRUE);
+
+    if( last_node != NULL){
 
         tDLElemPtr new = malloc(sizeof(struct tDLElem));
         if(new == NULL){
             data = NULL;
         }
         else{
-            new->data=data;
-            new->lptr=L->LastNode->lptr;
-            new->rptr=L->LastNode;
-            L->LastNode->lptr=new;
-            if(new->lptr != NULL){      /*Active element wasn't last one*/
-                new->lptr->rptr=new;
+            new->data = data;
+            new->lptr = last_node->lptr;
+            new->rptr = last_node;
+            last_node->lptr = new;
+            if(new->lptr != NULL){      /*Last node element wasn't last one*/
+                new->lptr->rptr = new;
             }
-            else{                       /*Active element was last => now L->Last must point to new element */
-                L->First=new;
+            else{                       /*Last Node element was last => now L->Last must point to new element */
+                L->First = new;
             }
+        }
+    }
+}
+
+void delete_element(tDLList *L, tDLElemPtr element){
+
+    tDLElemPtr temp = L->Last;
+
+    while(temp != NULL){
+        if(temp == element){            //delete this one
+
+            if(temp->rptr != NULL && temp->lptr != NULL){
+                temp->rptr->lptr = temp->lptr;
+                temp->lptr->rptr = temp->rptr;
+            }
+            else if(temp->rptr != NULL){
+                temp->rptr->lptr = temp->lptr;
+            }
+            else if(temp->lptr != NULL){
+                temp->lptr->rptr = temp->rptr;
+            }
+            free(temp);
+            break;
+
+        }
+        else{
+            temp = temp->lptr;
         }
     }
 }

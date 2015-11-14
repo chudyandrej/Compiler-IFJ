@@ -32,6 +32,7 @@ void shift_active_right(tDLList *L);
 void *copy_last(tDLList *L);
 void preinsert_lastNode(tDLList *L, void *data);
 void delete_element(tDLList *L, tDLElemPtr element);
+int length_list(tDLList *L);
 
 
 

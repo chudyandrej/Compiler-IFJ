@@ -23,18 +23,19 @@ typedef enum Instruction {
     MAT_DIFF,               /* - */
     MAT_MUL,                /* * */
     MAT_DIV,                /* / */
-    COMP_ASSIGNEMENT,        /* = */
+    COMP_ASSIGNEMENT,       /* = */
     COMP_GREATER,           /* > */
-    COMP_GREATER_E,          /* >= */
+    COMP_GREATER_EQ,        /* >= */
     COMP_SMALLER,           /* < */
     COMP_SMALLER_EQ,        /* <= */
     COMP_EQ,                /* == */
     COMP_NOT_EQ,            /* != */
+    MAT_INC,                /* ++ */
+    MAT_DEC,                /* -- */
     IO_SCOUT,               /* << */
     IO_SCIN,                /* >> */
     GOTO_UNCOND,
     GOTO_COND,
-
     FCE_PUSH,
     FCE_RETURNED,
     SCOPE_UP,
@@ -54,7 +55,7 @@ typedef enum Type {
     LABEL,
     OPERATOR,
     VARIABLE,
-    EMPTY,
+    EMPTY
 
 };
 
