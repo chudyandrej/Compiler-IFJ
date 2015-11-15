@@ -136,19 +136,18 @@ int length_list(tDLList *L){
         count++;
         temp = temp->rptr;
     }
-
     return count;
 }
 
 
-void *find_last(tDLList *L, bool NODE){
+tDLElemPtr find_last(tDLList *L, bool NODE){
 
     tDLElemPtr temp = L->Last;
 
     while(temp != NULL){
 
         if(!((((dTreeElementPtr) temp->data)->description == D_NODE) ^ NODE)){
-            return temp->data;
+            return temp;
         }
         else{
             temp = temp->lptr;
@@ -189,16 +188,18 @@ void delete_element(tDLList *L, tDLElemPtr element){
 
     while(temp != NULL){
         if(temp == element){            //delete this one
-
             if(temp->rptr != NULL && temp->lptr != NULL){
                 temp->rptr->lptr = temp->lptr;
                 temp->lptr->rptr = temp->rptr;
             }
             else if(temp->rptr != NULL){
                 temp->rptr->lptr = temp->lptr;
+                L->First = temp->rptr;
+
             }
             else if(temp->lptr != NULL){
                 temp->lptr->rptr = temp->rptr;
+                L->Last = temp->lptr;
             }
             free(temp);
             break;

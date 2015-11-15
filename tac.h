@@ -6,7 +6,7 @@
 #define IJF_TAC_H
 
 
-#include "stack.h"
+
 
 /*
 ***************************************************************
@@ -67,7 +67,6 @@ typedef union Address{
     char * fce;
     char build_in;
     char *variable;
-    enum sTokenKind op;
     unsigned int label;
 };
 

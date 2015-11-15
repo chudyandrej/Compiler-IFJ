@@ -36,6 +36,6 @@ int length_list(tDLList *L);
 
 
 
-void *find_last(tDLList *L, bool NODE );
+tDLElemPtr find_last(tDLList *L, bool NODE );
 
 #endif //IJF_STACK_H

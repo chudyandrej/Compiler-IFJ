@@ -6,7 +6,7 @@
 //
 // Created by andrej on 15.10.2015.
 //
-
+/*
 
 
 int start_syntax_analyz(){
@@ -28,37 +28,40 @@ int start_syntax_analyz(){
     }
 }
 
-int dec_function(){
+int dec_function() {
     int new_token = next_token();
-    if (new_token == KIN_IDENTIFIER){
-        if (next_token() == KIN_L_ROUNDBRACKET){
-            if(parameters() == 0){
+    if (new_token == KIN_IDENTIFIER) {
+        if (next_token() == KIN_L_ROUNDBRACKET) {
+            if (parameters() == 0) {
                 new_token = next_token();
-                if (new_token == KIN_IDENTIFIER){
-                    if (next_token() == KIN_L_ROUNDBRACKET){
-                        if(parameters() == 0){
+                if (new_token == KIN_IDENTIFIER) {
+                    if (next_token() == KIN_L_ROUNDBRACKET) {
+                        if (parameters() == 0) {
                             new_token = next_token();
-                if (new_token == KIN_SEMICOLON){ return 0;}
-                else if(new_token == KIN_L_BRACE) {
-                    int exit_code = body_funcion();
-                    if (exit_code == 0) { return 0; }
-                    errorMessage("Error in body of program !");
-                    return 1;
+                            if (new_token == KIN_SEMICOLON) { return 0; }
+                            else if (new_token == KIN_L_BRACE) {
+                                int exit_code = body_funcion();
+                                if (exit_code == 0) { return 0; }
+                                errorMessage("Error in body of program !");
+                                return 1;
+                            }
+                            else {
+                                errorMessage("Error during declaration function !");
+                                return 1;
+                            }
+                        }
+                    }
                 }
-                else {
-                    errorMessage("Error during declaration function !");
-                    return 1;
-                }
+                errorMessage("Error during declaration function !");
+                return 1;
             }
         }
     }
-    errorMessage("Error during declaration function !");
-    return 1;
 }
-
 int body_funcion(){
+    int  new_token = 0;
     while(true) {
-        int  new_token = next_token();
+        new_token = next_token();
         switch(new_token){
             case KW_CIN:
                 if (cin_cout(KIN_SCIN) == 0){ continue;} else{ return 1;}
@@ -96,13 +99,6 @@ int body_funcion(){
     }
 }
 
-int unary_operation(int operator){
-
-
-
-
-
-}
 
 int for_statement() {
     if (next_token() == KIN_L_ROUNDBRACKET) {
@@ -200,7 +196,7 @@ int parameters(){
     int new_token = next_token();
     if(new_token == KIN_R_ROUNDBRACKET) {
         return 0;
-    }                                                /*means no parameters*/
+    }
     while(true) {
         if((new_token == KW_AUTO) || (new_token == KW_DOUBLE) || (new_token == KW_INT) || (new_token == KW_STRING)) {
             if (next_token() == KIN_IDENTIFIER) {
@@ -236,10 +232,6 @@ int parameters_used(){
     }
 }
 
-int value() {
-
-    return 1;
-}
 
 
 void errorMessage(const char *mesasge ){
@@ -258,3 +250,4 @@ int next_token(){
     }
     return END_OF_FILE;
 }
+*/

@@ -6,11 +6,11 @@
 #define IJF_PRECEDENCE_H
 
 
-#include "stack.h"
+
 #include "scanner.h"
 #include "tac.h"
 #include <stdbool.h>
-
+#include "stack.h"
 
 const char PrecedentTable[19][19];
 
@@ -20,8 +20,7 @@ typedef struct dTreeElement{
     union Address data;
 } *dTreeElementPtr;
 
-extern unsigned int tmp_counter;
-extern tDLList *THC;
+
 
 typedef enum {
     /* 1 */  RULE_1 = 1, /* E -> ID    */
