@@ -1,6 +1,4 @@
-#include "precedence.h"
 #include "parser.h"
-
 
 FILE *fp;
 
@@ -10,8 +8,7 @@ int main(int argc, char *argv[]) {
 
     fp = fopen(argv[1],"r");
     token_predict = get_token(fp);
-    int exit_code = expression_process(KIN_SEMICOLON);
-   //  = start_syntax_analyz();
+    int exit_code = start_syntax_analyz();
 
    fclose(fp);
 

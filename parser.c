@@ -174,7 +174,7 @@ int if_statement(){
     return 1;
 }
 
-int cin_cout(enum sTokenKind operator){
+int cin_cout(enum sTokenKind operator){         //treba spravit specificky cout
     Token *new_token;
     if ((new_token=next_token())->type ==  operator){
         free(new_token);
@@ -196,9 +196,9 @@ int cin_cout(enum sTokenKind operator){
                     errorMessage_syntax("Cin or cout command!");
                     return 1;
                 }
-
             }
             free(new_token);
+            break;
         }
     }
     errorMessage_syntax("Cin or cout operator!");
@@ -216,7 +216,7 @@ int assing_funcCall(){
     }
     else if (new_token->type == KIN_ASSIGNEMENT){       //assing var
         free(new_token);
-        return expression_process(KIN_SEMICOLON);
+        return (expression_process(KIN_SEMICOLON) == KIN_SEMICOLON)? 0 : 1;
     }
     errorMessage_syntax("Assing function!");
     return 1;

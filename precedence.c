@@ -61,7 +61,7 @@ void printf_stack(tDLList *Stack){
     tDLElemPtr new_help = Stack->First;
     new_help = Stack->First;
     printf("\n####### STACK ##########\n");
-    printf("######## %p ########\n",&Stack);
+    printf("#### %p ####\n",&Stack);
     while(new_help != NULL){
         printf("%d\n",((dTreeElementPtr) new_help->data)->description);
         new_help = new_help->rptr;
@@ -321,9 +321,10 @@ int expression_process(enum sTokenKind end_char){
             if(call_function(new_token) != 0){return 1;}
             insert_last(Stack, create_stack_element(D_STOPER, NULL));
             insert_last(Stack, create_stack_element(D_TMP, NULL));
-            new_token=next_token();
+
             printf("VYNARAM\n");
             printf_stack(Stack);
+            continue;
         }
         load_new_tag = true;
 
