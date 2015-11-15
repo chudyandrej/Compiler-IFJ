@@ -8,25 +8,23 @@
 #include <stdio.h>
 
 typedef enum ErrCode {
-    LEX_ERR = 1,
-    /*  1 - chyba v programu v rámci lexikální analýzy
-     * (chybná struktura aktuálního lexému).*/
+        LEX_ERR = 1,    // 1 - chyba v programu v rámci lexikální analýzy
+                        // (chybná struktura aktuálního lexému).
+        SYN_ERR,
+                        /*  2 - chyba v programu v rámci syntaktické analýzy
+                         * (chybná syntaxe struktury programu).*/
 
-            SYN_ERR,
-    /*  2 - chyba v programu v rámci syntaktické analýzy
-     * (chybná syntaxe struktury programu).*/
+        PROGRAM_SEM_ERR,
+                        /*  3 - sémantická chyba v programu – nedefinovaná funkce/promenná,
+                         *  pokus o redefinici funkce/promenné, atd.*/
 
-            PROGRAM_SEM_ERR,
-    /*  3 - sémantická chyba v programu – nedefinovaná funkce/promenná,
-     *  pokus o redefinici funkce/promenné, atd.*/
+        TYPE_COMP_SEM_ERR,
+                            /*  4 - sémantická chyba typové kompatibility v aritmetických,
+                            * retezcových a relacních výrazech, príp. špatný pocet
+                            * ci typ parametru u volání funkce.*/
 
-            TYPE_COMP_SEM_ERR,
-    /*  4 - sémantická chyba typové kompatibility v aritmetických,
-     * retezcových a relacních výrazech, príp. špatný pocet
-     * ci typ parametru u volání funkce.*/
-
-            VAR_TYPE_ERR,
-    /*  5 - chyba pri odvozování datového typu promenné.*/
+        VAR_TYPE_ERR,
+                    /*  5 - chyba pri odvozování datového typu promenné.*/
 
             OTHER_SEM_ERR,
     /* 6 - ostatní sémantické chyby*/
