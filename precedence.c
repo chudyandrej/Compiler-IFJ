@@ -174,7 +174,8 @@ int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3){
                     return 2;
                 } break;
             case D_NODE:
-                if (p1->description == KIN_L_ROUNDBRACKET && p3->description == KIN_R_ROUNDBRACKET) {
+                if (p1->description == KIN_R_ROUNDBRACKET && p3->description == KIN_L_ROUNDBRACKET) {
+                    printf("wrtfffsdfdsfsdsfs\n");
                     return 2;
                 }
                 break;
@@ -221,19 +222,18 @@ int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3){
                 return 100;
         }
     }
-    printf("Mrda mi v halve\n");
+    printf("Mrda mi v halve: rules - od vrchu: %d %d %d\n", p1->description, 
+        p2->description, p3->description);
     return 100;
 }
 int element_reduct(tDLList *Stack){
     dTreeElementPtr elements[3] = {NULL,NULL,NULL};
     tDLElemPtr new = Stack->Last;
-
-    for(int i =0; i<=4; i++){
-        printf("%d\n",((dTreeElementPtr)new->data)->description );
+    int i;
+    for(i =0; i<=4; i++){
         if(((dTreeElementPtr)new->data)->description == D_STOPER){
             free(new->data);
             delete_element(Stack,new);
-            printf("PICO");
             break;
         }
         if (i >= 3){
@@ -241,7 +241,7 @@ int element_reduct(tDLList *Stack){
             return 100;           //ak nepojde matova ruka je v ohni
         }
         elements[i] = (dTreeElementPtr) new->data;
-        new = Stack->Last->lptr;
+        new = new->lptr;
     }
     int exit_code = rules(elements[0],elements[1],elements[2]);
     if(exit_code == 0){
@@ -250,7 +250,7 @@ int element_reduct(tDLList *Stack){
         return 0;
     }
     else if(exit_code >= 1 && exit_code <= 2){
-        for (int i = 0; i < exit_code; i++) {
+        for (i = 0; i < exit_code; i++) {
             free(copy_last(Stack));
             delete_last(Stack);
         }
@@ -292,36 +292,41 @@ int expression_process(enum sTokenKind end_char){
                 if (Stack->Last == find_last(Stack,true)) {
                     preinsert_lastNode(Stack, create_stack_element(D_STOPER, NULL));
                     insert_last(Stack, create_stack_element(new_token->type, new_token));
-                    continue;
+                    printf("pushujem pred node\n");
                 }
                 else {
                     insert_last(Stack, create_stack_element(D_STOPER, NULL));
                     insert_last(Stack, create_stack_element(new_token->type, new_token));
                     printf("pushujem\n");
-
-                    continue;
                 }
-            case '>':
-                printf("redukujem\n");
-                exit_code = element_reduct(Stack);
+                printf("po pushnuti:\n");
                 tDLElemPtr new_help = Stack->First;
-                printf("Len: %d\n",length_list(Stack));
                 while(new_help != NULL){
                     printf("%d\n",((dTreeElementPtr) new_help->data)->description);
                     new_help = new_help->rptr;
                 }
-                printf("exit code: %d",exit_code);
+                continue;
+            case '>':
+                printf("redukujem [%d][%d]\n", top_token, new_token->type);
+                exit_code = element_reduct(Stack);
+                new_help = Stack->First;
+                printf("po redukovani:\n");
+                while(new_help != NULL){
+                    printf("%d\n",((dTreeElementPtr) new_help->data)->description);
+                    new_help = new_help->rptr;
+                }
+                printf("exit code: %d\n",exit_code);
                 if(exit_code == 0){
                     load_new_tag = false;
                     continue;
                 }
 
                 if(exit_code == 100 && length_list(Stack) == 2 &&
-                        ((dTreeElementPtr)(find_last(Stack,true))->data)->description == D_DOLLAR) {
+                        ((dTreeElementPtr)(find_last(Stack,false))->data)->description == D_DOLLAR) {
                     return 0;
                 }
                 else if ((exit_code == 100 && length_list(Stack) == 3 &&
-                        ((dTreeElementPtr)(find_last(Stack,true))->data)->description == KIN_R_ROUNDBRACKET) &&
+                        ((dTreeElementPtr)(find_last(Stack,false))->data)->description == KIN_R_ROUNDBRACKET) &&
                         end_char == KIN_R_ROUNDBRACKET){
                     return 0;
                 }
@@ -332,7 +337,11 @@ int expression_process(enum sTokenKind end_char){
                 insert_last(Stack, create_stack_element(new_token->type, new_token));
                 continue;
             default:
-                printf("Mrda mi v hlave");
+                if(length_list(Stack) == 2 &&
+                    ((dTreeElementPtr)(find_last(Stack,false))->data)->description == D_DOLLAR) {
+                     return 0;
+                }
+                printf("precedence table errror s tokenom: %d\n", new_token->type);
                 return 1;
 
         }
