@@ -30,6 +30,43 @@ const char PrecedentTable [19][19] ={
     [D_DOLLAR]              = {'<', '<' ,'<','<' ,'<','<','<','<','<','<','<', 0 ,'<','<','<','<','<','<', 0 },
 };
 
+void gen_instruction(enum Instruction ction_inst, union Address op1,union Address op2,enum Type t_op1,enum Type t_op2){
+    tOperation instruction = malloc(sizeof(struct Operation));
+    instruction->ction_inst = ction_inst;
+    instruction->op1 = op1;
+    instruction->op2 = op2;
+    instruction->t_op1 = t_op1;
+    instruction->t_op2 = t_op2;
+    instruction->pe_t_t = TMP;
+    //instruction->t.tmp = tmp_counter;
+    //tmp_counter++;
+    // insert_last(THC, instruction);
+
+}
+void gen_unary_instruction(enum Instruction ction_inst, union Address op1,union Address t,enum Type t_op1,enum Type pe_t_t){
+    tOperation instruction = malloc(sizeof(struct Operation));
+    instruction->ction_inst = ction_inst;
+    instruction->op1 = op1;
+    instruction->t_op1 = t_op1;
+    instruction->t_op2 = EMPTY;
+    instruction->pe_t_t = TMP;
+    // instruction->t.tmp = tmp_counter;
+    //  tmp_counter++;
+    //  insert_last(THC, instruction);
+
+}
+
+
+void printf_stack(tDLList *Stack){
+    tDLElemPtr new_help = Stack->First;
+    new_help = Stack->First;
+    printf("\n######## STACK ##########\n");
+    while(new_help != NULL){
+        printf("%d\n",((dTreeElementPtr) new_help->data)->description);
+        new_help = new_help->rptr;
+    }
+    printf("########################\n");
+}
 tDLList* init_stack(){
     tDLList *Stack = malloc(sizeof(tDLList));   //malloc stack
     init_list(Stack);                           //init stack
@@ -95,31 +132,6 @@ dTreeElementPtr create_stack_element(enum sTokenKind description, Token *token) 
         return NULL;
     }
 }
-void gen_instruction(enum Instruction ction_inst, union Address op1,union Address op2,enum Type t_op1,enum Type t_op2){
-    tOperation instruction = malloc(sizeof(struct Operation));
-    instruction->ction_inst = ction_inst;
-    instruction->op1 = op1;
-    instruction->op2 = op2;
-    instruction->t_op1 = t_op1;
-    instruction->t_op2 = t_op2;
-    instruction->pe_t_t = TMP;
-    //instruction->t.tmp = tmp_counter;
-    //tmp_counter++;
-   // insert_last(THC, instruction);
-
-}
-void gen_unary_instruction(enum Instruction ction_inst, union Address op1,union Address t,enum Type t_op1,enum Type pe_t_t){
-    tOperation instruction = malloc(sizeof(struct Operation));
-    instruction->ction_inst = ction_inst;
-    instruction->op1 = op1;
-    instruction->t_op1 = t_op1;
-    instruction->t_op2 = EMPTY;
-    instruction->pe_t_t = TMP;
-   // instruction->t.tmp = tmp_counter;
-  //  tmp_counter++;
-  //  insert_last(THC, instruction);
-
-}
 int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3){
     if(p3 != NULL) { // mame tri argumenty
         switch (p2->description) {
@@ -175,7 +187,7 @@ int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3){
                 } break;
             case D_NODE:
                 if (p1->description == KIN_R_ROUNDBRACKET && p3->description == KIN_L_ROUNDBRACKET) {
-                    printf("wrtfffsdfdsfsdsfs\n");
+
                     return 2;
                 }
                 break;
@@ -237,7 +249,6 @@ int element_reduct(tDLList *Stack){
             break;
         }
         if (i >= 3){
-            printf("Mrdka\n");
             return 100;           //ak nepojde matova ruka je v ohni
         }
         elements[i] = (dTreeElementPtr) new->data;
@@ -281,9 +292,8 @@ int expression_process(enum sTokenKind end_char){
         }
         load_new_tag = true;
         if((new_token->type == end_char && new_token->type != KIN_R_ROUNDBRACKET) || new_token->type == END_OF_FILE){
+            printf("Token: %d %d\n", new_token->type,END_OF_FILE);
             new_token->type = D_DOLLAR;
-            printf("robim");
-
         }
         int exit_code;
         if(new_token->type > D_DOLLAR){ printf("mrada mi v medziach: expression_process"); return 1;}
@@ -292,30 +302,15 @@ int expression_process(enum sTokenKind end_char){
                 if (Stack->Last == find_last(Stack,true)) {
                     preinsert_lastNode(Stack, create_stack_element(D_STOPER, NULL));
                     insert_last(Stack, create_stack_element(new_token->type, new_token));
-                    printf("pushujem pred node\n");
                 }
                 else {
                     insert_last(Stack, create_stack_element(D_STOPER, NULL));
                     insert_last(Stack, create_stack_element(new_token->type, new_token));
-                    printf("pushujem\n");
                 }
-                printf("po pushnuti:\n");
-                tDLElemPtr new_help = Stack->First;
-                while(new_help != NULL){
-                    printf("%d\n",((dTreeElementPtr) new_help->data)->description);
-                    new_help = new_help->rptr;
-                }
+                //printf_stack(Stack);
                 continue;
             case '>':
-                printf("redukujem [%d][%d]\n", top_token, new_token->type);
                 exit_code = element_reduct(Stack);
-                new_help = Stack->First;
-                printf("po redukovani:\n");
-                while(new_help != NULL){
-                    printf("%d\n",((dTreeElementPtr) new_help->data)->description);
-                    new_help = new_help->rptr;
-                }
-                printf("exit code: %d\n",exit_code);
                 if(exit_code == 0){
                     load_new_tag = false;
                     continue;

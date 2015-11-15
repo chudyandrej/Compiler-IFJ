@@ -43,6 +43,7 @@ typedef enum {
 
 }PrecedenceRules;
 
+
 dTreeElementPtr create_stack_element(enum sTokenKind description, Token *token);
 dTreeElementPtr load_token(dTreeElementPtr new_element, Token *token);
 dTreeElementPtr load_nonterm_char(dTreeElementPtr new_element, enum sTokenKind description);

@@ -1,7 +1,3 @@
-//
-// Created by Andrej Oliver Chudý on 07/11/15.
-//
-
 /*
  * File: scanner.c
  *
@@ -47,13 +43,13 @@ Token * get_token(FILE * fp) {
         return NULL;
     }
 
-    *token = (Token){ 0 };
+    * token = (Token){ 0 };
     char c;
     char tc; /* temporary character */
 
 
     while(1) {
-        c = (char) getc(fp);
+        c =(char)getc(fp);
 
         switch(state) {
             /* ######################## S_START ################################# */
@@ -144,6 +140,7 @@ Token * get_token(FILE * fp) {
                     str_free(str_tmp);
                     return token;
                 }
+                break;
 
                 /* ########################## S_PLUS ################################ */
             case S_PLUS:
@@ -158,6 +155,8 @@ Token * get_token(FILE * fp) {
                     str_free(str_tmp);
                     return token;
                 }
+                break;
+
                 /* ######################### S_MINUS ################################ */
             case S_MINUS:
                 if (c == '-') {
@@ -171,6 +170,7 @@ Token * get_token(FILE * fp) {
                     str_free(str_tmp);
                     return token;
                 }
+                break;
 
                 /* ######################### S_GREATER ############################## */
             case S_GREATER:
@@ -190,6 +190,7 @@ Token * get_token(FILE * fp) {
                     str_free(str_tmp);
                     return token;
                 }
+                break;
 
                 /* ######################### S_SMALLER ############################## */
             case S_SMALLER:
@@ -209,6 +210,7 @@ Token * get_token(FILE * fp) {
                     str_free(str_tmp);
                     return token;
                 }
+                break;
 
                 /* ########################## S_EQUAL ############################### */
             case S_EQUAL:
@@ -223,6 +225,7 @@ Token * get_token(FILE * fp) {
                     str_free(str_tmp);
                     return token;
                 }
+                break;
 
                 /* ######################### S_SCREAMER ############################# */
             case S_SCREAMER:
@@ -236,6 +239,8 @@ Token * get_token(FILE * fp) {
                     str_free(str_tmp);
                     return token;
                 }
+                break;
+
                 /* ########################### S_TEXT ############################### */
 
             case S_TEXT:
@@ -274,7 +279,7 @@ Token * get_token(FILE * fp) {
                     hex[1] = (char) getc(fp);
 
                     if (isxdigit(hex[0]) && isxdigit(hex[1])) {
-                        if (str_add_char(str_tmp, (char) strtol(hex,NULL,16)))
+                        if (str_add_char(str_tmp,(char)strtol(hex,NULL,16)))
                             cleanup(token, str_tmp);
                     }
                     else {
@@ -303,7 +308,7 @@ Token * get_token(FILE * fp) {
                     }
                 }
                 else if (c == '.') {
-                    if (!isdigit(tc = (char) getc(fp)) || (++count_dot > 1 || count_e != 0 )) {
+                    if (!isdigit(tc =(char)getc(fp)) || (++count_dot > 1 || count_e != 0 )) {
                         token->type = KIN_UNKNOWN;
                         cleanup(NULL, str_tmp);
                         return token;
@@ -316,7 +321,7 @@ Token * get_token(FILE * fp) {
                 }
                 else if (isalpha(c)) {
                     if ( c == 'e' || c == 'E') {
-                        if (++count_e > 1 || !isdigit(tc = (char) getc(fp))) {
+                        if (++count_e > 1 || !isdigit(tc = (char)getc(fp))) {
                             ungetc(tc, fp);
                             token->type = KIN_UNKNOWN;
                             cleanup(NULL, str_tmp);
@@ -356,8 +361,7 @@ Token * get_token(FILE * fp) {
                 /* ##################### S_COMMENT_BLOCK ############################ */
             case S_COMMENT_BLOCK:
                 if (c == '*') {
-                    c = getc(fp) == '/';
-                    if (c) {
+                    if ((c = (char) getc(fp)) == '/') {
                         state = S_START;
                     }
                     else
@@ -414,7 +418,7 @@ int isoperator(char c)
     int i;
     char operators[] = {';', '*', '/', '+', '-', '>', '<', '=', '!', '(', ')',
                         '{', '}', ',', EOF};
-    for (i = 0; (int) strlen(operators) > i; i++) {
+    for (i = 0; i<strlen(operators); i++) {
         if (c == operators[i])
             return TRUE;
     }
@@ -435,8 +439,8 @@ int isoperator(char c)
 int copy_carray_to_token(Token *t, char *s)
 /* prekopiruje retezec s do t->s */
 {
-    int length = (int) strlen(s);
-    if ((t->str = (char*) malloc((size_t) (length+1))) == NULL)
+    int length = (int)strlen(s);
+    if ((t->str = (char*) malloc(((size_t)length+1))) == NULL)
         return FAIL;
     strcpy(t->str, s);
     return SUCCESS;
@@ -457,7 +461,7 @@ int copy_str_to_token(Token *t, string *s)
 /* prekopiruje retezec s do t->s */
 {
     int length = s->length;
-    if ((t->str = (char*) malloc((size_t) (length+1))) == NULL)
+    if ((t->str = (char*) malloc((size_t)length+1)) == NULL)
         return FAIL;
     strcpy(t->str, s->str);
     return SUCCESS;
@@ -521,4 +525,3 @@ char * keywords[] = {
         "find",
         "sort"
 };
-
