@@ -1,4 +1,4 @@
-#include <mach/task.h>
+
 #include "parser.h"
 
 int start_syntax_analyz(){
@@ -25,169 +25,258 @@ int start_syntax_analyz(){
 int dec_function(){
     Token *new_token = next_token();
     if (new_token->type == KIN_IDENTIFIER){
-        if (next_token() == KIN_L_ROUNDBRACKET){
-            if(parameters() == 0){
+        free(new_token);
+        if ((new_token = next_token())->type == KIN_L_ROUNDBRACKET){
+            free(new_token);
+            if(parameters_declar() == 0){
                 new_token = next_token();
-                if (new_token == KIN_SEMICOLON){ return 0;}
-                else if(new_token == KIN_L_BRACE) {
-                    int exit_code = body_funcion();
-                    if (exit_code == 0) { return 0; }
-                    errorMessage("Error in body of program !");
-                    return 1;
+                if (new_token->type == KIN_SEMICOLON){
+                    free(new_token);
+                    //generacia instrukcnej sady;
+                    return 0;
+                }
+                else if(new_token->type == KIN_L_BRACE) {
+                    free(new_token);
+                    //generacia instrukcnej sady;
+                    return body_funcion();
                 }
                 else {
-                    errorMessage("Error during declaration function !");
+                    errorMessage_syntax("Declaration function !");
                     return 1;
                 }
             }
         }
     }
-    errorMessage("Error during declaration function !");
+    errorMessage_syntax("Declaration function !");
     return 1;
 }
 
 int body_funcion(){
     while(true) {
-        int  new_token = next_token();
-        switch(new_token){
+        Token *new_token = next_token();
+        switch(new_token->type){
             case KW_CIN:
-                if (cin_cout(KIN_SCIN) == 0){ continue;} else{ return 1;}
+                free(new_token);
+                if (cin_cout(KIN_SCIN) == 0){continue;} else{return 1;}
             case KW_COUT:
-                if (cin_cout(KIN_SCOUT) == 0){ continue;} else{ return 1;}
+                free(new_token);
+                if (cin_cout(KIN_SCOUT) == 0){continue;} else{return 1;}
             case KW_IF:
-                if (if_statement() == 0){ continue;} else{ return 1;}
+                free(new_token);
+                if (if_statement() == 0){continue;} else{return 1;}
             case KW_FOR:
-                if (for_statement() == 0){ continue;} else{ return 1;}
+                free(new_token);
+                if (for_statement() == 0){continue;} else{return 1;}
             case KW_RETURN:
-                if(expression_process(KIN_SEMICOLON) == KIN_SEMICOLON){ continue;} else{ return 1;}
+                free(new_token);
+                if(expression_process(KIN_SEMICOLON) == 0){continue;} else{return 1;}
             case KW_SORT:
             case KW_LENGTH:
-                if (next_token() == KIN_L_ROUNDBRACKET &&
-                    parameters_used() == 1 && next_token() == KIN_SEMICOLON){continue;} else{return 1;}
+                free(new_token);
+                if ((new_token = next_token())->type == KIN_L_ROUNDBRACKET && parameters_used() == 1 ){
+                    free(new_token);
+                    if((new_token = next_token())->type == KIN_SEMICOLON){
+                        free(new_token);
+                        continue;
+                    }
+                }
+                return 1;
             case KW_FIND:
             case KW_CONCAT:
-                if (next_token() == KIN_L_ROUNDBRACKET &&
-                    parameters_used() == 2  && next_token() == KIN_SEMICOLON){continue;} else{ return 1;}
+                free(new_token);
+                if ((new_token=next_token())->type == KIN_L_ROUNDBRACKET && parameters_used() == 2 ){
+                    free(new_token);
+                    if((new_token=next_token())->type == KIN_SEMICOLON){
+                        free(new_token);
+                        continue;
+                    }
+                }
+                return 1;
             case KW_SUBSTR:
-                if (next_token() == KIN_L_ROUNDBRACKET &&
-                    parameters_used() == 3  && next_token() == KIN_SEMICOLON){continue;} else{ return 1;}
+                free(new_token);
+                if ((new_token=next_token())->type == KIN_L_ROUNDBRACKET && parameters_used() == 3 ){
+                    free(new_token);
+                    if((new_token=next_token())->type == KIN_SEMICOLON){
+                        free(new_token);
+                        continue;
+                    }
+                }
+                return 1;
             case KIN_IDENTIFIER:
-                if (assing(KIN_SEMICOLON) == 0){ continue; } else{ return 1; }
+                free(new_token);
+                if (assing_funcCall() == 0){continue;} else{return 1;}
             case KW_AUTO:   case KW_DOUBLE:  case KW_INT:  case KW_STRING:      //all datatypes
-                if (dec_variable() == KIN_SEMICOLON) { continue; } else { return 1; }
+                free(new_token);
+                if (dec_variable() == 0) {continue;} else {return 1;}
             case KIN_R_BRACE:
+                free(new_token);
                 return 0;
             default:
-                errorMessage("Error in body of program !");
+                free(new_token);
+                errorMessage_syntax(" Body of function !");
                 return 1;
         }
     }
 }
 
 int for_statement() {
-    if (next_token() == KIN_L_ROUNDBRACKET) {
-        int new_token = next_token();
-        if((new_token == KW_AUTO) || (new_token == KW_DOUBLE) || (new_token == KW_INT) || (new_token == KW_STRING)) {
-            if ((next_token() == KIN_IDENTIFIER) && (assing(KIN_SEMICOLON) == 0) && (expression_process(KIN_SEMICOLON) == KIN_SEMICOLON) &&     //treba zment
-                (next_token() == KIN_IDENTIFIER) && (assing(KIN_R_ROUNDBRACKET) == 0)&& next_token() == KIN_L_BRACE){
-                return body_funcion();
+    Token *new_token;
+    if ((new_token=next_token())->type == KIN_L_ROUNDBRACKET){
+        free(new_token);
+        new_token= next_token();
+        if((new_token->type >= KW_AUTO) && (new_token->type <= KW_STRING)) {
+            free(new_token);
+            if (((new_token=next_token())->type == KIN_IDENTIFIER) && (assing_funcCall() == 0)) {
+                free(new_token);
+                if (expression_process(KIN_SEMICOLON) == KIN_SEMICOLON && (new_token = next_token())->type == KIN_IDENTIFIER) {
+                    free(new_token);
+                    if (assing_funcCall() == 0 && (new_token = next_token())->type == KIN_L_BRACE) {
+                        free(new_token);
+                        return body_funcion();
+
+                    }
+                }
             }
         }
-        else if (new_token == KIN_IDENTIFIER) {
-            if ((assing(KIN_SEMICOLON) == 0)&& (expression_process(KIN_SEMICOLON) == KIN_SEMICOLON) && (next_token() == KIN_IDENTIFIER) &&
-                (assing(KIN_R_ROUNDBRACKET) == 0) && next_token() == KIN_L_BRACE) {
-                return body_funcion();
+        else if (new_token->type == KIN_IDENTIFIER) {
+            free(new_token);
+            if ((assing_funcCall() == 0) && (expression_process(KIN_SEMICOLON) == 0)){
+                if((new_token=next_token())->type == KIN_IDENTIFIER) {
+                    free(new_token);
+                    if (assing_funcCall() == 0 && (new_token = next_token())->type == KIN_L_BRACE) {
+                        free(new_token);
+                        return body_funcion();
+                    }
+                }
             }
         }
     }
-    errorMessage("Error in for statement !");
+    errorMessage_syntax("Error in for statement !");
     return 1;
 }
 
 int if_statement(){
-    if((next_token()== KIN_L_ROUNDBRACKET) && (expression_process(KIN_R_ROUNDBRACKET)== 0) &&
-       (next_token()== KIN_L_BRACE) && (body_funcion() == 0)){
-        if ((next_token() == KW_ELSE) && (next_token() == KIN_L_BRACE)){
-            return body_funcion();
-        }
+    Token *new_token;
+    if(((new_token=next_token())->type == KIN_L_ROUNDBRACKET) && (expression_process(KIN_R_ROUNDBRACKET)== KIN_R_ROUNDBRACKET)){
+        free(new_token);
+       if((new_token=next_token())->type == KIN_L_BRACE && (body_funcion() == 0)) {
+           free(new_token);
+           if ((new_token = next_token())->type == KW_ELSE) {
+               free(new_token);
+               if ((new_token = next_token())->type == KIN_L_BRACE) {
+                   free(new_token);
+                   return body_funcion();
+               }
+           }
+       }
     }
+    errorMessage_syntax("Bad syntax in \"if\"");
     return 1;
 }
 
-int cin_cout(int op){
-    if (next_token() ==  op){
+int cin_cout(enum sTokenKind operator){
+    Token *new_token;
+    if ((new_token=next_token())->type ==  operator){
+        free(new_token);
         while(true){
-            if (next_token() == KIN_IDENTIFIER) {
-                int new_token = next_token();
-                if (new_token == op) {continue; }
-                else if(new_token == KIN_SEMICOLON){return 0;}
+            new_token = next_token();
+            if (new_token->type == KIN_IDENTIFIER) {
+                Token *new_token2 = next_token();
+                if (new_token2->type == operator) {
+                    free(new_token);
+                    free(new_token2);
+                    continue;
+                }
+                else if(new_token2->type == KIN_SEMICOLON){     //kontrola
+                    free(new_token);
+                    free(new_token2);
+                    return 0;
+                }
                 else {
-                    errorMessage("error in cin or cout command!");
+                    errorMessage_syntax("Cin or cout command!");
                     return 1;
                 }
+
             }
-            else{
-                break;
-            }
+            free(new_token);
         }
     }
-    errorMessage("Error in cin or cout operator!");
+    errorMessage_syntax("Cin or cout operator!");
     return 1;
 }
 
-int assing(int PREDICT_EXIT){
-    int new_token = next_token();
-    if ((new_token == KIN_L_ROUNDBRACKET) && (parameters_used() != 100) && (next_token() == KIN_SEMICOLON)) {
-        return 0;
-    }
-    else if (new_token == KIN_ASSIGNEMENT){
-        return expression_process(KIN_SEMICOLON);
-    }
-    errorMessage("Error in assing function!");
-    return 1;
-}
-
-
-int dec_variable(){
-    if (next_token() == KIN_IDENTIFIER) {
-        int new_token = next_token();
-        if (new_token == KIN_SEMICOLON) {
+int assing_funcCall(){
+    Token *new_token = next_token();
+    if ((new_token->type == KIN_L_ROUNDBRACKET) && (parameters_used() != 100)) {        //func call
+        free(new_token);
+        if((new_token=next_token())->type == KIN_SEMICOLON){
+            free(new_token);
             return 0;
         }
-        else if(new_token == KIN_ASSIGNEMENT){
-            return expression_process(KIN_SEMICOLON);
-        }
     }
-    errorMessage("Error in declaration variable");
+    else if (new_token->type == KIN_ASSIGNEMENT){       //assing var
+        free(new_token);
+        return expression_process(KIN_SEMICOLON);
+    }
+    errorMessage_syntax("Assing function!");
     return 1;
 }
 
-int parameters(){
-    int new_token = next_token();
-    if(new_token == KIN_R_ROUNDBRACKET) {
+int dec_variable(){
+    Token *new_token;
+    if ((new_token=next_token())->type == KIN_IDENTIFIER) {
+        free(new_token);
+        new_token = next_token();
+        if (new_token->type == KIN_SEMICOLON) {
+            free(new_token);
+            return 0;
+        }
+        else if(new_token->type == KIN_ASSIGNEMENT){
+            free(new_token);
+            if(expression_process(KIN_SEMICOLON) == KIN_SEMICOLON){
+                return 0;
+            }
+            else{
+                errorMessage_syntax("Bad syntax in assingment");
+                return 1;
+            }
+        }
+    }
+    errorMessage_syntax("Declaration variable");
+    return 1;
+}
+
+int parameters_declar(){
+    Token *new_token= next_token();
+    if(new_token->type == KIN_R_ROUNDBRACKET) {
+        free(new_token);
         return 0;
     }                                                /*means no parameters*/
     while(true) {
-        if((new_token == KW_AUTO) || (new_token == KW_DOUBLE) || (new_token == KW_INT) || (new_token == KW_STRING)) {
-            if (next_token() == KIN_IDENTIFIER) {
+        if((new_token->type >= KW_AUTO) && (new_token->type <= KW_STRING)){
+            free(new_token);
+            if ((new_token=next_token())->type == KIN_IDENTIFIER) {
+                free(new_token);
                 new_token = next_token();
-                if (new_token == KIN_R_ROUNDBRACKET) {
+                if (new_token->type == KIN_R_ROUNDBRACKET){
+                    free(new_token);
                     return 0;
                 }
-                else if (new_token == KIN_COMMA) {
+                else if (new_token->type == KIN_COMMA) {
+                    free(new_token);
                     new_token = next_token();
                     continue;
                 }
             }
         }
-        errorMessage("Error in declaration parameters!");
+        errorMessage_syntax("Declaration parameters!");
         return 1;
     }
 }
 
 int parameters_used(){
-
     int counter_of_arguments = 0;
+
 
     while(true) {
         counter_of_arguments++;
@@ -198,28 +287,27 @@ int parameters_used(){
         else if(exit_code_value == KIN_R_ROUNDBRACKET){
             return counter_of_arguments;
         }
-        errorMessage("Error in parameter used!");
+        errorMessage_syntax("Parameter used!");
         return 100;
     }
 }
 
-
 void errorMessage_syntax(const char *message ){
-    fprintf(stderr,"############ SYNTAX ERROR ###########\n");
+    fprintf(stderr,"############### SYNTAX ERROR ##############\n");
     fprintf(stderr,"Error message: %s \n",message);
-    fprintf(stderr,"#####################################\n");
+    fprintf(stderr,"###########################################\n");
 
 }
 void errorMessage_lexical(const char *message ){
-    fprintf(stderr,"############ LEXICAL ERROR ##########\n");
+    fprintf(stderr,"################ LEXICAL ERROR #############\n");
     fprintf(stderr,"Error message: %s \n",message);
-    fprintf(stderr,"#####################################\n");
+    fprintf(stderr,"############################################\n");
 
 }
 void errorMessage_internal(const char *message ){
-    fprintf(stderr,"############ INTERNAL ERROR #########\n");
+    fprintf(stderr,"############### INTERNAL ERROR ############\n");
     fprintf(stderr,"Error message: %s \n",message);
-    fprintf(stderr,"#####################################\n");
+    fprintf(stderr,"###########################################\n");
 
 }
 

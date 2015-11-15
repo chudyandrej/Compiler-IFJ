@@ -1,1 +1,13 @@
-(5*2)*(25-(23*apd)));
+
+int main(){
+    cin >> a >> t;
+    int andrej = 5*4+3;
+    if(a+b*2>4){
+
+    }
+    else{
+        cin >> a;
+    }
+    func(a+b,d+d*2+(4+3)*2);
+
+}

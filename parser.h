@@ -16,11 +16,11 @@
 
 int start_syntax_analyz();
 int dec_function();
-int parameters();
+int parameters_declar();
 int body_funcion();
-int assing(int PREDICT_EXIT);
+int assing_funcCall();
 int dec_variable();
-int cin_cout(int op);
+int cin_cout(enum sTokenKind operator);
 int if_statement();
 int parameters_used();
 int for_statement();
