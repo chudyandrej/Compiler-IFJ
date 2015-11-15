@@ -45,34 +45,35 @@ typedef enum sTokenKind {
     /*################# DERIVATE ELEMENT ##################*/
     /* 18 */   D_DOLLAR,
     /* 19 */   D_STOPER,
-    /* 20 */   D_NODE,
+    /* 20 */   D_TMP,
+    /* 21 */   D_NODE,
     /*######################################################*/
-    /* 21 */   KIN_ASSIGNEMENT,            /* = */
-    /* 22 */   KIN_SCOUT,                  /* << */
-    /* 23 */   KIN_SCIN,                   /* >> */
-    /* 24 */   KIN_L_BRACE,                /* { */
-    /* 25 */   KIN_R_BRACE,                /* } */
-    /* 26 */   KIN_SEMICOLON,              /* ; */
+    /* 22 */   KIN_ASSIGNEMENT,            /* = */
+    /* 23 */   KIN_SCOUT,                  /* << */
+    /* 24 */   KIN_SCIN,                   /* >> */
+    /* 25 */   KIN_L_BRACE,                /* { */
+    /* 26 */   KIN_R_BRACE,                /* } */
+    /* 27 */   KIN_SEMICOLON,              /* ; */
     /*################## KEYWORDS ########################*/
-    /* 27 */   KW_AUTO,                   /* data type */
-    /* 28 */   KW_DOUBLE,                 /* data type */
-    /* 29 */   KW_INT,                    /* data type */
-    /* 30 */   KW_STRING,                 /* data type */
-    /* 31 */   KW_CIN,                    /* command */
-    /* 32 */   KW_COUT,                   /* command */
-    /* 33 */   KW_ELSE,                   /* command */
-    /* 34 */   KW_FOR,                    /* command */
-    /* 35 */   KW_IF,                     /* command */
-    /* 36 */   KW_RETURN,                 /* command */
-    /* 37 */   KW_LENGTH,                 /* command */
-    /* 38 */   KW_SUBSTR,                 /* command */
-    /* 39 */   KW_CONCAT,                 /* command */
-    /* 40 */   KW_FIND,                   /* command */
-    /* 41 */   KW_SORT,                   /* command */
+    /* 28 */   KW_AUTO,                   /* data type */
+    /* 29 */   KW_DOUBLE,                 /* data type */
+    /* 30 */   KW_INT,                    /* data type */
+    /* 31 */   KW_STRING,                 /* data type */
+    /* 32 */   KW_CIN,                    /* command */
+    /* 33 */   KW_COUT,                   /* command */
+    /* 34 */   KW_ELSE,                   /* command */
+    /* 35 */   KW_FOR,                    /* command */
+    /* 36 */   KW_IF,                     /* command */
+    /* 37 */   KW_RETURN,                 /* command */
+    /* 38 */   KW_LENGTH,                 /* command */
+    /* 39 */   KW_SUBSTR,                 /* command */
+    /* 40 */   KW_CONCAT,                 /* command */
+    /* 41 */   KW_FIND,                   /* command */
+    /* 42 */   KW_SORT,                   /* command */
     /*###################################################*/
-    /* 42 */   KIN_COMMA,                  /* , */
-    /* 43 */   KIN_UNKNOWN,                /*LEX_ERR*/
-    /* 44 */   END_OF_FILE,                /* EOF */
+    /* 43 */   KIN_COMMA,                  /* , */
+    /* 44 */   KIN_UNKNOWN,                /*LEX_ERR*/
+    /* 45 */   END_OF_FILE,                /* EOF */
 
 }TokenKind;
 

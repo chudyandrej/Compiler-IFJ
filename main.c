@@ -4,12 +4,16 @@
 
 FILE *fp;
 
+Token *token_predict = NULL;
 
 int main(int argc, char *argv[]) {
 
     fp = fopen(argv[1],"r");
-    int exit_code = start_syntax_analyz();
-    fclose(fp);
+    token_predict = get_token(fp);
+    int exit_code = expression_process(KIN_SEMICOLON);
+   //  = start_syntax_analyz();
 
-    return exit_code;
+   fclose(fp);
+
+    return exit_code ;
 }

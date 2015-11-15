@@ -276,11 +276,9 @@ int parameters_declar(){
 
 int parameters_used(){
     int counter_of_arguments = 0;
-
-
     while(true) {
         counter_of_arguments++;
-        int exit_code_value = expression_process(KIN_SEMICOLON);
+        int exit_code_value = expression_process(KIN_COMMA);
         if(exit_code_value == KIN_COMMA) {
             continue;
         }
@@ -313,7 +311,8 @@ void errorMessage_internal(const char *message ){
 
 Token *next_token(){
 
-    Token *new_token = get_token(fp);
+    Token *new_token = token_predict;
+    token_predict = get_token(fp);
     if(new_token == NULL ){
         //odalocujeme
         errorMessage_internal("Malloc error");
@@ -324,6 +323,7 @@ Token *next_token(){
         exit(LEX_ERR);
     }
     else{
+        printf("Token: %d precedence_token: %d\n",new_token->type,token_predict->type);
         return new_token;
     }
 }

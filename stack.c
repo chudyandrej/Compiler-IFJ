@@ -2,7 +2,7 @@
 // Created by Andrej Oliver Chudý on 07/11/15.
 //
 
-#include <stdbool.h>
+
 #include "stack.h"
 
 

@@ -31,7 +31,6 @@ void errorMessage_internal(const char *message );
 Token *next_token();
 
 
-
-int bracket(int token);
+extern Token *token_predict;
 
 #endif //IJF_PARSER_H

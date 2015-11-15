@@ -4,7 +4,7 @@
 
 
 #include "precedence.h"
-#include "stack.h"
+
 
 
 const char PrecedentTable [19][19] ={
@@ -61,6 +61,7 @@ void printf_stack(tDLList *Stack){
     tDLElemPtr new_help = Stack->First;
     new_help = Stack->First;
     printf("\n####### STACK ##########\n");
+    printf("######## %p ########\n",&Stack);
     while(new_help != NULL){
         printf("%d\n",((dTreeElementPtr) new_help->data)->description);
         new_help = new_help->rptr;
@@ -68,7 +69,7 @@ void printf_stack(tDLList *Stack){
     printf("########################\n");
 }
 tDLList* init_stack(){
-    tDLList *Stack = malloc(sizeof(tDLList));   //malloc stack
+    tDLList *Stack = malloc(sizeof(struct tDLList));   //malloc stack
     init_list(Stack);                           //init stack
     dTreeElementPtr new_element;
     new_element = create_stack_element(D_DOLLAR, NULL);
@@ -114,7 +115,13 @@ dTreeElementPtr create_stack_element(enum sTokenKind description, Token *token) 
         printf("Malloc ERROR");
         return NULL;
     }
-    if(token == NULL){      //stoper, dollar
+    if(description == D_TMP){
+        new_element->type = TMP;
+        //new_element->data.tmp =
+        new_element->description = KIN_NUM_INT;
+            return new_element;
+    }
+    else if(token == NULL){      //stoper, dollar
         return load_nonterm_char(new_element, description);
     }
     else if ((token->type >= KIN_NUM_INT && token->type <= KIN_TEXT) || token->type == KIN_IDENTIFIER) { //cislo,string,var
@@ -230,7 +237,7 @@ int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3){
                 return 100;
         }
     }
-    printf("Mrda mi v halve: rules - od vrchu: %d %d %d\n", p1->description, 
+    printf("Mrda mi v halve: rules - od vrchu: %d %d %d\n", p1->description,
         p2->description, p3->description);
     return 100;
 }
@@ -271,20 +278,52 @@ int element_reduct(tDLList *Stack){
     }
 }
 
+int call_function(Token *id_token){
+
+    switch(id_token->type){
+        case KW_SORT:
+        case KW_LENGTH:
+            if(parameters_used() == 1){return 0;}else{return 1;}
+        case KW_FIND:
+        case KW_CONCAT:
+            if(parameters_used() == 2){return 0;}else{return 1;}
+        case KW_SUBSTR:
+            if(parameters_used() == 3){return 0;}else{return 1;}
+        case KIN_IDENTIFIER:
+
+            if(parameters_used() != 100){ printf("ta som tu\n");return 0;}else{return 1;}
+
+        default:
+            return 1;
+
+    }
+
+}
+
 
 
 int expression_process(enum sTokenKind end_char){
     tDLList *Stack = init_stack();
+
     bool load_new_tag = true;
     Token *new_token = NULL;
     int exit_char = KIN_R_ROUNDBRACKET;
     while(true) {
+        printf_stack(Stack);
         int top_token = ((dTreeElementPtr)(find_last(Stack,false))->data)->description;
         if(load_new_tag == true) {
-            if((new_token = get_token(fp)) == NULL || new_token->type == KIN_UNKNOWN){
-                printf("Lexical error \n");
-                return 1;
-            }
+            new_token = next_token();
+        }
+        if((new_token->type == KIN_IDENTIFIER || (new_token->type >= KW_LENGTH && new_token->type <= KW_SORT)) &&
+                token_predict->type == KIN_L_ROUNDBRACKET){
+            printf("VNARAM\n");
+            free(next_token());
+            if(call_function(new_token) != 0){return 1;}
+            insert_last(Stack, create_stack_element(D_STOPER, NULL));
+            insert_last(Stack, create_stack_element(D_TMP, NULL));
+            new_token=next_token();
+            printf("VYNARAM\n");
+            printf_stack(Stack);
         }
         load_new_tag = true;
 
@@ -295,8 +334,8 @@ int expression_process(enum sTokenKind end_char){
         }
 
         int exit_code;
-        if(new_token->type > D_DOLLAR){ printf("mrada mi v medziach: expression_process %d",new_token->type);return 1;}
-        //printf_stack(Stack);
+        if(new_token->type > D_DOLLAR){ printf("Mrada mi v medziach: expression_process %d",new_token->type);return 1;}
+
         switch (PrecedentTable[top_token][new_token->type]) {
             case '<':
                 if (Stack->Last == find_last(Stack,true)) {
@@ -316,9 +355,11 @@ int expression_process(enum sTokenKind end_char){
                 }
                 if(exit_code == 100 && length_list(Stack) == 2 &&
                         ((dTreeElementPtr)(find_last(Stack,false))->data)->description == D_DOLLAR) {
+                    dispose_list(Stack);
                     return end_char;
                 }
                 else{
+                    dispose_list(Stack);
                     return 1;
                 }
             case '=':
@@ -330,9 +371,11 @@ int expression_process(enum sTokenKind end_char){
             default:
                 if(length_list(Stack) == 2 &&
                     ((dTreeElementPtr)(find_last(Stack,false))->data)->description == D_DOLLAR) {
+                    dispose_list(Stack);
                      return exit_char;
                 }
                 printf("precedence table errror s tokenom: %d\n", new_token->type);
+                dispose_list(Stack);
                 return 1;
 
         }

@@ -1,13 +1,1 @@
-
-int main(){
-    cin >> a >> t;
-    int andrej = 5*4+3;
-    if(a+b*2>4){
-
-    }
-    else{
-        cin >> a;
-    }
-    func(a+b,d+d*2+(4+3)*2);
-
-}
+5 + d(a+sort(sdf,dsa)) + awhdiuah(59*daa*sdf(45/8));

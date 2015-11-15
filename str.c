@@ -2,8 +2,7 @@
 // Created by Andrej Oliver Chudý on 07/11/15.
 //
 
-#include <string.h>
-#include <stdlib.h>
+
 #include "str.h"
 
 #define STR_LEN_INC 8

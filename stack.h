@@ -7,6 +7,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
+
 #include "precedence.h"
 
 typedef struct tDLElem{
@@ -16,7 +18,7 @@ typedef struct tDLElem{
 
 } *tDLElemPtr;
 
-typedef struct{
+typedef struct tDLList{
     tDLElemPtr First;   /*points to firts element in the list*/
     tDLElemPtr Last;    /*points to last element in the list*/
     tDLElemPtr Active;  /*points to active element in the list*/

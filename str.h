@@ -5,6 +5,8 @@
 #ifndef IJF_STR_H
 #define IJF_STR_H
 
+#include <string.h>
+#include <stdlib.h>
 typedef struct
 {
     char* str;		// misto pro dany retezec ukonceny znakem '\0'

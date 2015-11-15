@@ -6,11 +6,13 @@
 #define IJF_PRECEDENCE_H
 
 
-
+#include "stack.h"
+#include "parser.h"
 #include "scanner.h"
 #include "tac.h"
-#include <stdbool.h>
-#include "stack.h"
+
+
+
 
 const char PrecedentTable[19][19];
 
@@ -19,7 +21,6 @@ typedef struct dTreeElement{
     enum Type type;
     union Address data;
 } *dTreeElementPtr;
-
 
 
 typedef enum {
@@ -51,5 +52,7 @@ void gen_instruction(enum Instruction ction_inst, union Address op1,union Addres
 void gen_unary_instruction(enum Instruction ction_inst, union Address op1,union Address t,enum Type t_op1,enum Type pe_t_t);
 int expression_process(enum sTokenKind end_char);
 int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3);
+
+
 
 #endif //IJF_PRECEDENCE_H
