@@ -1,0 +1,62 @@
+a=4
+a4;
+func4,4);
+sort(a;
+a=4***4;
+func(4,4*);
+sort(a,a);
+length(var,d,a);
+substr(variable);
+concat (one, two,a);
+find();
+sort(,cc);
+b=((4**4)*4*a(a,a,a));
+for(int i=0; a d; i=i+1){ }
+if(a*4){ } else  }
+if(a+4){  else { }
+if(a-4){ }  { }
+if(a*4{ } else { }
+ifa<4){ } else { }
+if(a--4){ } else { }
+if(<=4){ } else { }
+if(a>=){ } else { }
+if(a*(+4)-4){ } else { }
+for(){}
+for(int a; ;prem){}
+for(int a; a< c; find(c)){}
+for(int a; a< c ; i++);
+return; 
+else{}
+"askdjflkaa;
+987variable;
+float c;
+int find(a,b);
+int sort(c);
+double length(var);
+int function(){}
+int function();
+454564e4.8;
+457.4654.546;
+545..456;
+4++++4;
+4----4;
+4+-*/4;
+4--;
+++a++1;
+a=;
+length("ao", "ah");
+length("sjfdsjfa);
+=//length();
+string substr(string s, int i , int n){  int a=5; return1; }
+substr("jfdsa, 1, 2);
+substr("sdf",4,4,4);
+substr();
+string concat(string s, string s2){  int a=5; return1; }
+concat("str", "sttr);
+concat("asdf", "asdfa","dsfasd");
+concat(); 
+int find(string s, string s2){  int a=5; return1; }
+find("sdf","dfasd","dsafs");
+find();
+sort("asdf","sadf");
+=//sort();
