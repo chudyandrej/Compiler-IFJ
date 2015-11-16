@@ -69,7 +69,7 @@ int body_funcion(){
                 if (for_statement() == 0){continue;} else{return 1;}
             case KW_RETURN:
                 free(new_token);
-                if(expression_process(KIN_SEMICOLON) == 0){continue;} else{return 1;}
+                if(expression_process(KIN_SEMICOLON) == KIN_SEMICOLON){continue;} else{return 1;}
             case KW_SORT:
             case KW_LENGTH:
                 free(new_token);
@@ -180,7 +180,10 @@ int cin_cout(enum sTokenKind operator){         //treba spravit specificky cout
         free(new_token);
         while(true){
             new_token = next_token();
-            if (new_token->type == KIN_IDENTIFIER) {
+            int token_type = new_token->type;
+            if ( token_type == KIN_IDENTIFIER || (operator == KIN_SCOUT && 
+                            (token_type >= KIN_NUM_INT && token_type <= KIN_TEXT))) {
+                
                 Token *new_token2 = next_token();
                 if (new_token2->type == operator) {
                     free(new_token);
