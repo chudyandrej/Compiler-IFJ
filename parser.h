@@ -15,7 +15,7 @@
 
 
 int start_syntax_analyz();
-int dec_function();
+int dec_function(unsigned int type_func);
 int parameters_declar();
 int body_funcion();
 int assing_funcCall();
@@ -30,7 +30,7 @@ void errorMessage_lexical(const char *message );
 void errorMessage_internal(const char *message );
 Token *next_token();
 
-
+extern struct tBST Func;
 extern Token *token_predict;
-
+extern tDLList *tac_stack;
 #endif //IJF_PARSER_H

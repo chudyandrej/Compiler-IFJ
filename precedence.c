@@ -4,8 +4,7 @@
 
 
 #include "precedence.h"
-
-
+unsigned int tmp_counter = 0;
 
 const char PrecedentTable [19][19] ={
                             // n_i  n_d  text +    -   *   /  ++  --   ID  (   )   ==   <   >  <=  >=  =!  $
@@ -27,32 +26,21 @@ const char PrecedentTable [19][19] ={
     [KIN_SMALLER_EQ]        = {'<', '<' ,'<','<' ,'<','<','<','<','<','<','<','>','>','>','>','>','>','>','>'},
     [KIN_GREATER_EQ]        = {'<', '<' ,'<','<' ,'<','<','<','<','<','<','<','>','>','>','>','>','>','>','>'},
     [KIN_NOT_EQ]            = {'<', '<' ,'<','<' ,'<','<','<','<','<','<','<','>','>','>','>','>','>','>','>'},
-    [D_DOLLAR]              = {'<', '<' ,'<','<' ,'<','<','<','<','<','<','<','!' ,'<','<','<','<','<','<', 0 },
+    [D_DOLLAR]              = {'<', '<' ,'<','<' ,'<','<','<','<','<','<','<','!' ,'<','<','<','<','<','<', 0},
 };
 
-void gen_instruction(enum Instruction ction_inst, union Address op1,union Address op2,enum Type t_op1,enum Type t_op2){
+void gen_instruction(enum sTokenKind ction_inst, union Address op1,union Address op2,enum Type t_op1,enum Type t_op2){
     tOperation instruction = malloc(sizeof(struct Operation));
     instruction->ction_inst = ction_inst;
     instruction->op1 = op1;
     instruction->op2 = op2;
     instruction->t_op1 = t_op1;
     instruction->t_op2 = t_op2;
-    instruction->pe_t_t = TMP;
-    //instruction->t.tmp = tmp_counter;
-    //tmp_counter++;
-    // insert_last(THC, instruction);
-
-}
-void gen_unary_instruction(enum Instruction ction_inst, union Address op1,union Address t,enum Type t_op1,enum Type pe_t_t){
-    tOperation instruction = malloc(sizeof(struct Operation));
-    instruction->ction_inst = ction_inst;
-    instruction->op1 = op1;
-    instruction->t_op1 = t_op1;
-    instruction->t_op2 = EMPTY;
-    instruction->pe_t_t = TMP;
-    // instruction->t.tmp = tmp_counter;
-    //  tmp_counter++;
-    //  insert_last(THC, instruction);
+    instruction->t_t = TMP;
+    instruction->t.tmp = tmp_counter;
+    instruction->label = 0;
+    tmp_counter++;
+    insert_last(tac_stack, instruction);
 
 }
 
@@ -96,7 +84,7 @@ dTreeElementPtr load_token(dTreeElementPtr new_element, Token *token){
             return new_element;
         case KIN_NUM_INT:
             new_element->type = INT;
-            new_element->data.i = atoi(token->str);
+            new_element->data.i = (int) strtol(token->str, NULL, 10);
             new_element->description = KIN_NUM_INT;
             return new_element;
         case KIN_IDENTIFIER:
@@ -140,53 +128,17 @@ int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3){
     if(p3 != NULL) { // mame tri argumenty
         switch (p2->description) {
             case KIN_PLUS:
-                if (p1->description == D_NODE && p3->description == D_NODE) {
-               //     gen_instruction(MAT_ADD,p1->data,p3->data,p1->type,p3->type);
-                    return 2;
-                } break;
             case KIN_MINUS:
-                if (p1->description == D_NODE && p3->description == D_NODE) {
-               //     gen_instruction(MAT_DIFF,p1->data,p3->data,p1->type,p3->type);
-                    return 2;
-                } break;
             case KIN_MUL:
-                if (p1->description == D_NODE && p3->description == D_NODE) {
-                 //   gen_instruction(MAT_MUL,p1->data,p3->data,p1->type,p3->type);
-                    return 2;
-                } break;
             case KIN_DIV:
-                if (p1->description == D_NODE && p3->description == D_NODE) {
-                //    gen_instruction(MAT_DIV,p1->data,p3->data,p1->type,p3->type);
-                    return 2;
-                } break;
             case KIN_EQ:
-                if (p1->description == D_NODE && p3->description == D_NODE) {
-                //    gen_instruction(COMP_EQ,p1->data,p3->data,p1->type,p3->type);
-                    return 2;
-                } break;
             case KIN_NOT_EQ:
-                if (p1->description == D_NODE && p3->description == D_NODE) {
-                 //   gen_instruction(COMP_NOT_EQ,p1->data,p3->data,p1->type,p3->type);
-                    return 2;
-                } break;
             case KIN_SMALLER:
-                if (p1->description == D_NODE && p3->description == D_NODE) {
-                   // gen_instruction(COMP_SMALLER,p1->data,p3->data,p1->type,p3->type);
-                    return 2;
-                } break;
             case KIN_GREATER:
-                if (p1->description == D_NODE && p3->description == D_NODE) {
-                   // gen_instruction(COMP_GREATER,p1->data,p3->data,p1->type,p3->type);
-                    return 2;
-                } break;
             case KIN_SMALLER_EQ:
-                if (p1->description == D_NODE && p3->description == D_NODE) {
-                   // gen_instruction(COMP_SMALLER_EQ,p1->data,p3->data,p1->type,p3->type);
-                    return 2;
-                } break;
             case KIN_GREATER_EQ:
                 if (p1->description == D_NODE && p3->description == D_NODE) {
-                   // gen_instruction(COMP_GREATER_EQ, p1->data, p3->data, p1->type, p3->type);
+                    gen_instruction(p2->description,p1->data,p3->data,p1->type,p3->type);
                     return 2;
                 } break;
             case D_NODE:
@@ -203,10 +155,9 @@ int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3){
     else if(p2 != NULL){    // rules 3-6
         switch(p1->description){
             case KIN_PLUSPLUS:
+            case KIN_MINUSMINUS:
                 if(p2->description == D_NODE){
-                    return 1;
-                } break;
-            case KIN_MINUSMINUS: if(p2->description == D_NODE){
+                    gen_instruction(p1->description,p2->data,p2->data,p2->type,EMPTY);
                     return 1;
                 } break;
             default:
@@ -214,12 +165,13 @@ int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3){
                 break;
         }
         switch(p2->description){
-            case KIN_PLUSPLUS: if(p1->description == D_NODE){
+            case KIN_PLUSPLUS:
+            case KIN_MINUSMINUS:
+                if(p1->description == D_NODE){
+                    gen_instruction(p2->description,p1->data,p1->data,EMPTY, p1->type);
                     return 1;
                 } break;
-            case KIN_MINUSMINUS: if(p1->description == D_NODE){
-                    return 1;
-                } break;
+
             default:
                 printf("chyba pri uplatnovani pravidiel dvoch\n");
                 return 100;
@@ -237,8 +189,7 @@ int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3){
                 return 100;
         }
     }
-    printf("Mrda mi v halve: rules - od vrchu: %d %d %d\n", p1->description,
-        p2->description, p3->description);
+
     return 100;
 }
 int element_reduct(tDLList *Stack){
@@ -300,9 +251,7 @@ int call_function(Token *id_token){
 
 }
 
-
-
-int expression_process(enum sTokenKind end_char){
+int expression_process(enum sTokenKind end_char){       //vracat posledny node
     tDLList *Stack = init_stack();
 
     bool load_new_tag = true;

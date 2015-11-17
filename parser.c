@@ -1,16 +1,19 @@
 
 #include "parser.h"
+#include "bst.h"
 
 int start_syntax_analyz(){
 
     Token *new_token = next_token();
+    int exit_code;
     switch(new_token->type){
         case KW_AUTO:
         case KW_DOUBLE:
         case KW_INT:
         case KW_STRING:
+            exit_code = dec_function(new_token->type);
             free(new_token);
-            return dec_function();
+            return exit_code;
         case END_OF_FILE:
             free(new_token);
             errorMessage_syntax("Program file is empty !");
@@ -22,24 +25,42 @@ int start_syntax_analyz(){
     }
 }
 
-int dec_function(){
-    Token *new_token = next_token();
-    if (new_token->type == KIN_IDENTIFIER){
-        free(new_token);
+int dec_function(unsigned int type_func){
+    Token *func_name = next_token();
+    Token *new_token;
+    char * data_types;
+    char * names;
+    if (func_name->type == KIN_IDENTIFIER){
         if ((new_token = next_token())->type == KIN_L_ROUNDBRACKET){
             free(new_token);
             if(parameters_declar() == 0){
                 new_token = next_token();
+                BSTFind(&Func,func_name->str);
+                if ( ! BSTActive(&Func)) {
+                    BSTAdd(&Func, func_name->str);
+                }
+                if (GSTDeclare(&Func, data_types, names)){
+
+                    return 1;
+                }
+
                 if (new_token->type == KIN_SEMICOLON){
                     free(new_token);
-                    //generacia instrukcnej sady;
                     return 0;
                 }
                 else if(new_token->type == KIN_L_BRACE) {
                     free(new_token);
                     //generacia instrukcnej sady;
-                    return body_funcion();
+                    tac_stack = malloc(sizeof(struct tDLList));
+                    init_list(tac_stack);
+                    int ret_val = body_funcion();
+                    if (!ret_val){
+                        BSTFind(&Func, func_name->str);
+                        ret_val = GSTDefine(&Func, tac_stack);
+                    }
+                    return ret_val;
                 }
+                    //erroro dvoch body
                 else {
                     errorMessage_syntax("Declaration function !");
                     return 1;
@@ -210,14 +231,7 @@ int cin_cout(enum sTokenKind operator){         //treba spravit specificky cout
 
 int assing_funcCall(){
     Token *new_token = next_token();
-    if ((new_token->type == KIN_L_ROUNDBRACKET) && (parameters_used() != 100)) {        //func call
-        free(new_token);
-        if((new_token=next_token())->type == KIN_SEMICOLON){
-            free(new_token);
-            return 0;
-        }
-    }
-    else if (new_token->type == KIN_ASSIGNEMENT){       //assing var
+    if (new_token->type == KIN_ASSIGNEMENT){       //assing var
         free(new_token);
         return (expression_process(KIN_SEMICOLON) == KIN_SEMICOLON)? 0 : 1;
     }
