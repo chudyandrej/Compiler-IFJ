@@ -88,7 +88,7 @@ void heapify(char *s, int length){
     /*Find right_child => parent_index*2+2 */
     while(swap_controll){
         swap_controll=0;
-        for(index = 0; index <= (length-1)/2; index++){
+        for(index = 0; index <= (length-1)/2; index++){ /*loop each parent node*/
            
             for(j=1; j < 3; j++){
                 if(s[index]<s[index*2+j]){
@@ -120,7 +120,7 @@ void shift_down(char *s, int length){
                 index=index*2+1;
             }
             else{
-                break;
+                break; 
             }
         }
         else{       /*one child*/
@@ -144,7 +144,7 @@ void sort(char *s){
     
     heapify(s, length);     /*heap sort needs max heap*/
    
-   for(length; length > 0; ){      
+   for( ; length > 0; ){      
         swap(s, 0, length);   /*swap first and last*/
         length--;
                      
