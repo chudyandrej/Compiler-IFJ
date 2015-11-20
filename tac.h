@@ -6,7 +6,7 @@
 #define IJF_TAC_H
 
 
-#import "scanner.h"
+#include "scanner.h"
 
 /*
 ***************************************************************
