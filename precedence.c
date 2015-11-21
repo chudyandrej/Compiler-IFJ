@@ -251,7 +251,7 @@ int call_function(Token *id_token){
 
 }
 
-int expression_process(enum sTokenKind end_char){       //vracat posledny node
+int expression_process(enum sTokenKind end_char, dTreeElementPtr final_node){       //vracat posledny node
     tDLList *Stack = init_stack();
 
     bool load_new_tag = true;
@@ -267,7 +267,7 @@ int expression_process(enum sTokenKind end_char){       //vracat posledny node
                 token_predict->type == KIN_L_ROUNDBRACKET){
             printf("VNARAM\n");
             free(next_token());
-            if(call_function(new_token) != 0){return 1;}
+            if(call_function(new_token) != 0){dispose_list(Stack); return 1;}
             insert_last(Stack, create_stack_element(D_STOPER, NULL));
             insert_last(Stack, create_stack_element(D_TMP, NULL));
 
@@ -284,7 +284,7 @@ int expression_process(enum sTokenKind end_char){       //vracat posledny node
         }
 
         int exit_code;
-        if(new_token->type > D_DOLLAR){ printf("Mrada mi v medziach: expression_process %d",new_token->type);return 1;}
+        if(new_token->type > D_DOLLAR){ printf("Mrada mi v medziach: exp_proc. %d",new_token->type);dispose_list(Stack); return 1;}
 
         switch (PrecedentTable[top_token][new_token->type]) {
             case '<':
@@ -305,6 +305,7 @@ int expression_process(enum sTokenKind end_char){       //vracat posledny node
                 }
                 if(exit_code == 100 && length_list(Stack) == 2 &&
                         ((dTreeElementPtr)(find_last(Stack,false))->data)->description == D_DOLLAR) {
+                    final_node = Stack->Last->data;
                     dispose_list(Stack);
                     return end_char;
                 }
@@ -317,12 +318,15 @@ int expression_process(enum sTokenKind end_char){       //vracat posledny node
                 continue;
             case '!':
                 printf("\nvykricnik\n");
+                    final_node = Stack->Last->data;
+                    dispose_list(Stack);
                     return exit_char;
             default:
                 if(length_list(Stack) == 2 &&
                     ((dTreeElementPtr)(find_last(Stack,false))->data)->description == D_DOLLAR) {
+                    final_node = Stack->Last->data;
                     dispose_list(Stack);
-                     return exit_char;
+                    return exit_char;
                 }
                 printf("precedence table errror s tokenom: %d\n", new_token->type);
                 dispose_list(Stack);

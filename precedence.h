@@ -50,7 +50,7 @@ dTreeElementPtr load_token(dTreeElementPtr new_element, Token *token);
 dTreeElementPtr load_nonterm_char(dTreeElementPtr new_element, enum sTokenKind description);
 void gen_instruction(enum sTokenKind, union Address op1,union Address op2,enum Type t_op1,enum Type t_op2);
 void gen_unary_instruction(enum Instruction ction_inst, union Address op1,union Address t,enum Type t_op1,enum Type pe_t_t);
-int expression_process(enum sTokenKind end_char);
+int expression_process(enum sTokenKind end_char, dTreeElementPtr node);
 int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3);
 
 
