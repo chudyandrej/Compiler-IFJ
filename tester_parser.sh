@@ -4,7 +4,7 @@
 i=0;
 
 while read p; do 
-    echo "\n\n----------------test----------------"
+    printf "\n\n----------------test----------------"
     i=$((i+1))  
 
     echo "test line input no. $i: $p      #####"
