@@ -128,6 +128,27 @@ int body_funcion(){
                 return 1;
             case KIN_IDENTIFIER:
                 free(new_token);
+                if(token_predict->type == KIN_MINUSMINUS || token_predict->type == KIN_PLUSPLUS){
+                    new_token = next_token();
+                    free(new_token);
+                    if((new_token = next_token())->type == KIN_SEMICOLON){
+                        //make instruction
+                        free(new_token);
+                        dTreeElementPtr new_element = malloc(sizeof(struct dTreeElement));
+                        if(new_element == NULL) { /*clean, exit99*/ return 1;}
+                        new_element->type = VARIABLE;
+                        new_element->data.variable = new_token->str;
+                        new_element->description = KIN_IDENTIFIER;
+                        gen_instruction(op,new_element->data,new_element->data,VARIABLE,EMPTY);
+                        free(new_token);
+                        body_funcion();
+                        return 0;
+                    }
+                    else{
+                        free(new_token);
+                        return 1;
+                    }
+                }
                 if (assing_funcCall() == 0){continue;} else{return 1;}
             case KW_AUTO:   case KW_DOUBLE:  case KW_INT:  case KW_STRING:      //all datatypes
                 free(new_token);
@@ -247,7 +268,7 @@ int cin(enum sTokenKind operator){
             break;
         }      
     }
-    errorMessage_syntax("Cinoperator!");
+    errorMessage_syntax("Cin operator!");
     return 1;
 }
 
