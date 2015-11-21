@@ -76,6 +76,7 @@ int dec_function(unsigned int type_func){
 int body_funcion(){
     while(true) {
         Token *new_token = next_token();
+        unsigned int op;
         switch(new_token->type){
             case KW_CIN:
                 free(new_token);
@@ -134,6 +135,28 @@ int body_funcion(){
             case KIN_R_BRACE:
                 free(new_token);
                 return 0;
+            case KIN_PLUSPLUS:
+            case KIN_MINUSMINUS:
+                op = (int) new_token->type;
+                free(new_token);
+                if((new_token=next_token())->type == KIN_IDENTIFIER){
+                    // new_token - info about identifier
+                    Token *temp_token;
+                    if((temp_token=next_token())->type == KIN_SEMICOLON){
+                        free(temp_token);
+                        dTreeElementPtr new_element = malloc(sizeof(struct dTreeElement));
+                        if(new_element == NULL) { /*clean, exit99*/ return 1;}
+                        new_element->type = VARIABLE;
+                        new_element->data.variable = new_token->str;
+                        new_element->description = KIN_IDENTIFIER;
+                        gen_instruction(op,new_element->data,new_element->data,EMPTY, VARIABLE);
+                        free(new_token);
+                        body_funcion();
+                        return 0;
+                    }
+                    return 1;                  
+                }
+                return 1;                  
             default:
                 free(new_token);
                 errorMessage_syntax(" Body of function !");
@@ -202,31 +225,31 @@ int if_statement(){
 
 int cin_cout(enum sTokenKind operator){         //treba spravit specificky cout
     Token *new_token;
-    if ((new_token=next_token())->type ==  operator){
+    if ((new_token=next_token())->type == KIN_SCIN || new_token->type == KIN_SCOUT){
         free(new_token);
-        while(true){
-            new_token = next_token();
-            int token_type = new_token->type;
-            if ( token_type == KIN_IDENTIFIER || (operator == KIN_SCOUT && 
-                            (token_type >= KIN_NUM_INT && token_type <= KIN_TEXT))) {
-                
-                Token *new_token2 = next_token();
-                if (new_token2->type == operator) {
+        if(operator == KIN_SCIN){
+            while(true){
+                if((new_token = next_token())->type == KIN_IDENTIFIER){
                     free(new_token);
-                    free(new_token2);
-                    continue;
-                }
-                else if(new_token2->type == KIN_SEMICOLON){     //kontrola
-                    free(new_token);
-                    free(new_token2);
-                    return 0;
-                }
-                else {
-                    errorMessage_syntax("Cin or cout command!");
-                    return 1;
-                }
+                    if((new_token = next_token())->type == KIN_SEMICOLON){
+                        free(new_token);
+                        return 0;
+                    }
+                    if(new_token->type == KIN_SCIN){
+                        continue;
+                    }
+                    else {return 1;}
+                } 
             }
-            free(new_token);
+            
+        }       //SCOUT
+        while(true){
+            
+            dTreeElementPtr end_node = malloc(sizeof(struct dTreeElement));
+            int ret_code = expression_process(KIN_SEMICOLON, end_node);
+            free(end_node);
+            if(ret_code == KIN_SEMICOLON){ return 0;}
+            if(ret_code == KIN_SCOUT){ continue; }
             break;
         }
     }
@@ -239,7 +262,9 @@ int assing_funcCall(){
     if (new_token->type == KIN_ASSIGNEMENT){       //assing var
         free(new_token);
         dTreeElementPtr end_node = malloc(sizeof(struct dTreeElement));
-        return (expression_process(KIN_SEMICOLON, end_node) == KIN_SEMICOLON)? 0 : 1;
+        int ret_code = (expression_process(KIN_SEMICOLON, end_node) == KIN_SEMICOLON)? 0 : 1;
+        free(end_node);
+        return ret_code;
     }
     errorMessage_syntax("Assing function!");
     return 1;
@@ -290,7 +315,7 @@ void ap_type(char **types,unsigned int type){
     }
 
     *types = realloc(*types, sizeof(char)*2);
-    if (*types == NULL){errorMessage_internal("Ralloc");}
+    if (*types == NULL){errorMessage_internal("Realloc");}
 
 }
 
@@ -385,7 +410,7 @@ Token *next_token(){
         exit(LEX_ERR);
     }
     else{
-        printf("Token: %d precedence_token: %d\n",new_token->type,token_predict->type);
+        printf("Token: %d predict_token: %d\n",new_token->type,token_predict->type);
         return new_token;
     }
 }

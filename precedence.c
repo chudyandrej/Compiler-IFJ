@@ -278,7 +278,7 @@ int expression_process(enum sTokenKind end_char, dTreeElementPtr final_node){   
         load_new_tag = true;
 
         if((new_token->type == end_char && new_token->type != KIN_R_ROUNDBRACKET) || new_token->type == END_OF_FILE ||
-                new_token->type == KIN_COMMA){
+                new_token->type == KIN_COMMA || new_token->type == KIN_SCOUT){
             exit_char = new_token->type;
             new_token->type = D_DOLLAR;
         }
