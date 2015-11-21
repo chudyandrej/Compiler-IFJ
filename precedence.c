@@ -326,7 +326,7 @@ int expression_process(enum sTokenKind end_char, dTreeElementPtr final_node){   
                     clean_stack(Stack, final_node, true);                    
                     return exit_char;
                 }
-                printf("precedence table errror s tokenom: %d\n", new_token->type);
+                printf("precedence table errror s tokenom: %d, vrch stacku: %d\n", new_token->type,((dTreeElementPtr) Stack->Last->data)->description);
                 clean_stack(Stack, final_node, false);   
                 return 1;
 
