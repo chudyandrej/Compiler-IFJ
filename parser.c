@@ -80,10 +80,10 @@ int body_funcion(){
         switch(new_token->type){
             case KW_CIN:
                 free(new_token);
-                if (cin_cout(KIN_SCIN) == 0){continue;} else{return 1;}
+                if (cin() == 0){continue;} else{return 1;}
             case KW_COUT:
                 free(new_token);
-                if (cin_cout(KIN_SCOUT) == 0){continue;} else{return 1;}
+                if (cout() == 0){continue;} else{return 1;}
             case KW_IF:
                 free(new_token);
                 if (if_statement() == 0){continue;} else{return 1;}
@@ -223,37 +223,49 @@ int if_statement(){
     return 1;
 }
 
-int cin_cout(enum sTokenKind operator){         //treba spravit specificky cout
+int cin(enum sTokenKind operator){
     Token *new_token;
-    if ((new_token=next_token())->type == KIN_SCIN || new_token->type == KIN_SCOUT){
+    if ((new_token=next_token())->type == KIN_SCIN){
         free(new_token);
-        if(operator == KIN_SCIN){
-            while(true){
-                if((new_token = next_token())->type == KIN_IDENTIFIER){
-                    free(new_token);
-                    if((new_token = next_token())->type == KIN_SEMICOLON){
-                        free(new_token);
-                        return 0;
-                    }
-                    if(new_token->type == KIN_SCIN){
-                        continue;
-                    }
-                    else {return 1;}
-                } 
-            }
-            
-        }       //SCOUT
+       
         while(true){
-            
+            if((new_token = next_token())->type == KIN_IDENTIFIER){
+                free(new_token);
+                if((new_token = next_token())->type == KIN_SEMICOLON){
+                    free(new_token);
+                    return 0;
+                }
+                if(new_token->type == KIN_SCIN){
+                    free(new_token);
+                    continue;
+                }
+                else{
+                    free(new_token);
+                    break;
+                }
+            }
+            break;
+        }      
+    }
+    errorMessage_syntax("Cinoperator!");
+    return 1;
+}
+
+int cout(){
+    Token *new_token;
+    
+    if ((new_token=next_token())->type == KIN_SCOUT){ 
+        free(new_token);
+        while(true){            
             dTreeElementPtr end_node = malloc(sizeof(struct dTreeElement));
             int ret_code = expression_process(KIN_SEMICOLON, end_node);
             free(end_node);
-            if(ret_code == KIN_SEMICOLON){ return 0;}
-            if(ret_code == KIN_SCOUT){ continue; }
-            break;
+            if(ret_code == KIN_SEMICOLON){ return 0; }
+            else if(ret_code == KIN_SCOUT){ continue; }
+            else{ break; }
         }
     }
-    errorMessage_syntax("Cin or cout operator!");
+    errorMessage_syntax("Cout operator!");
     return 1;
 }
 
