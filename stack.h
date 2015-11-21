@@ -40,4 +40,6 @@ int length_list(tDLList *L);
 
 tDLElemPtr find_last(tDLList *L, bool NODE );
 
+extern tDLList *tac_stack;
+
 #endif //IJF_STACK_H

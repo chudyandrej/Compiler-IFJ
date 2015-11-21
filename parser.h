@@ -6,7 +6,7 @@
 #define IJF_PARSER_H
 
 
-#include "scanner.h"
+#include "scanner.h" 
 #include "stack.h"
 #include <stdbool.h>
 #include "err.h"
@@ -32,5 +32,5 @@ Token *next_token();
 
 extern struct tBST Func;
 extern Token *token_predict;
-extern tDLList *tac_stack;
+
 #endif //IJF_PARSER_H

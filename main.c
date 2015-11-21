@@ -13,7 +13,8 @@ int main(int argc, char *argv[]) {
     token_predict = get_token(fp);
     int exit_code = start_syntax_analyz();
 
-   fclose(fp);
-
-    return exit_code ;
+    fclose(fp);
+    printf("exit_code: %d\n!!!!#####", exit_code);
+    
+    return exit_code;
 }
