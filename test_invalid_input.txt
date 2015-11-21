@@ -1,5 +1,11 @@
 a=4
 a4;
+cin << a;
+cin >> a >> "dsdfa";
+cin >> d >> 45;
+cin >> a>> b<<c;
+cout >> a;
+cout << g << "sdjf" << 45 >>d << d;
 func4,4);
 sort(a;
 a=4***4;

@@ -9,7 +9,7 @@ while read p; do
 
     echo "test line input no. $i: $p      #####"
     echo "int main(){" > testforinterpret.txt
-    echo $p >> testforinterpret.txt
+    echo "$p" >> testforinterpret.txt
     echo "}" >> testforinterpret.txt
     ./$1 testforinterpret.txt
  
