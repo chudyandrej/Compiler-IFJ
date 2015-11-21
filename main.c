@@ -14,7 +14,8 @@ int main(int argc, char *argv[]) {
     int exit_code = start_syntax_analyz();
 
     fclose(fp);
-    printf("exit_code: %d\n!!!!#####", exit_code);
+    printf("Instructions: %d\n", length_list(tac_stack));
+    printf("exit_code: %d!!!!#####\n", exit_code);
     
     return exit_code;
 }
