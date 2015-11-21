@@ -1,4 +1,3 @@
-
 #include "parser.h"
 #include "bst.h"
 
@@ -33,16 +32,18 @@ int dec_function(unsigned int type_func){
     if (func_name->type == KIN_IDENTIFIER){
         if ((new_token = next_token())->type == KIN_L_ROUNDBRACKET){
             free(new_token);
-            if(parameters_declar(type_func, data_types, names) == 0){
+            if(parameters_declar(type_func, &data_types, &names) == 0){
+                printf("\ntyps: %s\n",data_types);
+                printf("\nnames: %s\n",names);
                 new_token = next_token();
                 BSTFind(&Func,func_name->str);
                 if ( ! BSTActive(&Func)) {
                     BSTAdd(&Func, func_name->str);
                 }
-              /*  if (GSTDeclare(&Func, data_types, names)){
+                if (GSTDeclare(&Func, data_types, names)){
 
                     return 1;
-                }*/
+                }
 
                 if (new_token->type == KIN_SEMICOLON){
                     free(new_token);
@@ -269,36 +270,34 @@ int dec_variable(){
     return 1;
 }
 
-void ap_type(char *types,unsigned int type){
+void ap_type(char **types,unsigned int type){
 
     switch (type){
         case KW_INT:
-            strcat(types,"i ");
+            strcat(*types,"i ");
             break;
         case KW_DOUBLE:
-            strcat(types,"d ");
+            strcat(*types,"d ");
             break;
         case KW_AUTO:
-            strcat(types,"a ");
+            strcat(*types,"a ");
             break;
         case KW_STRING:
-            strcat(types,"s ");
+            strcat(*types,"s ");
             break;
         default:
             break;
     }
 
-    types = realloc(types, sizeof(char)*2);
-    if (types == NULL){errorMessage_internal("Ralloc");}
+    *types = realloc(*types, sizeof(char)*2);
+    if (*types == NULL){errorMessage_internal("Ralloc");}
 
 }
 
-int parameters_declar(unsigned int type_func, char *types, char *names){
-
-    types = malloc(sizeof(char)*2);
-
+int parameters_declar(unsigned int type_func, char **types, char **names){
+    *types = malloc(sizeof(char)*2);
+    strcpy(*types, "");
     ap_type(types, type_func);
-    printf(" \nbla : %s\n",types);
     Token *new_token= next_token();
     if(new_token->type == KIN_R_ROUNDBRACKET) {
         free(new_token);
@@ -306,13 +305,22 @@ int parameters_declar(unsigned int type_func, char *types, char *names){
     }                                                /*means no parameters*/
     while(true) {
         if((new_token->type >= KW_AUTO) && (new_token->type <= KW_STRING)){
-
+            ap_type(types, new_token->type);
             free(new_token);
             if ((new_token=next_token())->type == KIN_IDENTIFIER) {
+                if (*names == NULL){
+                    *names = new_token->str;
+                }
+                else{
+                    *names = realloc(*names, strlen(new_token->str) * sizeof(char) + 2);
+                    strcat(*names, " ");
+                    strcat(*names, new_token->str);
+                }
                 free(new_token);
                 new_token = next_token();
                 if (new_token->type == KIN_R_ROUNDBRACKET){
                     free(new_token);
+
                     return 0;
                 }
                 else if (new_token->type == KIN_COMMA) {
