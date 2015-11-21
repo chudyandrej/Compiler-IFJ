@@ -15,7 +15,7 @@ extern tDLList *tac_stack;
 
 int start_syntax_analyz();
 int dec_function(unsigned int type_func);
-int parameters_declar();
+int parameters_declar(unsigned int type_func, char *types, char *names);
 int body_funcion();
 int assing_funcCall();
 int dec_variable();
@@ -23,6 +23,7 @@ int cin_cout(enum sTokenKind operator);
 int if_statement();
 int parameters_used();
 int for_statement();
+void ap_type(char *types,unsigned int type);
 
 void errorMessage_syntax(const char *message );
 void errorMessage_lexical(const char *message );
