@@ -267,7 +267,7 @@ int expression_process(enum sTokenKind end_char, dTreeElementPtr final_node){   
                 token_predict->type == KIN_L_ROUNDBRACKET){
             printf("VNARAM\n");
             free(next_token());
-            if(call_function(new_token) != 0){dispose_list(Stack); return 1;}
+            if(call_function(new_token) != 0){clean_stack(Stack, final_node, false); return 1;}
             insert_last(Stack, create_stack_element(D_STOPER, NULL));
             insert_last(Stack, create_stack_element(D_TMP, NULL));
 
@@ -284,7 +284,7 @@ int expression_process(enum sTokenKind end_char, dTreeElementPtr final_node){   
         }
 
         int exit_code;
-        if(new_token->type > D_DOLLAR){ printf("Mrada mi v medziach: exp_proc. %d",new_token->type);dispose_list(Stack); return 1;}
+        if(new_token->type > D_DOLLAR){ printf("Mrada mi v medziach: exp_proc. %d",new_token->type);clean_stack(Stack, final_node, false); return 1;}
 
         switch (PrecedentTable[top_token][new_token->type]) {
             case '<':
@@ -305,12 +305,11 @@ int expression_process(enum sTokenKind end_char, dTreeElementPtr final_node){   
                 }
                 if(exit_code == 100 && length_list(Stack) == 2 &&
                         ((dTreeElementPtr)(find_last(Stack,false))->data)->description == D_DOLLAR) {
-                    final_node = Stack->Last->data;
-                    dispose_list(Stack);
+                    clean_stack(Stack, final_node, true);
                     return end_char;
                 }
                 else{
-                    dispose_list(Stack);
+                    clean_stack(Stack, final_node, false);   
                     return 1;
                 }
             case '=':
@@ -318,23 +317,24 @@ int expression_process(enum sTokenKind end_char, dTreeElementPtr final_node){   
                 continue;
             case '!':
                 printf("\nvykricnik\n");
-                    final_node = Stack->Last->data;
-                    dispose_list(Stack);
+                    clean_stack(Stack, final_node, true);   
                     return exit_char;
             default:
                 if(length_list(Stack) == 2 &&
                     ((dTreeElementPtr)(find_last(Stack,false))->data)->description == D_DOLLAR) {
-                    final_node = Stack->Last->data;
-                    dispose_list(Stack);
+                    clean_stack(Stack, final_node, true);                    
                     return exit_char;
                 }
                 printf("precedence table errror s tokenom: %d\n", new_token->type);
-                dispose_list(Stack);
+                clean_stack(Stack, final_node, false);   
                 return 1;
 
         }
     }
+}
 
-
+void clean_stack(tDLList *Stack, void *ptr, bool correct_end){
+    ptr = (correct_end) ? (void *) Stack->Last->data : NULL;
+    dispose_list(Stack);
 }
 

@@ -53,6 +53,8 @@ void gen_unary_instruction(enum Instruction ction_inst, union Address op1,union 
 int expression_process(enum sTokenKind end_char, dTreeElementPtr node);
 int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3);
 
+void clean_stack(tDLList *Stack, void *ptr, bool correct_end);
+
 
 
 #endif //IJF_PRECEDENCE_H
