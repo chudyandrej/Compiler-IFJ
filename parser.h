@@ -11,8 +11,7 @@
 #include <stdbool.h>
 #include "err.h"
 
-
-
+extern tDLList *tac_stack;
 
 int start_syntax_analyz();
 int dec_function(unsigned int type_func);
