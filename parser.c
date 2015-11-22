@@ -15,7 +15,7 @@ int start_syntax_analyz(){
             return exit_code;
         case END_OF_FILE:
             free(new_token);
-            errorMessage_syntax("Program file is empty !");
+            errorMessage_syntax("EMPTY file cannot be interpreted!");
             return 1;
         default:
             free(new_token);
