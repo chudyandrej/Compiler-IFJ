@@ -17,7 +17,7 @@ concat (one, two,a);
 find();
 sort(,cc);
 b=((4**4)*4*a(a,a,a));
-for(int i=0; a d; i=i+1){ }
+;for(int i=0; a d; i=i+1){ }    //zmaz semicolon at the begining
 if(a*4){ } else  }
 if(a+4){  else { }
 if(a-4){ }  { }
