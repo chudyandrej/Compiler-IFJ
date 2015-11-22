@@ -92,11 +92,33 @@ void *gc_malloc(size_t size){
         exit(99);
     }
 
-    gc_insert_last(ptr);    //create log about malloc
-   // if(ptr != NULL){        
-        return ptr;         //if log was succesfull
- //   }
+    gc_insert_last(ptr);    //if failed, exits in gc_insert_last func
+    return ptr;         
+
 }
+
+void *gc_realloc(void *ptr, size_t size){
+    void *temp = ptr;
+    //realloc feature size = 0, is for now not implemented
+
+    ptr = realloc(ptr, size);
+    if(ptr == NULL){
+        //deletes origin pointer from log, 
+        // but it won't be freed, cause, it is maybe already freed by realloc
+        gc_delete_element(find(temp)); 
+        gc_free_all();      //free all
+        fprintf(stderr,"INTERNAL ERROR: malloc failed");
+        exit(99);
+    }
+    if(ptr != temp){
+        if(temp != NULL){ gc_delete_element(find(temp)); }  //remove and free from log
+        gc_insert_last(ptr);    //if failed, exits in gc_insert_last func
+    }
+   
+    return ptr;
+}
+
+
 
 void *gc_free(void *ptr){
 

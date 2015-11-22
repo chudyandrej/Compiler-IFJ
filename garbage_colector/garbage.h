@@ -8,6 +8,7 @@ extern  tDLList *G;
 
 void *find(void *ptr);
 void *gc_malloc(size_t size);
+void *gc_realloc(void *ptr, size_t size);
 void *gc_free(void *ptr);
 void gc_free_all();
 
