@@ -1,3 +1,3 @@
-auto main(int aa, double c, auto l, string pd){
- aaa = 1;
+int main(){
+a=a++ - --b   * ++b;
 }
