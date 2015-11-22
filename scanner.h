@@ -75,12 +75,17 @@ typedef enum sTokenKind {
     /* 44 */   KIN_UNKNOWN,                /*LEX_ERR*/
     /* 45 */   END_OF_FILE,                /* EOF */
 /*#################### TAC ELEMENT #####################*/
-               TAC_GOTO_UNCOND,
-               TAC_GOTO_COND,
-               TAC_PUSH,
-               TAC_INIT,
-               TAC_CALL,
-               TAC_RETURN
+            TAC_GOTO_UNCOND,
+            TAC_GOTO_COND,
+            TAC_PUSH,
+            TAC_INIT,
+            TAC_CALL,
+            TAC_RETURN,
+            SCOPE_UP,
+            SCOPE_DOWN,
+            TAC_EMPTY,
+            KIN_UNARYMINUS
+
 }TokenKind;
 
 

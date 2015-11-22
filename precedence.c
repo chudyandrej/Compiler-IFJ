@@ -29,7 +29,7 @@ const char PrecedentTable [19][19] ={
     [D_DOLLAR]              = {'<', '<' ,'<','<' ,'<','<','<','<','<','<','<','!' ,'<','<','<','<','<','<', 0},
 };
 
-void gen_instruction(enum sTokenKind ction_inst, union Address op1,union Address op2,enum Type t_op1,enum Type t_op2){
+void gen_tnp(enum sTokenKind ction_inst, union Address op1, union Address op2, enum Type t_op1, enum Type t_op2){
     tOperation instruction = gc_malloc(sizeof(struct Operation));
     instruction->ction_inst = ction_inst;
     instruction->op1 = op1;
@@ -41,7 +41,30 @@ void gen_instruction(enum sTokenKind ction_inst, union Address op1,union Address
     instruction->label = 0;
     tmp_counter++;
     insert_last(tac_stack, instruction);
-
+}
+void gen_instructions(enum sTokenKind ction_inst,union Address t, union Address op1, union Address op2,enum Type t_t, enum Type t_op1, enum Type t_op2){
+    tOperation instruction = gc_malloc(sizeof(struct Operation));
+    instruction->ction_inst = ction_inst;
+    instruction->op1 = op1;
+    instruction->op2 = op2;
+    instruction->t_op1 = t_op1;
+    instruction->t_op2 = t_op2;
+    instruction->t_t = t_t;
+    instruction->t = t;
+    instruction->label = 0;
+    insert_last(tac_stack, instruction);
+}
+void gen_label(unsigned int lab){
+    tOperation instruction = gc_malloc(sizeof(struct Operation));
+    instruction->ction_inst = TAC_EMPTY;
+    instruction->op1 = NULL;
+    instruction->op2 = NULL;
+    instruction->t_op1 = EMPTY;
+    instruction->t_op2 = EMPTY;
+    instruction->t_t = EMPTY;
+    instruction->t = NULL;
+    instruction->label = lab;
+    insert_last(tac_stack, instruction);
 }
 
 
@@ -138,7 +161,7 @@ int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3){
             case KIN_SMALLER_EQ:
             case KIN_GREATER_EQ:
                 if (p1->description == D_NODE && p3->description == D_NODE) {
-                    gen_instruction(p2->description,p1->data,p3->data,p1->type,p3->type);
+                    gen_tnp(p2->description, p1->data, p3->data, p1->type, p3->type);
                     return 2;
                 } break;
             case D_NODE:
@@ -157,7 +180,7 @@ int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3){
             case KIN_PLUSPLUS:
             case KIN_MINUSMINUS:
                 if(p2->description == D_NODE){
-                    gen_instruction(p1->description,p2->data,p2->data,p2->type,EMPTY);
+                    gen_tnp(p1->description, p2->data, p2->data, p2->type, EMPTY);
                     return 1;
                 } break;
             default:
@@ -168,7 +191,7 @@ int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3){
             case KIN_PLUSPLUS:
             case KIN_MINUSMINUS:
                 if(p1->description == D_NODE){
-                    gen_instruction(p2->description,p1->data,p1->data,EMPTY, p1->type);
+                    gen_tnp(p2->description, p1->data, p1->data, EMPTY, p1->type);
                     return 1;
                 } break;
 
@@ -235,15 +258,34 @@ int call_function(Token *id_token){
     switch(id_token->type){
         case KW_SORT:
         case KW_LENGTH:
-            if(parameters_used() == 1){return 0;}else{return -1;}
+            if(parameters_used() == 1){
+                union Address tmp;
+                tmp.fce = id_token->str;
+                gen_instructions(TAC_CALL,tmp,NULL,NULL,FUNCION, EMPTY,EMPTY);
+                return 0;
+            }else{return -1;}
         case KW_FIND:
         case KW_CONCAT:
-            if(parameters_used() == 2){return 0;}else{return -1;}
+            if(parameters_used() == 2){
+                union Address tmp;
+                tmp.fce = id_token->str;
+                gen_instructions(TAC_CALL,tmp,NULL,NULL,FUNCION, EMPTY,EMPTY);
+                return 0;
+            }else{return -1;}
         case KW_SUBSTR:
-            if(parameters_used() == 3){return 0;}else{return -1;}
+            if(parameters_used() == 3){
+                union Address tmp;
+                tmp.fce = id_token->str;
+                gen_instructions(TAC_CALL,tmp,NULL,NULL,FUNCION, EMPTY,EMPTY);
+                return 0;
+            }else{return -1;}
         case KIN_IDENTIFIER:
-
-            if(parameters_used() != -1){ printf("ta som tu\n");return 0;}else{return -1;}
+            if(parameters_used() != -1){
+                union Address tmp;
+                tmp.fce = id_token->str;
+                gen_instructions(TAC_CALL,tmp,NULL,NULL,FUNCION, EMPTY,EMPTY);
+                return 0;
+            }else{return -1;}
 
         default:
             return -1;
@@ -252,7 +294,7 @@ int call_function(Token *id_token){
 
 }
 
-int expression_process(enum sTokenKind end_char, dTreeElementPtr final_node){       //vracat posledny node
+int expression_process(enum sTokenKind end_char, dTreeElementPtr *final_node){       //vracat posledny node
     tDLList *Stack = init_stack();
     bool load_new_tag = true;
     Token *new_token = NULL;
@@ -267,7 +309,7 @@ int expression_process(enum sTokenKind end_char, dTreeElementPtr final_node){   
                 token_predict->type == KIN_L_ROUNDBRACKET){                         //funcion in expession
            // printf("VNARAM\n");
             gc_free(next_token());
-            if(call_function(new_token) != 0){ final_node = clean_stack(Stack, false); return -1;}
+            if(call_function(new_token) != 0){ *final_node = clean_stack(Stack, false); return -1;}
             insert_last(Stack, create_stack_element(D_STOPER, NULL));
             insert_last(Stack, create_stack_element(D_TMP, NULL));
 
@@ -286,7 +328,7 @@ int expression_process(enum sTokenKind end_char, dTreeElementPtr final_node){   
         int exit_code;
         if(new_token->type > D_DOLLAR){
             printf("Mrada mi v medziach: exp_proc. %d",new_token->type);
-            final_node = clean_stack(Stack, false);
+            *final_node = clean_stack(Stack, false);
             return -1;
         }
 
@@ -309,11 +351,11 @@ int expression_process(enum sTokenKind end_char, dTreeElementPtr final_node){   
                 }
                 if(exit_code == 100 && length_list(Stack) == 2 &&
                         ((dTreeElementPtr)(find_last(Stack,false))->data)->description == D_DOLLAR) {
-                    final_node = clean_stack(Stack, true);
+                    *final_node = clean_stack(Stack, true);
                     return end_char;
                 }
                 else{
-                    final_node = clean_stack(Stack, false);
+                    *final_node = clean_stack(Stack, false);
                     return -1;
                 }
             case '=':
@@ -321,16 +363,16 @@ int expression_process(enum sTokenKind end_char, dTreeElementPtr final_node){   
                 continue;
             case '!':
                 printf("\nvykricnik\n");
-                final_node = clean_stack(Stack, true);
+                *final_node = clean_stack(Stack, true);
                 return exit_char;
             default:
                 if(length_list(Stack) == 2 &&
                     ((dTreeElementPtr)(find_last(Stack,false))->data)->description == D_DOLLAR) {
-                    final_node = clean_stack(Stack, true);
+                    *final_node = clean_stack(Stack, true);
                     return exit_char;
                 }
                 printf("precedence table errror s tokenom: %d, vrch stacku: %d\n", new_token->type,((dTreeElementPtr) Stack->Last->data)->description);
-                final_node = clean_stack(Stack, false);
+                *final_node = clean_stack(Stack, false);
                 return -1;
 
         }

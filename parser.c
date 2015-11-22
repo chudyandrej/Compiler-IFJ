@@ -1,5 +1,7 @@
 #include "parser.h"
 
+unsigned int label = 1;
+
 int start_syntax_analyz(){
     bool func_found = false;
     Token *new_token;
@@ -53,7 +55,7 @@ int dec_function(unsigned int type_func){
                     BSTAdd(&Func, func_name->str);
                 }
                 if (GSTDeclare(&Func, data_types, names)){
-                    errorMessage_semantic("neznamy error BST");
+                    errorMessage_semantic("chyba 3 redefinica");
                     return 1;
                 }
                 if (new_token->type == KIN_SEMICOLON){
@@ -69,7 +71,14 @@ int dec_function(unsigned int type_func){
                     if (!ret_val){
                         BSTFind(&Func, func_name->str);
                         ret_val = GSTDefine(&Func, tac_stack);
+                        if(ret_val){
+                            errorMessage_semantic("chyba 3 redefinica");
+                            return 3;
+                        }
                     }
+
+
+
                     //erroro dvoch body
                     gc_free(func_name);
                     return ret_val;
@@ -86,6 +95,8 @@ int dec_function(unsigned int type_func){
 }
 
 int body_funcion(){
+    gen_tnp(SCOPE_UP, NULL, NULL, EMPTY, EMPTY);
+    Token *name;
     while(true) {
         Token *new_token = next_token();
         dTreeElementPtr end_node = NULL;
@@ -104,8 +115,10 @@ int body_funcion(){
                 gc_free(new_token);
                 if (for_statement() == 0){continue;} else{return 1;}
             case KW_RETURN:
+
                 gc_free(new_token);
                 if(expression_process(KIN_SEMICOLON, end_node) == KIN_SEMICOLON){
+                    gen_instructions(TAC_RETURN,end_node->data,NULL,NULL,end_node->type,EMPTY,EMPTY);
                     gc_free(end_node);
                     continue;
                 } else{return 1;}
@@ -116,12 +129,9 @@ int body_funcion(){
                     new_token = next_token();
                     if(new_token->type == KIN_SEMICOLON){
                         //make instruction
-                     /*   dTreeElementPtr new_element = gc_malloc(sizeof(struct dTreeElement));
-                        if(new_element == NULL) {  return 1;}
-                        new_element->type = VARIABLE;
-                        new_element->data.variable = new_token->str;
-                        new_element->description = KIN_IDENTIFIER;
-                        gen_instruction(op,new_element->data,new_element->data,VARIABLE,EMPTY);*/
+                        union Address tmp;
+                        tmp.variable = new_token->str;
+                        gen_instructions(operator_history,tmp,NULL,NULL,VARIABLE,EMPTY,EMPTY);
                         gc_free(new_token);
                         continue;
                     }
@@ -130,7 +140,7 @@ int body_funcion(){
                         return 1;
                     }
                 }
-                else if (assing_exp() == 0){continue;} else{return 1;}
+                else if (assing_exp(name) == 0){continue;} else{return 1;}
             case KIN_PLUSPLUS:
             case KIN_MINUSMINUS:
                 operator_history = new_token->type;
@@ -139,12 +149,9 @@ int body_funcion(){
                     // new_token - info about identifier
                     Token *temp_token;
                     if((temp_token=next_token())->type == KIN_SEMICOLON){
-                        /*dTreeElementPtr new_element = gc_malloc(sizeof(struct dTreeElement));
-                        if(new_element == NULL) {  return 1;}
-                        new_element->type = VARIABLE;
-                        new_element->data.variable = new_token->str;
-                        new_element->description = KIN_IDENTIFIER;
-                        gen_instruction(op,new_element->data,new_element->data,EMPTY, VARIABLE);*/
+                        union Address tmp;
+                        tmp.variable = new_token->str;
+                        gen_instructions(operator_history,tmp,NULL,NULL,VARIABLE,EMPTY,EMPTY);
                         gc_free(new_token);
                         gc_free(temp_token);
                         continue;
@@ -157,6 +164,7 @@ int body_funcion(){
                 if (dec_variable() == 0) {continue;} else {return 1;}
             case KIN_R_BRACE:
                 gc_free(new_token);
+                gen_tnp(SCOPE_DOWN, NULL, NULL, EMPTY, EMPTY);
                 return 0;
             default:
                 gc_free(new_token);
@@ -167,21 +175,39 @@ int body_funcion(){
 }
 
 int for_statement() {
+    gen_tnp(SCOPE_UP, NULL, NULL, EMPTY, EMPTY);
     Token *new_token;
+    union Address cond;
+    cond.label = label;
+    union Address uncond;
+    uncond.label = label + 1;
+    union Address incre;
+    incre.label = label + 2;
+    union Address skip;
+    skip.label = label + 3;
+    label = label + 4;
     dTreeElementPtr end_node = NULL;
     if ((new_token=next_token())->type == KIN_L_ROUNDBRACKET){
         gc_free(new_token);
         new_token= next_token();
         if((new_token->type >= KW_AUTO) && (new_token->type <= KW_STRING)) {
-            gc_free(new_token);
-            if (((new_token=next_token())->type == KIN_IDENTIFIER) && (assing_exp() == 0)) {
-                gc_free(new_token);
-                if (expression_process(KIN_SEMICOLON, end_node) == KIN_SEMICOLON && (new_token = next_token())->type == KIN_IDENTIFIER) {
+            if(dec_variable(new_token->type) == 0){
+                gen_label(incre.label);
+                if (expression_process(KIN_SEMICOLON, end_node) == KIN_SEMICOLON ){
+                    gen_instructions(TAC_GOTO_COND, cond, end_node->data, NULL, LABEL, end_node->type,EMPTY);
+                    gen_instructions(TAC_GOTO_UNCOND, skip, NULL, NULL, LABEL, EMPTY, EMPTY);
+                    gen_label(uncond.label);
+                    if((new_token = next_token())->type == KIN_IDENTIFIER) {
                     gc_free(new_token);
                     if (assing_exp() == 0 && (new_token = next_token())->type == KIN_L_BRACE) {
+                        gen_instructions(TAC_GOTO_UNCOND, incre, NULL, NULL, LABEL, EMPTY, EMPTY);
                         gc_free(new_token);
-                        return body_funcion();
-
+                        gen_label(skip.label);
+                        int exit_code = body_funcion();
+                        gen_instructions(TAC_GOTO_UNCOND, uncond, NULL, NULL, LABEL, EMPTY, EMPTY);
+                        gen_label(cond.label);
+                        gen_tnp(SCOPE_DOWN, NULL, NULL, EMPTY, EMPTY);
+                        return exit_code;
                     }
                 }
             }
@@ -206,16 +232,26 @@ int for_statement() {
 
 int if_statement(){
     Token *new_token;
+    union Address cond;
+    cond.label = label;
+    union Address uncond;
+    uncond.label = label + 1;
+    label = label + 2;
     dTreeElementPtr end_node = NULL;
     if(((new_token=next_token())->type == KIN_L_ROUNDBRACKET) && (expression_process(KIN_R_ROUNDBRACKET, end_node)== KIN_R_ROUNDBRACKET)){
+        gen_instructions(TAC_GOTO_COND, cond, end_node->data, NULL, LABEL, end_node->type,EMPTY);
         gc_free(new_token);
        if((new_token=next_token())->type == KIN_L_BRACE && (body_funcion() == 0)) {
+           gen_instructions(TAC_GOTO_UNCOND, uncond, NULL, NULL, LABEL, EMPTY,EMPTY);
+           gen_label(cond.label);
            gc_free(new_token);
            if ((new_token = next_token())->type == KW_ELSE) {
                gc_free(new_token);
                if ((new_token = next_token())->type == KIN_L_BRACE) {
                    gc_free(new_token);
-                   return body_funcion();
+                   int exit_code =  body_funcion();
+                   gen_label(uncond.label);
+                   return exit_code;
                }
            }
        }
@@ -230,6 +266,10 @@ int cin(){
         gc_free(new_token);
         while(true){
             if((new_token = next_token())->type == KIN_IDENTIFIER){
+                union Address tmp;
+                tmp.variable = new_token->str;
+                gen_instructions(KIN_SCIN,tmp , NULL, NULL, VARIABLE, EMPTY, EMPTY);
+
                 gc_free(new_token);
                 new_token = next_token();
                 if(new_token->type == KIN_SEMICOLON){
@@ -257,7 +297,10 @@ int cout(){
     if ((new_token=next_token())->type == KIN_SCOUT){ 
         gc_free(new_token);
         while(true){
-            int ret_code = expression_process(KIN_SEMICOLON, end_node);
+            int ret_code = expression_process(KIN_SEMICOLON, &end_node);
+            if(end_node != NULL) {
+                gen_instructions(KIN_SCOUT, end_node->data, NULL, NULL, end_node->type, EMPTY, EMPTY);
+            }
             gc_free(end_node);
             if(ret_code == KIN_SEMICOLON){return 0; }
             else if(ret_code == KIN_SCOUT){continue; }
@@ -268,13 +311,15 @@ int cout(){
     return 1;
 }
 
-int assing_exp(){
+int assing_exp(Token *name){
     Token *new_token = next_token();
     dTreeElementPtr end_node = NULL;
     if (new_token->type == KIN_ASSIGNEMENT){       //assing var
         gc_free(new_token);
         int ret_code = (expression_process(KIN_SEMICOLON, end_node) == KIN_SEMICOLON)? 0 : 1;
-        printf("tu: %d",ret_code);
+        union Address tmp;
+        tmp.variable = name->str;
+        gen_instructions(KIN_ASSIGNEMENT, tmp, end_node->data, NULL, VARIABLE, end_node->type, EMPTY);
         //gen_instrukcie
         gc_free(end_node);
         return ret_code;
@@ -287,6 +332,9 @@ int dec_variable(){
     Token *new_token;
     dTreeElementPtr end_node = NULL;
     if ((new_token=next_token())->type == KIN_IDENTIFIER) {
+        union Address tmp;
+        tmp.variable = new_token->str;
+        gen_instructions(TAC_INIT,tmp, NULL, NULL, VARIABLE,INT,EMPTY);         //dorobbit
         gc_free(new_token);
         new_token = next_token();
         if (new_token->type == KIN_SEMICOLON) {
@@ -380,6 +428,7 @@ int parameters_used(){
     while(true) {
         counter_of_arguments++;
         int exit_code_value = expression_process(KIN_COMMA, end_node);
+        gen_instructions(TAC_PUSH, end_node->data, NULL,NULL,end_node->type, EMPTY,EMPTY);
         gc_free(end_node);
         if(exit_code_value == KIN_COMMA) {
             continue;
