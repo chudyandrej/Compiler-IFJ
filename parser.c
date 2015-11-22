@@ -92,7 +92,7 @@ int body_funcion(){
                 if (for_statement() == 0){continue;} else{return 1;}
             case KW_RETURN:
                 free(new_token);
-                dTreeElementPtr end_node = malloc(sizeof(struct dTreeElement));
+                dTreeElementPtr end_node;
                 if(expression_process(KIN_SEMICOLON, end_node) == KIN_SEMICOLON){continue;} else{return 1;}
             case KW_SORT:
             case KW_LENGTH:
@@ -195,7 +195,7 @@ int for_statement() {
             free(new_token);
             if (((new_token=next_token())->type == KIN_IDENTIFIER) && (assing_funcCall() == 0)) {
                 free(new_token);
-                dTreeElementPtr end_node = malloc(sizeof(struct dTreeElement));
+                dTreeElementPtr end_node;
                 if (expression_process(KIN_SEMICOLON, end_node) == KIN_SEMICOLON && (new_token = next_token())->type == KIN_IDENTIFIER) {
                     free(new_token);
                     if (assing_funcCall() == 0 && (new_token = next_token())->type == KIN_L_BRACE) {
@@ -208,7 +208,7 @@ int for_statement() {
         }
         else if (new_token->type == KIN_IDENTIFIER) {
             free(new_token);
-            dTreeElementPtr end_node = malloc(sizeof(struct dTreeElement));
+            dTreeElementPtr end_node;
             if ((assing_funcCall() == 0) && (expression_process(KIN_SEMICOLON, end_node) == 0)){
                 if((new_token=next_token())->type == KIN_IDENTIFIER) {
                     free(new_token);
@@ -226,7 +226,7 @@ int for_statement() {
 
 int if_statement(){
     Token *new_token;
-    dTreeElementPtr end_node = malloc(sizeof(struct dTreeElement));
+    dTreeElementPtr end_node;
     if(((new_token=next_token())->type == KIN_L_ROUNDBRACKET) && (expression_process(KIN_R_ROUNDBRACKET, end_node)== KIN_R_ROUNDBRACKET)){
         free(new_token);
        if((new_token=next_token())->type == KIN_L_BRACE && (body_funcion() == 0)) {
@@ -278,7 +278,7 @@ int cout(){
     if ((new_token=next_token())->type == KIN_SCOUT){ 
         free(new_token);
         while(true){            
-            dTreeElementPtr end_node = malloc(sizeof(struct dTreeElement));
+            dTreeElementPtr end_node;
             int ret_code = expression_process(KIN_SEMICOLON, end_node);
             free(end_node);
             if(ret_code == KIN_SEMICOLON){ return 0; }
@@ -294,7 +294,7 @@ int assing_funcCall(){
     Token *new_token = next_token();
     if (new_token->type == KIN_ASSIGNEMENT){       //assing var
         free(new_token);
-        dTreeElementPtr end_node = malloc(sizeof(struct dTreeElement));
+        dTreeElementPtr end_node;
         int ret_code = (expression_process(KIN_SEMICOLON, end_node) == KIN_SEMICOLON)? 0 : 1;
         free(end_node);
         return ret_code;
@@ -314,7 +314,7 @@ int dec_variable(){
         }
         else if(new_token->type == KIN_ASSIGNEMENT){
             free(new_token);
-            dTreeElementPtr end_node = malloc(sizeof(struct dTreeElement));
+            dTreeElementPtr end_node;
             if(expression_process(KIN_SEMICOLON, end_node) == KIN_SEMICOLON){
                 return 0;
             }
@@ -397,7 +397,7 @@ int parameters_used(){
     int counter_of_arguments = 0;
     while(true) {
         counter_of_arguments++;
-        dTreeElementPtr end_node = malloc(sizeof(struct dTreeElement));
+        dTreeElementPtr end_node;
         int exit_code_value = expression_process(KIN_COMMA, end_node);
         if(exit_code_value == KIN_COMMA) {
             continue;
