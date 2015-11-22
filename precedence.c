@@ -57,12 +57,12 @@ void gen_instructions(enum sTokenKind ction_inst,union Address t, union Address 
 void gen_label(unsigned int lab){
     tOperation instruction = gc_malloc(sizeof(struct Operation));
     instruction->ction_inst = TAC_EMPTY;
-    instruction->op1 = NULL;
-    instruction->op2 = NULL;
+    instruction->op1.fce = NULL;
+    instruction->op2.fce = NULL;
     instruction->t_op1 = EMPTY;
     instruction->t_op2 = EMPTY;
     instruction->t_t = EMPTY;
-    instruction->t = NULL;
+    instruction->t.fce = NULL;
     instruction->label = lab;
     insert_last(tac_stack, instruction);
 }
@@ -137,11 +137,13 @@ dTreeElementPtr create_stack_element(enum sTokenKind description, Token *token) 
     }
     else if ((token->type >= KIN_NUM_INT && token->type <= KIN_TEXT) || token->type == KIN_IDENTIFIER) { //cislo,string,var
         dTreeElementPtr loaded_element = load_token(new_element, token);
+        gc_free(token->str);
         gc_free(token);
         return loaded_element;
     }
     else {      //operator
         dTreeElementPtr loaded_element = load_nonterm_char(new_element, token->type);
+        gc_free(token->str);
         gc_free(token);
         return loaded_element;
     }
@@ -194,7 +196,6 @@ int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3){
                     gen_tnp(p2->description, p1->data, p1->data, EMPTY, p1->type);
                     return 1;
                 } break;
-
             default:
                 printf("chyba pri uplatnovani pravidiel dvoch\n");
                 return -1;
@@ -261,7 +262,7 @@ int call_function(Token *id_token){
             if(parameters_used() == 1){
                 union Address tmp;
                 tmp.fce = id_token->str;
-                gen_instructions(TAC_CALL,tmp,NULL,NULL,FUNCION, EMPTY,EMPTY);
+                gen_instructions(TAC_CALL,tmp,fake,fake,FUNCION, EMPTY,EMPTY);
                 return 0;
             }else{return -1;}
         case KW_FIND:
@@ -269,21 +270,21 @@ int call_function(Token *id_token){
             if(parameters_used() == 2){
                 union Address tmp;
                 tmp.fce = id_token->str;
-                gen_instructions(TAC_CALL,tmp,NULL,NULL,FUNCION, EMPTY,EMPTY);
+                gen_instructions(TAC_CALL,tmp,fake,fake,FUNCION, EMPTY,EMPTY);
                 return 0;
             }else{return -1;}
         case KW_SUBSTR:
             if(parameters_used() == 3){
                 union Address tmp;
                 tmp.fce = id_token->str;
-                gen_instructions(TAC_CALL,tmp,NULL,NULL,FUNCION, EMPTY,EMPTY);
+                gen_instructions(TAC_CALL,tmp,fake,fake,FUNCION, EMPTY,EMPTY);
                 return 0;
             }else{return -1;}
         case KIN_IDENTIFIER:
             if(parameters_used() != -1){
                 union Address tmp;
                 tmp.fce = id_token->str;
-                gen_instructions(TAC_CALL,tmp,NULL,NULL,FUNCION, EMPTY,EMPTY);
+                gen_instructions(TAC_CALL,tmp,fake,fake,FUNCION, EMPTY,EMPTY);
                 return 0;
             }else{return -1;}
 
@@ -327,7 +328,6 @@ int expression_process(enum sTokenKind end_char, dTreeElementPtr *final_node){  
 
         int exit_code;
         if(new_token->type > D_DOLLAR){
-            printf("Mrada mi v medziach: exp_proc. %d",new_token->type);
             *final_node = clean_stack(Stack, false);
             return -1;
         }

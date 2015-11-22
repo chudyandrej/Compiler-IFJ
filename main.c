@@ -8,6 +8,8 @@ struct tBST Func;
 tDLList *tac_stack;
 tDLList *garbage = NULL;
 
+union Address fake;
+
 void print_instuctions();
 
 int main(int argc, char *argv[]) {
