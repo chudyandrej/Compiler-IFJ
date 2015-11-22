@@ -244,7 +244,7 @@ int if_statement(){
     return 1;
 }
 
-int cin(enum sTokenKind operator){
+int cin(){
     Token *new_token;
     if ((new_token=next_token())->type == KIN_SCIN){
         free(new_token);
