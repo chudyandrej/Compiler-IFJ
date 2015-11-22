@@ -205,18 +205,22 @@ int LSTSet (tBSTPtr T, struct TMPRecord * v){
     if (tmp==NULL)
         return 3;
     if (tmp->value.t == STRING){
-        if (v->t == STRING) {tmp->value.value = v->value; tmp->value.t = v->t;}
+        if (v->t == STRING) tmp->value.value = v->value;
         else return 4;
     }
     else if(tmp->value.t == DOUBLE){
-        if (v->t == DOUBLE) {tmp->value.value = v->value; tmp->value.t = v->t;}
+        if (v->t == DOUBLE) tmp->value.value = v->value;
         else if (v->t == INT) tmp->value.value.d = (double) v->value.i;
         else return 4;
     }
     else if(tmp->value.t == INT){
-        if (v->t == INT) {tmp->value.value = v->value; tmp->value.t = v->t;}
+        if (v->t == INT) tmp->value.value = v->value;
         else if (v->t == DOUBLE) tmp->value.value.i = (int) v->value.d;
         else return 4;
+    }
+    else if(tmp->value.t == AUTO){
+        tmp->value.value = v->value;
+        tmp->value.t = v->t;
     }
     else return 4;
     tmp->assigned = 1;
@@ -238,11 +242,14 @@ void LSTLeaveScope (tBSTEPtr ptr, int scope){
 
 int LSTGet (tBSTPtr T, struct TMPRecord * v){
     tVarPtr tmp = T->Act->data;
-    if (tmp==NULL)
+    if (tmp==NULL){
         return 1;
-    printf("SRSLY\n");
-    if(tmp->assigned == 0)
+    }
+    if(tmp->assigned == 0){
+        v->t = tmp->value.t;
         return 2;
-    *v = tmp->value;
+    }
+    v->value = tmp->value.value;
+    v->t = tmp->value.t;
     return 0;
 }

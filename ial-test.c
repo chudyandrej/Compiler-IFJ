@@ -72,6 +72,13 @@ void fillM(tDLList * m){
     o1->t_t=VARIABLE;
     o1->t_op1=INT;
 
+    tOperation o9 = malloc(sizeof(struct Operation));
+    o9->inst = TAC_INIT;
+    o9->t.variable = malloc(sizeof(char)*5);
+    strcpy(o9->t.variable, "barr");
+    o9->t_t=VARIABLE;
+    o9->t_op1=STRING;
+
 
     tOperation o2 = malloc(sizeof(struct Operation));
     o2->inst = KIN_PLUS;
@@ -100,10 +107,42 @@ void fillM(tDLList * m){
     o4->t_t=VARIABLE;
     o4->t_op1=TMP;
     o4->op1.tmp=1;
+
+    tOperation o5 = malloc(sizeof(struct Operation));
+    o5->inst = KIN_SCOUT;
+    o5->t.variable = malloc(sizeof(char)*5);
+    strcpy(o5->t.variable, "ahoj");
+    o5->t_t=VARIABLE;
+
+    tOperation o6 = malloc(sizeof(struct Operation));
+    o6->inst = KIN_SCOUT;
+    o6->t.s= malloc(sizeof(char)*5);
+    strcpy(o6->t.s, " :)\n");
+    o6->t_t=STRING;
+
+    tOperation o7 = malloc(sizeof(struct Operation));
+    o7->inst = KIN_SCIN;
+    o7->t.variable = malloc(sizeof(char)*5);
+    strcpy(o7->t.variable, "barr");
+    o7->t_t=VARIABLE;
+
+    tOperation o8 = malloc(sizeof(struct Operation));
+    o8->inst = KIN_SCOUT;
+    o8->t.variable = malloc(sizeof(char)*5);
+    strcpy(o8->t.variable, "barr");
+    o8->t_t=VARIABLE;
+
+
+
     insert_last(m, o1);
+    insert_last(m, o9);
     insert_last(m, o2);
     insert_last(m, o3);
     insert_last(m, o4);
+    insert_last(m, o5);
+    insert_last(m, o6);
+    insert_last(m, o7);
+    insert_last(m, o8);
 }
 
 void fillA(tDLList * a){

@@ -82,6 +82,7 @@ enum Type {
     INT,
     DOUBLE,
     STRING,
+    AUTO,
     VARIABLE,
     TMP,
     FUNCION,

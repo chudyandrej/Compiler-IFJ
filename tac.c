@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include "ial.h"
 #include "tac.h"
 #include "stack.h"
@@ -13,7 +14,9 @@ void * extendTmp(void *ptr, unsigned int *size);
 int countingOp(struct Operation *rec, tBSTPtr my_ST, int scope);
 int assignmentOp(struct Operation *rec, tBSTPtr my_ST, int scope);
 int initOp(struct Operation *rec, tBSTPtr my_ST, int scope);
-int dereference(struct Operation *rec, tBSTPtr my_ST, int scope, int address_number, struct TMPRecord * dereferenced);
+int coutOp(struct Operation *rec, tBSTPtr my_ST);
+int cinOp(struct Operation *rec, tBSTPtr my_ST);
+int dereference(struct Operation *rec, tBSTPtr my_ST, int address_number, struct TMPRecord * dereferenced);
 int pushOp(struct Operation *rec, tBSTPtr my_ST, int scope, tDLList * my_push);
 int to_double(struct TMPRecord * tmp);
 int function(char * name, tBSTPtr my_ST, union Address * ret);
@@ -59,9 +62,13 @@ int function(char * name, tBSTPtr my_ST, union Address * ret){
 		else if (instruction==TAC_INIT){
 			out = initOp(rec, my_ST, scope);
 		}
-		else if (instruction==TAC_EMPTY){
-
-		}
+		else if (instruction==KIN_SCOUT){
+			out = coutOp(rec, my_ST);
+		} 
+		else if (instruction==KIN_SCIN){
+			out = cinOp(rec, my_ST);
+		} 
+		else if (instruction==TAC_EMPTY);
 		else{
 			/*TO DO : 
 			KIN_PLUSPLUS,
@@ -74,12 +81,8 @@ int function(char * name, tBSTPtr my_ST, union Address * ret){
 			printf("IN PROGRESS!: %d\n", instruction);
 		}
 		shift_active(my_tac);
+		if (out) {printf("out fuu: %d\n", out); return out;}
 	}
-	struct TMPRecord * tmp = NULL;
-	BSTFind(my_ST, "ahoj");
-	out = LSTGet(my_ST, tmp);
-	printf("hodnota Ahoj, je: %d\n", tmp->value.i);
-
 	return out;
 }
 
@@ -90,16 +93,14 @@ int countingOp(struct Operation *rec, tBSTPtr my_ST, int scope){
 	struct TMPRecord * operand2 = malloc(sizeof(struct TMPRecord));
 	struct TMPRecord * target = malloc(sizeof(struct TMPRecord));
 	target->t=DOUBLE;
-	out = dereference(rec, my_ST, scope, 1, operand1);
-	printf("op1: %d\n", operand1->value.i);
+	out = dereference(rec, my_ST, 1, operand1);
 	if (out!=0) return out;
 	out = to_double(operand1);
 	if (out!=0) return out;
-	out = dereference(rec, my_ST, scope, 2, operand2);
+	out = dereference(rec, my_ST, 2, operand2);
 	if (out!=0) return out;
 	out = to_double(operand2);
 	if (out!=0) return out;
-	printf("FML\n");
 	switch(rec->inst){
 		case KIN_PLUS:
 			target->value.d = operand1->value.d + operand2->value.d;
@@ -145,7 +146,6 @@ int countingOp(struct Operation *rec, tBSTPtr my_ST, int scope){
 	} 
 	else if (rec->t_t==TMP){
 		store_tmp(target, rec->t.tmp);
-		printf("TMP0: %d\n", working_tmp[0]->value.i);
 	}
 	else return 10;
 	return out;
@@ -154,7 +154,7 @@ int countingOp(struct Operation *rec, tBSTPtr my_ST, int scope){
 
 int assignmentOp(struct Operation *rec, tBSTPtr my_ST, int scope){
 	struct TMPRecord * dereferenced = malloc(sizeof(struct TMPRecord));
-	int out = dereference(rec, my_ST, scope, 1, dereferenced);
+	int out = dereference(rec, my_ST, 1, dereferenced);
 	if (out!=0) return out;
 	if (rec->t_t==VARIABLE){
 		BSTFind(my_ST, rec->t.variable);
@@ -174,13 +174,13 @@ int initOp(struct Operation *rec, tBSTPtr my_ST, int scope){
 	BSTFind(my_ST, rec->t.variable);
 	if(!BSTActive(my_ST)) BSTAdd(my_ST, rec->t.variable);
 	out = LSTAdd(my_ST, rec->t_op1, scope);
-	printf("OUT, deklarace%d\n", out);
 	return out;
 }
 
-int dereference(struct Operation *rec, tBSTPtr my_ST, int scope, int address_number, struct TMPRecord * dereferenced){
-	int i = dereferenced->value.tmp;
+int dereference(struct Operation *rec, tBSTPtr my_ST, int address_number, struct TMPRecord * dereferenced){
 	struct TMPRecord * tmp = NULL;
+	int i;
+	int out = 0;
 	if (address_number==0){
 		dereferenced->value = rec->t;
 		dereferenced->t = rec->t_t;
@@ -197,22 +197,25 @@ int dereference(struct Operation *rec, tBSTPtr my_ST, int scope, int address_num
 		case INT:
 		case DOUBLE:
 		case STRING:
-			return 0;
+			break;
 		case TMP:
+			i = dereferenced->value.tmp;
 			dereferenced->value = working_tmp[i]->value;
 			dereferenced->t = working_tmp[i]->t;
 			break;
 		case VARIABLE:
-			tmp = dereferenced;
+			tmp = malloc(sizeof(struct TMPRecord));
 			BSTFind(my_ST, dereferenced->value.variable);
 			if (!BSTActive(my_ST)) return 3;
-			LSTGet(my_ST, tmp);
+			out = LSTGet(my_ST, tmp);
 			dereferenced->value = tmp->value;
 			dereferenced->t = tmp->t;
+			free(tmp);
+			break;
 		default:
 			return 10;
 	}
-	return 0;
+	return out;
 }
 
 void * extendTmp(void *ptr, unsigned int *size){
@@ -236,4 +239,59 @@ void store_tmp(struct TMPRecord * tmp, int i){
 		working_tmp = extendTmp(working_tmp, &working_size);
 	}
 	working_tmp[i] = tmp;
+}
+
+int coutOp(struct Operation *rec, tBSTPtr my_ST){
+	int out = 0;
+	struct TMPRecord * dereferenced = malloc(sizeof(struct TMPRecord));
+	out = dereference(rec, my_ST, 0, dereferenced);
+	if (dereferenced->t==STRING){
+		printf("%s", dereferenced->value.s);
+	}
+	else if (dereferenced->t==INT){
+		printf("%d", dereferenced->value.i);
+	}
+	else if (dereferenced->t==DOUBLE){
+		printf("%g", dereferenced->value.d);
+	} 
+	else out = 10;
+	return out;
+}
+
+int cinOp(struct Operation *rec, tBSTPtr my_ST){
+	int out = 0;
+	if (rec->t_t!=VARIABLE) return 2;
+	struct TMPRecord * dereferenced = malloc(sizeof(struct TMPRecord));
+	out = dereference(rec, my_ST, 0, dereferenced);
+	if (out!=1){
+		char * str = malloc(1);
+		char * ptr = NULL;
+		char c;
+		int count = 1;
+		while(isspace(c=fgetc(stdin)));
+
+		do {
+			str = realloc(str, ++count);
+			str[count-2] = c;
+			str[count-1] = '\0';
+		}
+		while(!isspace(c=fgetc(stdin)));
+		if(dereferenced->t==INT){
+			dereferenced->value.i = (int) strtol(str, &ptr, 10);
+			if (*ptr!='\0') return 7;
+		}
+		else if(dereferenced->t==DOUBLE){
+			dereferenced->value.d = strtod(str, &ptr);
+			if (*ptr!='\0') return 7;
+		}
+		else if(dereferenced->t==STRING){
+			dereferenced->value.s = str;
+		}
+		else return 10;
+		BSTFind(my_ST, rec->t.variable);
+		if (!BSTActive(my_ST)) return 3;
+		out = LSTSet(my_ST, dereferenced);
+
+	}
+	return out;
 }

@@ -6,7 +6,7 @@ CFLAGS=-Wall -std=c99 -pedantic -lm
 
 all: $(PROGS)
 
-$(PRJ)-test: $(PRJ).c $(PRJ)-test.c
+$(PRJ)-test: $(PRJ).c $(PRJ)-test.c tac.c stack.h
 	$(CC) $(CFLAGS) -o $@ $(PRJ).c tac.c stack.c $(PRJ)-test.c
 
 clean:
