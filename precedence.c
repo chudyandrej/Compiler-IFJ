@@ -30,7 +30,7 @@ const char PrecedentTable [19][19] ={
 };
 
 void gen_instruction(enum sTokenKind ction_inst, union Address op1,union Address op2,enum Type t_op1,enum Type t_op2){
-    tOperation instruction = malloc(sizeof(struct Operation));
+    tOperation instruction = gc_malloc(sizeof(struct Operation));
     instruction->ction_inst = ction_inst;
     instruction->op1 = op1;
     instruction->op2 = op2;
@@ -57,7 +57,7 @@ void printf_stack(tDLList *Stack){
     printf("########################\n");
 }
 tDLList* init_stack(){
-    tDLList *Stack = malloc(sizeof(struct tDLList));   //malloc stack
+    tDLList *Stack = gc_malloc(sizeof(struct tDLList));   //malloc stack
     init_list(Stack);                           //init stack
     dTreeElementPtr new_element;
     new_element = create_stack_element(D_DOLLAR, NULL);
@@ -98,7 +98,7 @@ dTreeElementPtr load_token(dTreeElementPtr new_element, Token *token){
     }
 }
 dTreeElementPtr create_stack_element(enum sTokenKind description, Token *token) {
-    dTreeElementPtr new_element = malloc(sizeof(struct dTreeElement));
+    dTreeElementPtr new_element = gc_malloc(sizeof(struct dTreeElement));
     if (new_element == NULL) {
         printf("Malloc ERROR");
         return NULL;
@@ -114,12 +114,12 @@ dTreeElementPtr create_stack_element(enum sTokenKind description, Token *token) 
     }
     else if ((token->type >= KIN_NUM_INT && token->type <= KIN_TEXT) || token->type == KIN_IDENTIFIER) { //cislo,string,var
         dTreeElementPtr loaded_element = load_token(new_element, token);
-        free(token);
+        gc_free(token);
         return loaded_element;
     }
     else {      //operator
         dTreeElementPtr loaded_element = load_nonterm_char(new_element, token->type);
-        free(token);
+        gc_free(token);
         return loaded_element;
     }
 
@@ -148,7 +148,7 @@ int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3){
                 break;
             default:
                printf("Error: rules tri argumenty");
-                return 100;
+                return -1;
         }
 
     }
@@ -174,7 +174,7 @@ int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3){
 
             default:
                 printf("chyba pri uplatnovani pravidiel dvoch\n");
-                return 100;
+                return -1;
         }
     }
     else{       // rules 1-2
@@ -187,11 +187,11 @@ int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3){
             default:
                 printf("chybny: %d\n", p1->description);
                 printf("chyba pri uplatnovani pravidiel jednej\n");
-                return 100;
+                return -1;
         }
     }
 
-    return 100;
+    return -1;
 }
 int element_reduct(tDLList *Stack){
     dTreeElementPtr elements[3] = {NULL,NULL,NULL};
@@ -199,12 +199,12 @@ int element_reduct(tDLList *Stack){
     int i;
     for(i =0; i<=4; i++){
         if(((dTreeElementPtr)new->data)->description == D_STOPER){
-            free(new->data);
+            gc_free(new->data);
             delete_element(Stack,new);
             break;
         }
         if (i >= 3){
-            return 100;           //ak nepojde matova ruka je v ohni
+            return -1;           //ak nepojde matova ruka je v ohni
         }
         elements[i] = (dTreeElementPtr) new->data;
         new = new->lptr;
@@ -216,7 +216,7 @@ int element_reduct(tDLList *Stack){
     }
     else if(exit_code >= 1 && exit_code <= 2){
         for (i = 0; i < exit_code; i++) {
-            free(copy_last(Stack));
+            gc_free(copy_last(Stack));
             delete_last(Stack);
         }
         ((dTreeElementPtr)Stack->Last->data)->description = D_NODE;
@@ -226,7 +226,7 @@ int element_reduct(tDLList *Stack){
     }
     else {
       //  printf("Mrdka\n");
-        return 100;
+        return -1;
     }
 }
 
@@ -235,18 +235,18 @@ int call_function(Token *id_token){
     switch(id_token->type){
         case KW_SORT:
         case KW_LENGTH:
-            if(parameters_used() == 1){return 0;}else{return 1;}
+            if(parameters_used() == 1){return 0;}else{return -1;}
         case KW_FIND:
         case KW_CONCAT:
-            if(parameters_used() == 2){return 0;}else{return 1;}
+            if(parameters_used() == 2){return 0;}else{return -1;}
         case KW_SUBSTR:
-            if(parameters_used() == 3){return 0;}else{return 1;}
+            if(parameters_used() == 3){return 0;}else{return -1;}
         case KIN_IDENTIFIER:
 
-            if(parameters_used() != 100){ printf("ta som tu\n");return 0;}else{return 1;}
+            if(parameters_used() != -1){ printf("ta som tu\n");return 0;}else{return -1;}
 
         default:
-            return 1;
+            return -1;
 
     }
 
@@ -254,25 +254,24 @@ int call_function(Token *id_token){
 
 int expression_process(enum sTokenKind end_char, dTreeElementPtr final_node){       //vracat posledny node
     tDLList *Stack = init_stack();
-
     bool load_new_tag = true;
     Token *new_token = NULL;
-    int exit_char = KIN_R_ROUNDBRACKET;
+    int exit_char = KIN_R_ROUNDBRACKET;     //default value
     while(true) {
-        printf_stack(Stack);
+       // printf_stack(Stack);
         int top_token = ((dTreeElementPtr)(find_last(Stack,false))->data)->description;
         if(load_new_tag == true) {
             new_token = next_token();
         }
         if((new_token->type == KIN_IDENTIFIER || (new_token->type >= KW_LENGTH && new_token->type <= KW_SORT)) &&
-                token_predict->type == KIN_L_ROUNDBRACKET){
-            printf("VNARAM\n");
-            free(next_token());
-            if(call_function(new_token) != 0){clean_stack(Stack, final_node, false); return 1;}
+                token_predict->type == KIN_L_ROUNDBRACKET){                         //funcion in expession
+           // printf("VNARAM\n");
+            gc_free(next_token());
+            if(call_function(new_token) != 0){ final_node = clean_stack(Stack, false); return -1;}
             insert_last(Stack, create_stack_element(D_STOPER, NULL));
             insert_last(Stack, create_stack_element(D_TMP, NULL));
 
-            printf("VYNARAM\n");
+           // printf("VYNARAM\n");
             printf_stack(Stack);
             continue;
         }
@@ -285,7 +284,11 @@ int expression_process(enum sTokenKind end_char, dTreeElementPtr final_node){   
         }
 
         int exit_code;
-        if(new_token->type > D_DOLLAR){ printf("Mrada mi v medziach: exp_proc. %d",new_token->type);clean_stack(Stack, final_node, false); return 1;}
+        if(new_token->type > D_DOLLAR){
+            printf("Mrada mi v medziach: exp_proc. %d",new_token->type);
+            final_node = clean_stack(Stack, false);
+            return -1;
+        }
 
         switch (PrecedentTable[top_token][new_token->type]) {
             case '<':
@@ -306,36 +309,37 @@ int expression_process(enum sTokenKind end_char, dTreeElementPtr final_node){   
                 }
                 if(exit_code == 100 && length_list(Stack) == 2 &&
                         ((dTreeElementPtr)(find_last(Stack,false))->data)->description == D_DOLLAR) {
-                    clean_stack(Stack, final_node, true);
+                    final_node = clean_stack(Stack, true);
                     return end_char;
                 }
                 else{
-                    clean_stack(Stack, final_node, false);   
-                    return 1;
+                    final_node = clean_stack(Stack, false);
+                    return -1;
                 }
             case '=':
                 insert_last(Stack, create_stack_element(new_token->type, new_token));
                 continue;
             case '!':
                 printf("\nvykricnik\n");
-                    clean_stack(Stack, final_node, true);   
-                    return exit_char;
+                final_node = clean_stack(Stack, true);
+                return exit_char;
             default:
                 if(length_list(Stack) == 2 &&
                     ((dTreeElementPtr)(find_last(Stack,false))->data)->description == D_DOLLAR) {
-                    clean_stack(Stack, final_node, true);                    
+                    final_node = clean_stack(Stack, true);
                     return exit_char;
                 }
                 printf("precedence table errror s tokenom: %d, vrch stacku: %d\n", new_token->type,((dTreeElementPtr) Stack->Last->data)->description);
-                clean_stack(Stack, final_node, false);   
-                return 1;
+                final_node = clean_stack(Stack, false);
+                return -1;
 
         }
     }
 }
 
-void clean_stack(tDLList *Stack, void *ptr, bool correct_end){
-    ptr = (correct_end) ? (void *) Stack->Last->data : NULL;
+dTreeElementPtr clean_stack(tDLList *Stack,  bool correct_end){
+    dTreeElementPtr ptr = (correct_end) ? Stack->Last->data : NULL;
     dispose_list(Stack);
+    return ptr;
 }
 

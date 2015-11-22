@@ -6,22 +6,30 @@ FILE *fp;
 Token *token_predict = NULL;
 struct tBST Func;
 tDLList *tac_stack;
+tDLList *garbage = NULL;
 
 void print_instuctions();
 
 int main(int argc, char *argv[]) {
     BSTInit(&Func);
+    if((garbage= malloc(sizeof(tDLList))) == NULL){
+        errorMessage_internal("Malloc garbage collector");
+        return 1;
+    }
+    init_list(garbage);
     fp = fopen(argv[1],"r");
     token_predict = get_token(fp);
     int exit_code = start_syntax_analyz();
 
     fclose(fp);
-    printf("\n############---FINAL RESULTS---############\n");
-    printf("NO. instructions: %d \n", length_list(tac_stack));
-    printf("exit_code: %d  !!!!\n", exit_code);
-    
-    print_instuctions();
+    if(exit_code == 0) {
+        printf("\n############---FINAL RESULTS---############\n");
+        printf("NO. instructions: %d \n", length_list(tac_stack));
+        printf("exit_code: %d  !!!!\n", exit_code);
 
+        print_instuctions();
+    }
+    free(garbage);
     return exit_code;
 }
 

@@ -48,4 +48,8 @@ typedef enum ErrCode {
 }tErrCode;
 
 int handle_err(tErrCode code);
+void errorMessage_syntax(const char *message );
+void errorMessage_lexical(const char *message );
+void errorMessage_internal(const char *message );
+void errorMessage_semantic(const char *message );
 #endif //IJF_ERR_H

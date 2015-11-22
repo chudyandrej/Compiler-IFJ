@@ -9,6 +9,7 @@
  */
 
 #include "scanner.h"
+#include "garbage.h"
 
 #define ESC_HEX_MAX 2
 #define KEYWORDS_SIZE 15
@@ -32,14 +33,14 @@ Token * get_token(FILE * fp) {
     State state = S_START;
     string * str_tmp;
     Token * token;
-    if ((token = malloc(sizeof(Token))) == NULL) {
+    if ((token = gc_malloc(sizeof(Token))) == NULL) {
         return NULL;
     }
-    if ((str_tmp = malloc(sizeof(string))) == NULL) {
+    if ((str_tmp = gc_malloc(sizeof(string))) == NULL) {
         return NULL;
     }
     if (str_init(str_tmp)) {
-        free(token);
+        gc_free(token);
         return NULL;
     }
 
@@ -440,7 +441,7 @@ int copy_carray_to_token(Token *t, char *s)
 /* prekopiruje retezec s do t->s */
 {
     int length = (int)strlen(s);
-    if ((t->str = (char*) malloc(((size_t)length+1))) == NULL)
+    if ((t->str = (char*) gc_malloc(((size_t)length+1))) == NULL)
         return FAIL;
     strcpy(t->str, s);
     return SUCCESS;
@@ -461,7 +462,7 @@ int copy_str_to_token(Token *t, string *s)
 /* prekopiruje retezec s do t->s */
 {
     int length = s->length;
-    if ((t->str = (char*) malloc((size_t)length+1)) == NULL)
+    if ((t->str = (char*) gc_malloc((size_t)length+1)) == NULL)
         return FAIL;
     strcpy(t->str, s->str);
     return SUCCESS;
@@ -481,7 +482,7 @@ int copy_str_to_token(Token *t, string *s)
 int copy_char_to_token(Token *t, char c)
 /* prekopiruje znak c do t->s */
 {
-    if ((t->str = (char*) malloc(sizeof(char))) == NULL)
+    if ((t->str = (char*) gc_malloc(sizeof(char))) == NULL)
         return FAIL;
     t->str[0] = c;
     return SUCCESS;
@@ -503,7 +504,7 @@ int copy_char_to_token(Token *t, char c)
 
 Token * cleanup(Token * t, string * s) {
     if (s != NULL) str_free(s);
-    if (t != NULL) free(t);
+    if (t != NULL) gc_free(t);
     return NULL;
 }
 
