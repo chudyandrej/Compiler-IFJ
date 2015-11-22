@@ -23,6 +23,7 @@ nad nimi (pridani, vyhledavani ...)
 /* SDILENE */
 /***********/
 #include "ial.h"
+#include "tac.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -67,12 +68,7 @@ void BSTAdd (tBSTPtr T, char * key){
         interError();
         return;
     }
-    node->key = malloc(strlen(key)+1);
-    if (node->key==NULL) {
-        interError();
-        return;
-    }
-    strcpy(node->key, key);
+    node->key = key;
     node->lptr=NULL;
     node->rptr=NULL;
     node->data=NULL;
@@ -129,26 +125,24 @@ void GSTDispose(tBSTPtr T){
 int GSTAllDef(tBSTEPtr tmp){
     if(tmp==NULL) return 1;
     if(tmp->data==NULL) return 2;
-    if(((struct tFunc *)tmp->data)->TAC!=NULL) return 0;
+    if(((struct tFunc *)tmp->data)->TAC==NULL) return 0;
     int a = GSTAllDef(tmp->lptr);
     if(a!=1) return a;
     a = GSTAllDef(tmp->rptr);
     return a;
 }  
-int GSTDeclare(tBSTPtr T, char * params){
+int GSTDeclare(tBSTPtr T, char * params, char * names){
     if(T->Act==NULL) return 2;
     if(T->Act->data==NULL){
         tFuncPtr node = malloc(sizeof(struct tFunc));
-        node->params = malloc(strlen(params)+1);
-        if (node->params==NULL) {
-            interError();
-            return 2;
-        }
-        strcpy(node->params, params); 
+        node->params = params;
+        node->names = names;
         node->TAC = NULL;
         T->Act->data = node;
     } else {
         if(strcmp(params,((struct tFunc *)T->Act->data)->params)!=0)
+            return 1;
+        if(strcmp(names,((struct tFunc *)T->Act->data)->names)!=0)
             return 1;
     }
     return 0;
@@ -158,6 +152,10 @@ int GSTDefine(tBSTPtr T, void * TAC){
     if(((struct tFunc *)T->Act->data)->TAC != NULL) return 1;
     ((struct tFunc *)T->Act->data)->TAC = TAC;
     return 0;
+}
+
+void * GSTCopyTAC(tBSTPtr T){
+    return ((struct tFunc *)T->Act->data)->TAC;
 }  
                                          
 
@@ -168,8 +166,6 @@ int GSTDefine(tBSTPtr T, void * TAC){
 void scopeFree(tVarPtr ptr){
     if (ptr==NULL) return;
     scopeFree(ptr->ptr);
-    if ((ptr->datatype == 's') && (ptr->value.s != NULL))
-        free(ptr->value.s);
     free(ptr);
 }
 
@@ -188,7 +184,7 @@ void LSTDispose (tBSTPtr T){
     T->Act=NULL;
 }
 
-int LSTAdd (tBSTPtr T, char type, int scope){
+int LSTAdd (tBSTPtr T, enum Type type, int scope){
     if (T->Act->data!=NULL)
         if(((struct tVar *)T->Act->data)->scope == scope) return 1;
     tVarPtr node = malloc(sizeof(struct tVar));
@@ -197,27 +193,32 @@ int LSTAdd (tBSTPtr T, char type, int scope){
         return 2;
     }
     node->scope = scope;
-    node->datatype = type;
     node->assigned = 0;
-    node->value.s = NULL;
+    node->value.t = type;
     tVarPtr tmp = T->Act->data;
     T->Act->data = node;
     node->ptr = tmp;
     return 0;
 }  
-int LSTSet (tBSTPtr T, char type, union Value v){
+int LSTSet (tBSTPtr T, struct TMPRecord * v){
     tVarPtr tmp = T->Act->data;
     if (tmp==NULL)
-        return 1;
-    if (tmp->datatype == 'a')
-        tmp->datatype = type;
-    if (tmp->datatype != type)
-        //! pretypovani dodelam pozdeji
-        return 2;
-    if (tmp->datatype == 's')
-        if (tmp->value.s != NULL)
-            free (tmp->value.s);
-    tmp->value = v;
+        return 3;
+    if (tmp->value.t == STRING){
+        if (v->t == STRING) {tmp->value.value = v->value; tmp->value.t = v->t;}
+        else return 4;
+    }
+    else if(tmp->value.t == DOUBLE){
+        if (v->t == DOUBLE) {tmp->value.value = v->value; tmp->value.t = v->t;}
+        else if (v->t == INT) tmp->value.value.d = (double) v->value.i;
+        else return 4;
+    }
+    else if(tmp->value.t == INT){
+        if (v->t == INT) {tmp->value.value = v->value; tmp->value.t = v->t;}
+        else if (v->t == DOUBLE) tmp->value.value.i = (int) v->value.d;
+        else return 4;
+    }
+    else return 4;
     tmp->assigned = 1;
     return 0;
 }  
@@ -228,8 +229,6 @@ void LSTLeaveScope (tBSTEPtr ptr, int scope){
         if(((struct tVar *)ptr->data)->scope == scope){
             tVarPtr tmp = ptr->data;
             ptr->data = ((struct tVar *)ptr->data)->ptr;
-            if ((tmp->datatype == 's') && (tmp->value.s != NULL))
-                free(tmp->value.s);
             free(tmp);
         }
     LSTLeaveScope(ptr->lptr, scope);
@@ -237,12 +236,13 @@ void LSTLeaveScope (tBSTEPtr ptr, int scope){
     return ;
 } 
 
-char LSTGet (tBSTPtr T, union Value * v){
+int LSTGet (tBSTPtr T, struct TMPRecord * v){
     tVarPtr tmp = T->Act->data;
     if (tmp==NULL)
         return 1;
+    printf("SRSLY\n");
     if(tmp->assigned == 0)
         return 2;
     *v = tmp->value;
-    return tmp->datatype;
+    return 0;
 }

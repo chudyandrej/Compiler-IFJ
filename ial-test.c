@@ -2,129 +2,110 @@
 #include <string.h>
 #include <stdlib.h>
 #include "ial.h"
+#include "tac.h"
+#include "stack.h"
 
-void global();
-void local();
+struct tBST Func;
+
+
+void init();
+void fillM(tDLList * m);
+void fillA(tDLList * a);
 
 int main(){
-    global();
-    local();
-    printf("END\n");
-    return 0;
+    init();
+    int out =  interpret();
+    printf("///////////////\n");
+    printf("END!\n");
+    return out;
 }
 
-void local(){
-    printf("\n\n\n**INIT LOCAL SYMBOL TABLE**\n");
-    union Value v;
-    union Value ptr;
-    tBSTPtr T = malloc(sizeof(struct tBST));
-    BSTInit(T);
-    printf("active: %d\n", BSTActive(T));
-    BSTAdd(T, "FML");
-    printf("add FML\n");
-    BSTAdd(T, "FOO");
-    printf("add FOO\n");
-    BSTAdd(T, "BAR");
-    printf("add BAR\n");
-    printf("Act: %s\n", T->Act->key);
-    printf("add int BAR scope 0: %d\n", LSTAdd(T, 'i', 0));
-    v.i = 6;
-    printf("set double BAR scope 0 to 6: %d\n", LSTSet(T, 'i', v));
-    printf("add double BAR scope 1: %d\n", LSTAdd(T, 'd', 1));
-    printf("add incorrectly int BAR scope 1: %d\n", LSTAdd(T, 'i', 1));
-    v.d = 5.0;
-    printf("set double BAR scope 1 to 5.0: %d\n", LSTSet(T, 'd', v));
-    v.d = 3.0;
-    printf("re-set double BAR scope 1 to 3.0: %d\n", LSTSet(T, 'd', v));
-    printf("Return value: %c\n", LSTGet(T, &ptr));
-    printf("Value of BAR: %g\n", ptr.d);
-    v.i = 4;
-    printf("incorrect set double BAR scope 1 to 3 (int): %d\n", LSTSet(T, 'i', v));
-    printf("Return value: %c\n", LSTGet(T, &ptr));
-    printf("Value of BAR: %g\n", ptr.d);
-    LSTLeaveScope(T->Root, 1);
-    printf("Leave scope 1\n");
-    BSTFind(T, "BAR");
-    printf("act->key: %s\n", T->Act->key);
-    printf("Return value: %c\n", LSTGet(T, &ptr));
-    printf("Value of BAR: %d\n", ptr.i);
-    LSTDispose (T);
-    free(T);
+void init(){
+    int out;
+    BSTInit(&Func);
+    char * m_key = malloc(sizeof(char)*5);
+    char * a_key = malloc(sizeof(char)*5);
+    char * m_params = malloc(sizeof(char)*2);
+    char * a_params = malloc(sizeof(char)*4);
+    char * m_names = malloc(sizeof(char)*1);
+    char * a_names = malloc(sizeof(char)*4);
+    strcpy(m_key, "main");
+    strcpy(a_key, "fooo");
+    strcpy(m_params, "v");
+    strcpy(m_params, "iid");
+    strcpy(m_names, "");
+    strcpy(a_names,"a b");
+    tDLList * a = malloc(sizeof(tDLList));
+    tDLList * m = malloc(sizeof(tDLList));
+    fillM(m);
+    fillA(a);
+    BSTAdd(&Func, m_key);
+    BSTAdd(&Func, a_key);
+
+
+    BSTFind(&Func, m_key);
+    out = GSTDeclare(&Func, m_params, m_names);
+    printf("Declare main: %d\n", out);
+    out = GSTDefine(&Func, m);
+    printf("Define main: %d\n", out);
+
+
+    BSTFind(&Func, a_key);
+    out = GSTDeclare(&Func, a_params, a_names);
+    printf("Declare fooo: %d\n", out);
+    out = GSTDefine(&Func, a);
+    printf("Define fooo: %d\n", out);
+
+
+    out = GSTAllDef(Func.Root);
+    printf("///////////////\n");
+
 }
 
+void fillM(tDLList * m){
+    // int ahoj = (4+9)*5
+    init_list(m);
+    tOperation o1 = malloc(sizeof(struct Operation));
+    o1->inst = TAC_INIT;
+    o1->t.variable = malloc(sizeof(char)*5);
+    strcpy(o1->t.variable, "ahoj");
+    o1->t_t=VARIABLE;
+    o1->t_op1=INT;
 
-void global(){ //tested, everything passed
-    tBSTPtr T = malloc(sizeof(struct tBST));
-    BSTInit(T);
-    printf("**INIT GLOBAL SYMBOL TABLE**\n");
-    printf("active: %d\n", BSTActive(T));
-    BSTAdd(T, "FML");
-    printf("add FML\n");
-    printf("Act: %s\n", T->Act->key);
-    printf("Root: %s\n", T->Root->key);
-    printf("active: %d\n", BSTActive(T));
-    BSTAdd(T, "FOO");
-    printf("add FOO\n");
-    BSTAdd(T, "BAR");
-    printf("add BAR\n");
-    printf("Root->rptr: %s\n", T->Root->rptr->key);
-    printf("Root->lptr: %s\n", T->Root->lptr->key);
-    BSTAdd(T, "FN");
-    printf("add FN\n");
-    printf("Root->rptr->lptr: %s\n", T->Root->rptr->lptr->key);
-    printf("find non-existing key\n");
-    BSTFind(T, "FNO");
-    printf("active: %d\n", BSTActive(T));
-    printf("find FOO\n");
-    BSTFind(T, "FOO");
-    printf("active: %d\n", BSTActive(T));
-    printf("Act: %s\n", T->Act->key);
-    printf("**************\n");
-    printf("everything defined: %d\n", GSTAllDef(T->Root));
-    BSTFind(T, "FOO");
-    printf("declare FOO,vi,1: %d\n", GSTDeclare(T, "vi"));
-    BSTFind(T, "BAR");
-    printf("declare BAR,ii,2: %d\n", GSTDeclare(T, "ii"));
-    BSTFind(T, "FML");
-    printf("declare FML,iii,3: %d\n", GSTDeclare(T, "iii"));
-    BSTFind(T, "FN");
-    printf("declare FN,ii,4: %d\n", GSTDeclare(T, "ii"));
-    BSTFind(T, "FML");
-    printf("re-declare correctlty FML,iii,5: %d\n", GSTDeclare(T, "iii"));
-    printf("re-declare incorrectly FML,isi,6: %d\n", GSTDeclare(T, "isi"));
-    printf("everything defined: %d\n", GSTAllDef(T->Root));
-    BSTFind(T, "FNO");
-    printf("declare not added FNO,ii,7: %d\n", GSTDeclare(T, "ii"));
-    
-    char * a =malloc(10);
-    char * b =malloc(10);
-    char * c =malloc(10);
-    char * d =malloc(10);
 
-    BSTFind(T, "FML");
-    GSTDeclare(T, "iii");
-    printf("define FML,iii,8: %d\n", GSTDefine(T, a));
+    tOperation o2 = malloc(sizeof(struct Operation));
+    o2->inst = KIN_PLUS;
+    o2->t.tmp = 0;
+    o2->t_t=TMP;
+    o2->t_op1=INT;
+    o2->t_op2=INT;
+    o2->op1.i = 4;
+    o2->op2.i = 9;
 
-    BSTFind(T, "FN");
-    GSTDeclare(T, "ii");
-    printf("define FN,ii,9: %d\n", GSTDefine(T, b));
 
-    BSTFind(T, "BAR");
-    GSTDeclare(T, "ii");
-    printf("define BAR,ii,10: %d\n", GSTDefine(T, c));
+    tOperation o3 = malloc(sizeof(struct Operation));
+    o3->inst = KIN_MUL;
+    o3->t.tmp = 1;
+    o3->t_t=TMP;
+    o3->t_op1=TMP;
+    o3->t_op2=INT;
+    o3->op1.tmp = 0;
+    o3->op2.i = 5;
 
-    printf("everything defined: %d\n", GSTAllDef(T->Root));
 
-    BSTFind(T, "FOO");
-    GSTDeclare(T, "vi");
-    printf("define FOO,vi,11: %d\n", GSTDefine(T, d));
+    tOperation o4 = malloc(sizeof(struct Operation));
+    o4->inst = KIN_ASSIGNEMENT;
+    o4->t.variable = malloc(sizeof(char)*5);
+    strcpy(o4->t.variable, "ahoj");
+    o4->t_t=VARIABLE;
+    o4->t_op1=TMP;
+    o4->op1.tmp=1;
+    insert_last(m, o1);
+    insert_last(m, o2);
+    insert_last(m, o3);
+    insert_last(m, o4);
+}
 
-    BSTFind(T, "FOO");
-    GSTDeclare(T, "vi");
-    printf("re-define FOO,vi,12: %d\n", GSTDefine(T, d));
+void fillA(tDLList * a){
 
-    printf("everything defined: %d\n", GSTAllDef(T->Root));
-    printf("dispose Tree\n");
-    GSTDispose(T);
-    free(T);
 }
