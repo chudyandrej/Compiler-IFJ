@@ -1,5 +1,4 @@
 #include "parser.h"
-#include "ial.h"
 
 FILE *fp;
 
