@@ -348,6 +348,8 @@ enum Type translate(enum sTokenKind type){
             return DOUBLE;
         case KW_STRING:
             return STRING;
+        case KW_AUTO:
+            return AUTO;
         default:
             printf("hope never happen\n");              //just debug
             return AUTO;             //this situation never happen

@@ -321,7 +321,7 @@ int expression_process(enum sTokenKind end_char, dTreeElementPtr *final_node){  
             insert_last(Stack, create_stack_element(D_TMP, NULL));
 
            // printf("VYNARAM\n");
-            printf_stack(Stack);
+           // printf_stack(Stack);
             continue;
         }
         load_new_tag = true;
@@ -368,7 +368,7 @@ int expression_process(enum sTokenKind end_char, dTreeElementPtr *final_node){  
                 insert_last(Stack, create_stack_element(new_token->type, new_token));
                 continue;
             case '!':
-                printf("\nvykricnik\n");
+              //  printf("\nvykricnik\n");
                 *final_node = clean_stack(Stack, true);
                 return exit_char;
             default:
