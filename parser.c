@@ -222,9 +222,8 @@ int for_statement() {
                 gen_instructions(KIN_ASSIGNEMENT, tmp, end_node->data, fake, VARIABLE, end_node->type, EMPTY);
                 gc_free(end_node);
             }
-            if (new_token->type == KIN_L_BRACE) {
+            if (next_token()->type == KIN_L_BRACE) {
                 gen_instructions(TAC_GOTO_UNCOND, incre, fake, fake, LABEL, EMPTY, EMPTY);
-                gc_free(new_token);
                 gen_label(skip.label);
                 exit_code = body_funcion();
                 gen_instructions(TAC_GOTO_UNCOND, uncond, fake, fake, LABEL, EMPTY, EMPTY);
