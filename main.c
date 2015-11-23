@@ -73,7 +73,6 @@ void print_instuctions(){
         TokenKind instruction = rec->ction_inst;
         //printf("INSTRUKCE CISLO: %d\n", instruction);
         switch (instruction){
-
             case KIN_PLUS:
                 printf("ADD\n");                
                 break; 
@@ -91,9 +90,60 @@ void print_instuctions(){
                 break;  
             case KIN_MINUSMINUS:              
                 printf("MINUSMINUS\n");
-                 break;  
+                 break;
+            case TAC_GOTO_UNCOND:
+                printf("TAC_GOTO_UNCOND\n");
+                break;
+            case TAC_GOTO_COND:
+                printf("TAC_GOTO_UNCOND\n");
+                break;
+            case TAC_PUSH:
+                printf("TAC_PUSH\n");
+                break;
+            case TAC_INIT:
+                printf("TAC_INIT\n");
+                break;
+            case TAC_CALL:
+                printf("TAC_CALL\n");
+                break;
+            case TAC_RETURN:
+                printf("TAC_RETURN\n");
+                break;
+            case SCOPE_UP:
+                printf("SCOPE_UP\n");
+                break;
+            case SCOPE_DOWN:
+                printf("SCOPE_DOWN\n");
+                break;
+            case TAC_EMPTY:
+                printf("TAC_EMPTY\n");
+                break;
+            case KIN_ASSIGNEMENT:
+                printf("KIN_ASSIGNEMENT\n");
+                break;
+            case KIN_SCIN:
+                printf("KIN_SCIN\n");
+                break;
+            case KIN_SCOUT:
+                printf("KIN_SCOUT\n");
+                break;
+            case KIN_SMALLER:
+                printf("KIN_SMALLER\n");
+                break;
+            case KIN_GREATER:
+                printf("KIN_GREATER\n");
+                break;
+            case KIN_SMALLER_EQ:
+                printf("KIN_SMALLER_EQ\n");
+                break;
+            case KIN_GREATER_EQ:
+                printf("KIN_GREATER_EQ\n");
+                break;
+            case KIN_NOT_EQ:
+                printf("KIN_NOT_EQ\n");
+                break;
             default:
-                printf("unknown operation\n");
+                printf("unknown operation %d \n", instruction);
         }        
         shift_active(tac_stack);
     }

@@ -1,3 +1,10 @@
 int main(){
-a=a++ - --b   * ++b;
+a=(3+a)*b - b   * b;
+if(a+b > c){
+a = func(a*b+c-2,sort(4*2));
+}
+else{
+cout << a;
+}
+return a*2+b;
 }

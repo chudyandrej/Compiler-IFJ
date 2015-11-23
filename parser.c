@@ -126,7 +126,6 @@ int body_funcion(){
                     gc_free(next_token());  //useless token
                     new_token = next_token();
                     if(new_token->type == KIN_SEMICOLON){
-                        //make instruction
                         union Address tmp;
                         tmp.variable = new_token->str;
                         gen_instructions(operator_history,tmp,fake,fake,VARIABLE,EMPTY,EMPTY);
