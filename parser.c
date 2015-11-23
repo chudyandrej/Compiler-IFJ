@@ -342,11 +342,11 @@ int assing_exp(Token *token_var){       //token_var -> name of destination varia
 
 enum Type translate(enum sTokenKind type){
     switch(type){
-        case KIN_NUM_INT:
+        case KW_INT:
             return INT;
-        case KIN_NUM_DOUBLE:
+        case KW_DOUBLE:
             return DOUBLE;
-        case KIN_TEXT:
+        case KW_STRING:
             return STRING;
         default:
             printf("hope never happen\n");              //just debug

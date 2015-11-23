@@ -196,6 +196,12 @@ int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3){
                     gen_tnp(p2->description, p1->data, p1->data, EMPTY, p1->type);
                     return 1;
                 } break;
+            case KIN_MINUS:
+                if(p1->description == D_NODE){
+                    gen_tnp(KIN_UNARYMINUS, p1->data,fake, p1->type, EMPTY);
+                    return 1;
+                } break;
+
             default:
                 printf("chyba pri uplatnovani pravidiel dvoch\n");
                 return -1;

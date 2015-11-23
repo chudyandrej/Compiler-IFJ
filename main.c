@@ -64,11 +64,8 @@ void shift_active(tDLList *S){
 void print_instuctions(){
 
     printf("\nVYPIS INSTRUKCII:------------------\n");
-   
     activate_first(tac_stack);
-   
     while(is_active(tac_stack)){ //cyklit nad vsem 3AC instrukcemi
-       
         struct Operation *rec = copy_active(tac_stack);
         TokenKind instruction = rec->ction_inst;
         //printf("INSTRUKCE CISLO: %d\n", instruction);
@@ -141,6 +138,9 @@ void print_instuctions(){
                 break;
             case KIN_NOT_EQ:
                 printf("KIN_NOT_EQ\n");
+                break;
+            case KIN_UNARYMINUS:
+                printf("KIN_UNARYMINUS\n");
                 break;
             default:
                 printf("unknown operation %d \n", instruction);
