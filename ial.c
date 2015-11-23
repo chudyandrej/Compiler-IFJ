@@ -63,8 +63,8 @@ int find(char *s, char *search){
 /**
  * Swap two array items given by indexes
  * @param  s pointer to char array
- * @param  i index the first item in array to exchange
- * @param  j index the second item in array to exchange
+ * @param  i index the first item in array 's' to exchange
+ * @param  j index the second item in array 's' to exchange
  */
 void swap(char *s, int i, int j){
     char swap;
@@ -73,84 +73,51 @@ void swap(char *s, int i, int j){
     s[j] = swap;
 }
 
-/**
- * Heapify function creates max heap from given array
- * @param  s      pointer to char array
- * @param  length length of array
- */
-void heapify(char *s, int length){
-    int index;      /*parents' indexes*/
-    int j;          /*just counter*/
-    int swap_controll=1;
-
-    /*Find index of the last parent => round((size-1)/2) (indexing from 0) */
-    /*Find left_child => parent_index*2+1 */
-    /*Find right_child => parent_index*2+2 */
-    while(swap_controll){
-        swap_controll=0;
-        for(index = 0; index <= (length-1)/2; index++){ /*loop each parent node*/
-           
-            for(j=1; j < 3; j++){
-                if(s[index]<s[index*2+j]){
-                    swap(s, index, index*2+j);  
-                    swap_controll=1;              
-                }
-                if(index*2+2 == length+1) { break; }/*means only one child exist*/
-            }
-        }      
-    }
-}
 
 /**
- * Shift the first item down till array is ordered
- * @param s      pointer to char array
- * @param length length of array
+ * Reorder array (tree) by sorting heap tree
+ * @param  s        pointer to char array
+ * @param  start    index of nodeon which level is sift executed
+ * @param  length   actual length of array 's'
  */
-void shift_down(char *s, int length){
-    int index=0;
+void sift_down(char *s, int start, int length) {
+    int parent = start;
 
-    while(index <= ((length-1)/2)){
-        if(index*2+2 < length+1){   /*two children*/
-            if(s[index*2+1] <= s[index*2+2] && s[index] < s[index*2+2]){
-                swap(s, index, index*2+2);
-                index=index*2+2;
-            }
-            else if(s[index*2+1] >= s[index*2+2] && s[index] < s[index*2+1]){
-                swap(s, index, index*2+1);
-                index=index*2+1;
-            }
-            else{
-                break; 
+    while ( 2*parent + 1 < length) {
+        int child = 2*parent + 1;
+        if (child + 1 < length) { /* have both right and left childs */
+            if (s[child] < s[child+1]) {
+                child += 1; /* set bigger child to be swapped unit */
             }
         }
-        else{       /*one child*/
-            if(s[index] < s[index*2+1]){
-                swap(s, index, index*2+1);
-                index=index*2+1;
-            } 
-            else{
-                break; 
-            }
+        if (s[parent] < s[child]) {
+            swap(s, parent, child); /* swap if child is bigger then parent */
+            parent = child;
+        }
+        else {
+            break;
         }
     }
 }
 
+
 /**
- * Heap sort algorithm
- * @param  s pointer to char array
+ * Sort characters in array with heap-sort algoritm
+ * @param  s        pointer to char array
+ * @param  length   actual length of array 's'
  */
-void sort(char *s){
-    int length = strlen(s)-1; /*index of last item */ 
-    
-    heapify(s, length);     /*heap sort needs max heap*/
-   
-   for( ; length > 0; ){      
-        swap(s, 0, length);   /*swap first and last*/
-        length--;
-                     
-        if(length>=1){           /*shift down*/ 
-            shift_down(s, length); 
-        }
+void sort(char *s) {
+    int start, end;
+    int length = strlen(s);
+
+    /* heapify => make heap tree*/
+    for (start = (length - 2)/2; start >= 0; start--) {
+        sift_down(s, start, length);
+    }
+
+    for (end = length -1; end > 0; end--) {
+        swap(s, end, 0);
+        sift_down(s, 0, end);
     }
 }
 
