@@ -1,6 +1,4 @@
-//
-// Created by Andrej Oliver Chudý on 07/11/15.
-//
+
 
 #ifndef IJF_STR_H
 #define IJF_STR_H

@@ -1,6 +1,3 @@
-//
-// Created by Andrej Oliver Chudý on 22/11/15.
-//
 
 #include "garbage.h"
 
@@ -122,7 +119,7 @@ void *gc_realloc(void *ptr, size_t size){
 
 
 
-void *gc_free(void *ptr){
+void gc_free(void *ptr){
 
     free(ptr);                //free usefull data
     gc_delete_element(find(ptr));      //remove and free from log

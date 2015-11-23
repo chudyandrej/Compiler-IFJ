@@ -1,6 +1,3 @@
-//
-// Created by Andrej Oliver Chudý on 07/11/15.
-//
 
 #ifndef IJF_PARSER_H
 #define IJF_PARSER_H

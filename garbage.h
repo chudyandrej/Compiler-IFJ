@@ -1,6 +1,4 @@
-//
-// Created by Andrej Oliver Chudý on 22/11/15.
-//
+
 
 #ifndef IJF_GARBAGE_H
 #define IJF_GARBAGE_H
@@ -12,7 +10,7 @@ extern  tDLList *garbage;
 void *find(void *ptr);
 void *gc_malloc(size_t size);
 void *gc_realloc(void *ptr, size_t size);
-void *gc_free(void *ptr);
+void gc_free(void *ptr);
 void gc_free_all();
 
 void gc_delete_element(void *element);

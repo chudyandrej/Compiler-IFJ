@@ -1,6 +1,4 @@
-//
-// Created by Andrej Oliver Chudý on 13/11/15.
-//
+
 
 #ifndef IJF_TAC_H
 #define IJF_TAC_H
@@ -19,7 +17,7 @@
 
 
 
-typedef enum Type {
+enum Type {
     INT = 0,
     DOUBLE,
     STRING,
@@ -34,7 +32,7 @@ typedef enum Type {
 
 };
 
-typedef union Address{
+union Address{
     int i;
     double d;
     char *s;
