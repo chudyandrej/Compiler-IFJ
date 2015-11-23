@@ -7,24 +7,32 @@ auto c =  ((48*3+6-2)+4-3);
 auto c =  ((48*3+6-2)+4-3)*2+find(a,dads); 
 string a="nejakkdkz;sjdfktext bla";
 b=func(4,4);
-sort(a);
+a=sort(a);
 a=func    (4,4);
-sort("stringsk");
+a=sort("stringsk");
 string a = sort("fjds");
-length(var);
+a=length(var);
 a= length("sdfdsj");
-substr(variable,o,a);
-concat                      (one, two);
-find(aa, bbb);
-sort(cc);
-sort("blablablalbalsozoradtototobj");
+a=substr(variable,o,a);
+a=concat                      (one, two);
+a=find(aa, bbb);
+a=sort(cc);
+a=sort("blablablalbalsozoradtototobj");
 b=((4*4)*4*a(a,a,a));
-//for(int i=0; a< d; i=i+1){ }
-//for(i=4; a< d; i=i+1){ a=4; } 
-//for(i=0; a< d; i=i+1){ }
-//for(int i=0; a- d; i=i+1){ }
-//for(int i=0; a< d; i=4){ }
-//for(int a; a< c ; i++){ }
+for(int i=0; a< d; i=i+1){ }
+for(i=4; a< d; i=i+1){ a=4; } 
+for(i=0; a< d; i=i+1){ }
+for(int i=0; a- d; i=i+1){ }
+for(int i=0; a< d; i=4){ }
+for(int a; a< c ; i++){ }
+for(int a; a< c ; ++i){ }
+for(int a; a< c ; sort("adsfj")){ }
+for( i=0; a< d; i=i+1){ }
+for( i=0; a- d; i=i+1){ }
+for( i=0; a< d; i=4){ }
+for( a=2; a< c ; i++){ }
+for( a=1; a< c ; ++i){ }
+for( a=0; a< c ; sort("adsfj")){for( a=0; a< c ; sort("adsfj")){ for( a=0; a< c ; sort("adsfj")){ for( a=0; a< c ; sort("adsfj")){ for( a=0; a< c ; sort("adsfj")){ for( a=0; a< c ; sort("adsfj")){ for( a=0; a< c ; sort("adsfj")){ }}}}}} }
 if(a*4){ c= func(); } else { }
 if(a+4){ } else { }
 if(a-4){ } else { }
@@ -35,6 +43,8 @@ if(a<=4){ } else { }
 if(a>=4){ } else { }
 if(a !=4){ } else { }
 if(a*(d+4)-4){ } else { }
+if(sort("dskfj")){}else{}
+if(sort("dskfj")){a=4;b=sort("sadf");}else{a=func(4,54,5*5-6);}
 /*sdfsafaas*/ a=4;
 cin >> a>>c>>a>>d;
 cin >> a >>b;
@@ -67,3 +77,6 @@ a=++a;
 a=7894e20+4+ ++a*3;
 a=7894E20+4+ ++a*3;
 a=a++ - --b  * ++b;
+c= ((((((((((((((((((((((((54*(((((((((((((((4+3-(10)-5)/4)))))))/2)/2)/2)))))))))))))))))))))))))))));
+c=((( 5*3)/(4/9-7/85+ 4)/(4512*5/5-3+52)/4)*2+1);
+
