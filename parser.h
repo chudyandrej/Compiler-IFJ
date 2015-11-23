@@ -10,7 +10,7 @@
 #include "stack.h"
 #include <stdbool.h>
 #include "err.h"
-#include "bst.h"
+#include "ial.h"
 #include "garbage.h"
 
 extern tDLList *tac_stack;

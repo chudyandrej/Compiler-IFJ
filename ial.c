@@ -2,7 +2,7 @@
 // Created by Andrej Oliver Chudý on 17/11/15.
 //
 
-#include "bst.h"
+#include "ial.h"
 /*
 * Soubor s implementacemi algoritmu pro predmet IAL
 * Verze zadani: a/2/i

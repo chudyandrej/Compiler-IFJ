@@ -1,5 +1,5 @@
 #include "parser.h"
-#include "bst.h"
+#include "ial.h"
 
 FILE *fp;
 
