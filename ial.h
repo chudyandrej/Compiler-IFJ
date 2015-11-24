@@ -58,9 +58,7 @@ if( ! BSTActive) BSTAdd(&T. key);
 /***************/
 typedef struct tFunc{
     char * params; 
-        // v = void
         // d = double
-        // a = auto
         // i = int
         // s = string
         // prvni je navratova hodnota, zbyvajici parametry v danem poradi

@@ -16,7 +16,7 @@ int main(){
     init();
     int out =  interpret();
     printf("///////////////\n");
-    printf("END!\n");
+    printf("END: %d!\n", out);
     return out;
 }
 
@@ -31,7 +31,7 @@ void init(){
     char * a_names = malloc(sizeof(char)*4);
     strcpy(m_key, "main");
     strcpy(a_key, "fooo");
-    strcpy(m_params, "v");
+    strcpy(m_params, "i");
     strcpy(m_params, "iid");
     strcpy(m_names, "");
     strcpy(a_names,"a b");
@@ -98,7 +98,6 @@ void fillM(tDLList * m){
     o3->t_op2=INT;
     o3->op1.tmp = 0;
     o3->op2.i = 5;
-
 
     tOperation o4 = malloc(sizeof(struct Operation));
     o4->inst = KIN_ASSIGNEMENT;

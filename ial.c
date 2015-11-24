@@ -243,7 +243,7 @@ void LSTLeaveScope (tBSTEPtr ptr, int scope){
 int LSTGet (tBSTPtr T, struct TMPRecord * v){
     tVarPtr tmp = T->Act->data;
     if (tmp==NULL){
-        return 1;
+        return 8;
     }
     if(tmp->assigned == 0){
         v->t = tmp->value.t;

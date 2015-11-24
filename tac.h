@@ -75,6 +75,7 @@ typedef enum sTokenKind {
                SCOPE_UP,
                SCOPE_DOWN,
                TAC_EMPTY,
+               KIN_UNARYMINUS
 }TokenKind;
 
 
