@@ -71,7 +71,7 @@ int function(char * name, tBSTPtr my_ST, struct TMPRecord * ret){
 		else if (instruction==KIN_MINUSMINUS){
 			out = unaryOp(rec, my_ST, -1);
 		}
-		if((instruction>=3)&&(instruction<=17)){
+		else if((instruction>=3)&&(instruction<=17)){
 			out = countingOp(rec, my_ST);
 		}
 		else if (instruction==SCOPE_UP) scope++;
@@ -484,11 +484,12 @@ int unaryOp(struct Operation *rec, tBSTPtr my_ST, int con){
 	}
 	else{
 		out = dereference(rec, my_ST, 1, dereferenced);
+		if (out) return 3;
 		if (dereferenced->t==DOUBLE) dereferenced->value.d = dereferenced->value.d + con;
 		else if (dereferenced->t==INT) dereferenced->value.i = dereferenced->value.i + con;
 		else return 4;
 		if (rec->t_op1==VARIABLE){
-			BSTFind(my_ST, rec->t.variable);
+			BSTFind(my_ST, rec->op1.variable);
 			if (!BSTActive(my_ST)) return 3;
 			out = LSTSet(my_ST, dereferenced);
 		} 
