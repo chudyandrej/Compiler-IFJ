@@ -384,6 +384,7 @@ int expression_process(enum sTokenKind end_char, dTreeElementPtr *final_node){  
 
 dTreeElementPtr clean_stack(tDLList *Stack,  bool correct_end){
     dTreeElementPtr ptr = (correct_end) ? Stack->Last->data : NULL;
+    //ptr = (ptr->description == D_DOLLAR) ? NULL : ptr;  //case no parameters in function
     dispose_list(Stack);
     return ptr;
 }

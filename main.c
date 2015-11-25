@@ -123,7 +123,7 @@ void print_instuctions(){
                 printf("unknown operation %d ", instruction);
         }
         foobar(rec);
-        printf("    %d", (int)rec->label);
+        if ((int)rec->label>0) printf("         >>>%d", (int)rec->label);
             
         printf("\n");
         shift_active(tac_stack);

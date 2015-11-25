@@ -18,7 +18,7 @@ int to_double(struct TMPRecord * tmp);
 int function(char * name, tBSTPtr my_ST, struct TMPRecord * ret);
 void store_tmp(struct TMPRecord * tmp, int i);
 int condition(struct Operation *rec, tBSTPtr my_ST, int * jump);
-void jumpOp(struct Operation *rec, tBSTPtr my_ST, tDLList * my_tac);
+void jumpOp(struct Operation *rec, tDLList * my_tac);
 int returnOp(struct Operation *rec, tBSTPtr my_ST, struct TMPRecord * ret, char c);
 Type convert(char c);
 int unaryminusOp(struct Operation *rec, tBSTPtr my_ST);
@@ -28,6 +28,7 @@ int isBuildIn(struct Operation *rec);
 int buildInOp(struct Operation *rec, tBSTPtr my_ST, int op);
 int funcOp(struct Operation *rec, tBSTPtr my_ST);
 void decrease_push();
+char * get_name(char * names, int  i);
 
 int interpret(){
 	if (GSTAllDef(Func.Root) != 1) return 3;
@@ -82,7 +83,8 @@ int function(char * name, tBSTPtr my_ST, struct TMPRecord * ret){
 			out = assignmentOp(rec, my_ST);
 		}
 		else if (instruction==TAC_PUSH){
-			out = pushOp(rec, my_ST);
+			if (rec->t.s!=NULL)
+				out = pushOp(rec, my_ST);
 		}
 		else if (instruction==TAC_INIT){
 			out = initOp(rec, my_ST, scope);
@@ -95,14 +97,14 @@ int function(char * name, tBSTPtr my_ST, struct TMPRecord * ret){
 		} 
 		else if (instruction==TAC_EMPTY);
 		else if (instruction==TAC_GOTO_UNCOND){
-			jumpOp(rec, my_ST, my_tac);
+			jumpOp(rec, my_tac);
 			continue;
 		}
 		else if (instruction==TAC_GOTO_COND){
 			int jump = 0;
 			out =  condition(rec, my_ST, &jump);
 			if (jump){
-				jumpOp(rec, my_ST, my_tac);
+				jumpOp(rec, my_tac);
 				continue;
 			}
 		}
@@ -120,7 +122,7 @@ int function(char * name, tBSTPtr my_ST, struct TMPRecord * ret){
 			return 10; // neznama instrukce
 		}
 		shift_active(my_tac);
-		if (out) {printf("out fuu: %d\n", out); return out;}
+		if (out) {printf("%d, out fuu: %d\n", (int)instruction,  out); return out;}
 	}
 
 	return 8; // end of non-void function
@@ -247,9 +249,7 @@ int dereference(struct Operation *rec, tBSTPtr my_ST, int address_number, struct
 			break;
 		case TMP:
 			i = dereferenced->value.tmp;
-			printf("typ: %d, %d\n", (int)dereferenced->t, working_tmp[i]->t);
 			dereferenced->value = working_tmp[i]->value;
-			printf("!!!\n");
 			dereferenced->t = working_tmp[i]->t;
 			break;
 		case VARIABLE:
@@ -270,7 +270,6 @@ int dereference(struct Operation *rec, tBSTPtr my_ST, int address_number, struct
 void * extendTmp(void *ptr){
 	//working_tmp = extendTmp(working_tmp, &tmp_size);
 	working_size = working_size * 2;
-	printf("?!!!?\n");
 	ptr = realloc(ptr, sizeof(struct TMPRecord *) * working_size);
 	return ptr;
 }
@@ -291,12 +290,9 @@ int to_double(struct TMPRecord * tmp){
 
 void store_tmp(struct TMPRecord * tmp, int i){
 	while (i>=((int)working_size + 1)){
-		printf("%d >= %d\n", i, working_size);
 		working_tmp = extendTmp(working_tmp);
 	}
-	printf("WTF REALOC\n");
 	working_tmp[i] = tmp;
-	printf("%d: %d %d\n",i,  working_tmp[i]->value.i, (int)working_tmp[i]->t);
 }
 
 void store_push(struct TMPRecord * tmp){
@@ -378,7 +374,7 @@ int condition(struct Operation *rec, tBSTPtr my_ST, int * jump){
 	return out;
 }
 
-void jumpOp(struct Operation *rec, tBSTPtr my_ST, tDLList * my_tac){
+void jumpOp(struct Operation *rec, tDLList * my_tac){
 	unsigned int label = rec->t.label;
 	activate_first(my_tac);
 	while(is_active(my_tac)){
@@ -573,6 +569,49 @@ int buildInOp(struct Operation *rec, tBSTPtr my_ST, int op){
 
 int funcOp(struct Operation *rec, tBSTPtr my_ST){
 	int out = 0;
+	char * fce_name = rec->op1.fce;
+	BSTFind(&Func, fce_name);
+	if (!BSTActive(&Func)) return 10;
+	char * names = ((struct tFunc *)Func.Act->data)->names;
+	char * params = ((struct tFunc *)Func.Act->data)->params;
+	struct TMPRecord * ret = malloc(sizeof(struct TMPRecord));
+	struct tBST ST;
+	BSTInit(&ST);
+	for (int i = strlen(params)-1; i>=1; i--){
+		Type parameter = convert(params[i]);
+		char * name = get_name(names, i);
+		struct TMPRecord * operand;
+		operand = working_push[working_push_size-1];
+		decrease_push();
+		if ((operand->t!=parameter)&&((operand->t==STRING)||(parameter==STRING))){
+			return 4;
+		}
+		BSTFind(&ST, name);
+		if (BSTActive(&ST)) return 6;
+		BSTAdd(&ST, name);
+		LSTAdd(&ST, parameter, 0);
+		LSTSet(&ST, operand);
+	}
+
+	struct TMPRecord** BU_working_tmp = working_tmp; //tmp promene aktualni funce
+	struct TMPRecord** BU_working_push = working_push;
+	unsigned int BU_working_size = working_size;
+	unsigned int BU_working_push_size = working_push_size;
+	out = function(fce_name, &ST, ret);
+	if (out) return out;
+	working_tmp = BU_working_tmp;
+	working_push = BU_working_push;
+	working_size = BU_working_size;
+	working_push_size = BU_working_push_size;
+
+	if (rec->t_t==VARIABLE){
+		BSTFind(my_ST, rec->t.variable);
+		if (!BSTActive(my_ST)) return 3;
+		out = LSTSet(my_ST, ret);
+	} 
+	else if (rec->t_t==TMP){
+		store_tmp(ret, rec->t.tmp);
+	}
 
 	return out;
 }
@@ -604,4 +643,24 @@ int isBuildIn(struct Operation *rec){
 void decrease_push(){
 	working_push_size--;
 	working_push = extendPush(working_push, working_push_size);
+}
+
+char * get_name(char * names, int  i){
+	int counter = 0;
+	int length = strlen(names);
+	int begin = 0;
+	int end = 0;
+	for (int j = 0; j<length; j++){
+		if (names[j]==' ') {
+			counter++;
+			if (counter==i) end = j;
+			if (counter==i-1) begin = j+1;
+		}
+	}
+	if (counter<i) end = length;
+	length = end - begin + 1;
+	char * name = malloc(sizeof(char)*length);
+	memcpy(name, &names[begin], length-1);
+	name[length-1]='\0';
+	return name;
 }

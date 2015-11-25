@@ -139,6 +139,10 @@ int GSTDeclare(tBSTPtr T, char * params, char * names){
     } else {
         if(strcmp(params,((struct tFunc *)T->Act->data)->params)!=0)
             return 1;
+        if ((names==NULL)||(((struct tFunc *)T->Act->data)->names==NULL)){
+            if ((names==NULL)&&(((struct tFunc *)T->Act->data)->names==NULL)) return 0;
+            else return 1;
+        }
         if(strcmp(names,((struct tFunc *)T->Act->data)->names)!=0)
             return 1;
     }
