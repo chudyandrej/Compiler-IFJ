@@ -12,6 +12,7 @@
 #include "precedence.h"
 #include "tac.h"
 
+extern unsigned int tmp_counter;
 extern tDLList *tac_stack;
 extern union Address fake;
 int start_syntax_analyz();

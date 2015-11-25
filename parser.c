@@ -60,6 +60,7 @@ int dec_function(unsigned int type_func){
                 }
                 if (new_token->type == KIN_SEMICOLON){
                     gc_free(new_token);
+                    gc_free(new_token);
                     gc_free(func_name);
                     return 0;
                 }
@@ -91,6 +92,7 @@ int dec_function(unsigned int type_func){
 }
 
 int body_funcion(){
+    fprintf(stderr,"scope UP body !!!  ##\n");
     gen_instructions(SCOPE_UP, fake, fake, fake, EMPTY, EMPTY, EMPTY);
     Token *token_var;
      Token *new_token ;
@@ -156,16 +158,26 @@ int body_funcion(){
                     return 1;
                 }
                 return 1;
-            case KW_AUTO:   case KW_DOUBLE:  case KW_INT:  case KW_STRING:      //all datatypes
+            case KW_AUTO:   
+                if((new_token=next_token())->type == KIN_IDENTIFIER){
+                    if(assing_exp(new_token) == 0){continue;}else{return 1;}
+                    //kde odalokovat new_token co siel do func?
+                }
+                else{return 1;}
+            case KW_DOUBLE:  case KW_INT:  case KW_STRING:      //all datatypes
                 if (dec_variable(new_token->type) == 0) {
                     gc_free(new_token);
                     continue;}
                 else {return 1;}
+            case KIN_L_BRACE:
+                if(body_funcion() == 0){continue;}else{return 1;}
             case KIN_R_BRACE:
+               fprintf(stderr,"scope down body!!!  ##\n");
                 gc_free(new_token);
                 gen_instructions(SCOPE_DOWN, fake, fake, fake, EMPTY, EMPTY, EMPTY);
                 return 0;
             default:
+                fprintf(stderr,"body of func token %d\n", new_token->type);
                 gc_free(new_token);
                 errorMessage_syntax(" Body of function !");
                 return 1;
@@ -175,7 +187,7 @@ int body_funcion(){
 
 int for_statement() {
 
-    gen_tnp(SCOPE_UP, fake, fake, EMPTY, EMPTY);
+    gen_instructions(SCOPE_UP, fake, fake, fake, EMPTY, EMPTY, EMPTY);
     Token *new_token;
     char *var_name;
     union Address cond;
@@ -216,7 +228,7 @@ int for_statement() {
             int exit_code = expression_process(KIN_R_ROUNDBRACKET,&end_node);
             if(exit_code == KIN_ASSIGNEMENT){
                 exit_code = expression_process(KIN_R_ROUNDBRACKET,&end_node);
-                if(exit_code != KIN_R_ROUNDBRACKET){
+                if(exit_code != KIN_R_ROUNDBRACKET || end_node == NULL){
                     return 1;
                 }
                 union Address tmp;
@@ -224,14 +236,14 @@ int for_statement() {
                 gen_instructions(KIN_ASSIGNEMENT, tmp, end_node->data, fake, VARIABLE, end_node->type, EMPTY);
                 gc_free(end_node);
             }
-            if ((new_token = next_token())->type == KIN_L_BRACE) {
+            if ((new_token = next_token())->type == KIN_L_BRACE && end_node != NULL) {
                 gc_free(new_token);
                 gen_instructions(TAC_GOTO_UNCOND, incre, fake, fake, LABEL, EMPTY, EMPTY);
                 gen_label(skip.label);
                 exit_code = body_funcion();
                 gen_instructions(TAC_GOTO_UNCOND, uncond, fake, fake, LABEL, EMPTY, EMPTY);
                 gen_label(cond.label);
-                gen_tnp(SCOPE_DOWN, fake, fake, EMPTY, EMPTY);
+                gen_instructions(SCOPE_DOWN, fake, fake, fake, EMPTY, EMPTY, EMPTY);
                 return exit_code;
             }
         }
@@ -255,7 +267,7 @@ int if_statement(){
             gen_instructions(TAC_GOTO_COND, cond, end_node->data, fake, LABEL, end_node->type, EMPTY);
             gc_free(new_token);
         }
-        if((new_token=next_token())->type == KIN_L_BRACE && (body_funcion() == 0)) {
+        if((new_token = next_token())->type == KIN_L_BRACE && (body_funcion() == 0)) {
            gen_instructions(TAC_GOTO_UNCOND, uncond, fake, fake, LABEL, EMPTY,EMPTY);
            gen_label(cond.label);
            gc_free(new_token);
@@ -330,8 +342,8 @@ int assing_exp(Token *token_var){       //token_var -> name of destination varia
     dTreeElementPtr end_node = NULL;
     if (new_token->type == KIN_ASSIGNEMENT){
         gc_free(new_token);
-        int ret_code = (expression_process(KIN_SEMICOLON, &end_node) == KIN_SEMICOLON)? 0 : 1;
-        if(ret_code == 0) {
+        int ret_code = (expression_process(KIN_SEMICOLON, &end_node) == KIN_SEMICOLON && end_node != NULL)? 0 : 1;
+        if(ret_code == 0 ) {
             union Address tmp;
             tmp.variable = token_var->str;
             fprintf(stderr,"variable: %s\n", tmp.variable);
@@ -372,7 +384,7 @@ int dec_variable(enum sTokenKind type){
             return 0;
         }
         else if(token_predict->type == KIN_ASSIGNEMENT){
-            assing_exp(new_token);
+            if(assing_exp(new_token) != 0){return 1;}
             return 0;
         }
     }
@@ -450,8 +462,8 @@ int parameters_used(){
     while(true) {
         counter_of_arguments++;
         int exit_code_value = expression_process(KIN_COMMA, &end_node);
-        if(end_node != NULL){
-            printf("push %d\n", end_node->description);
+        if(end_node->description != D_DOLLAR || end_node != NULL){
+            fprintf(stderr,"push %d\n", end_node->description);
             gen_instructions(TAC_PUSH, end_node->data, fake, fake, end_node->type, EMPTY, EMPTY);
             gc_free(end_node);
         }
@@ -470,15 +482,18 @@ Token *next_token(){
     Token *new_token = token_predict;
     token_predict = get_token(fp);
     if(new_token == NULL ){
-        //odalocujeme
+        gc_free_all();
         errorMessage_internal("Malloc error");
         exit(INTER_ERR);
     } else if(new_token->type == KIN_UNKNOWN){
-        errorMessage_lexical("");
-        //odalocujeme
+        errorMessage_lexical("BAD SYNTAX");
+        gc_free_all();
         exit(LEX_ERR);
     }
     else{
+        if(new_token->type == KIN_SEMICOLON){
+            tmp_counter = 0;
+        }
         return new_token;
     }
 }
