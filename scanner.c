@@ -32,6 +32,8 @@ Token * get_token(FILE * fp) {
     State state = S_START;
     string * str_tmp;
     Token * token;
+    char hex[ESC_HEX_MAX];
+    char ch; //help variable for escape sequence processing
     if ((token = gc_malloc(sizeof(Token))) == NULL) {
         return NULL;
     }
@@ -268,25 +270,32 @@ Token * get_token(FILE * fp) {
                 /* ######################## S_TEXT_ESC ############################## */
 
             case S_TEXT_ESC:
-                if (c == '"' || c == 'n' || c == 't' || c == '\\') {
-                    if (str_add_char(str_tmp, '\\') || str_add_char(str_tmp, c)) {
-                        cleanup(token, str_tmp);
-                    }
-                }
-                else if (c == 'x') {
-                    char hex[ESC_HEX_MAX];
+                switch(c) {
+                case '"':
+                    ch = '\"';
+                    break;
+                case 'n':
+                    ch = '\n';
+                    break;
+                case 't':
+                    ch = '\t';
+                    break;
+                case '\\':
+                    ch = '\\';
+                    break;
+                case 'x':
+                case 'X':
                     hex[0] = (char) getc(fp);
                     hex[1] = (char) getc(fp);
 
-                    if (isxdigit(hex[0]) && isxdigit(hex[1])) {
-                        if (str_add_char(str_tmp,(char)strtol(hex,NULL,16)))
-                            cleanup(token, str_tmp);
-                    }
+                    if (isxdigit(hex[0]) && isxdigit(hex[1])) ch = (char)strtol(hex,NULL,16);
                     else {
                         ungetc(hex[0],fp);
                         ungetc(hex[1],fp);
                     }
+                    break;
                 }
+                if (str_add_char(str_tmp, ch)) cleanup(token, str_tmp);
                 state = S_TEXT;
                 break;
 
