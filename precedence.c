@@ -188,7 +188,7 @@ int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3){
             case KIN_PLUSPLUS:
             case KIN_MINUSMINUS:
                 if(p1->description == D_NODE){
-                    gen_tnp(p2->description, p1->data, p1->data, EMPTY, p1->type);
+                    gen_instructions(p2->description, p1->data, fake, fake, p1->type, EMPTY, EMPTY);
                     return 1;
                 } break;
             case KIN_MINUS:
