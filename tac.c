@@ -137,46 +137,80 @@ int countingOp(struct Operation *rec, tBSTPtr my_ST){
 	target->t=DOUBLE;
 	out = dereference(rec, my_ST, 1, operand1);
 	if (out!=0) return out;
-	out = to_double(operand1);
-	if (out!=0) return out;
 	out = dereference(rec, my_ST, 2, operand2);
 	if (out!=0) return out;
-	out = to_double(operand2);
-	if (out!=0) return out;
-	switch(rec->inst){
-		case KIN_PLUS:
-			target->value.d = operand1->value.d + operand2->value.d;
-			break;
-		case KIN_MINUS:
-			target->value.d = operand1->value.d - operand2->value.d;
-			break;
-		case KIN_MUL:
-			target->value.d = operand1->value.d * operand2->value.d;
-			break;
-		case KIN_DIV:
-			if (operand2->value.d==0.0) return 9;
-			target->value.d = operand1->value.d / operand2->value.d;
-			break;
-		case KIN_EQ:
-			target->value.d = operand1->value.d == operand2->value.d;
-			break;
-		case KIN_SMALLER:
-			target->value.d = operand1->value.d < operand2->value.d;
-			break;
-		case KIN_GREATER:
-			target->value.d = operand1->value.d > operand2->value.d;
-			break;
-		case KIN_SMALLER_EQ:
-			target->value.d = operand1->value.d <= operand2->value.d;
-			break;
-		case KIN_GREATER_EQ:
-			target->value.d = operand1->value.d >= operand2->value.d;
-			break;
-		case KIN_NOT_EQ:
-			target->value.d = operand1->value.d != operand2->value.d;
-			break;
-		default:
-			out = 4;
+	if ((operand1->t == STRING) && (operand2->t == STRING)){
+		int comp = strcmp(operand1->value.s, operand2->value.s);
+		switch(rec->inst){
+			case KIN_EQ:
+				if (comp == 0) target->value.i = 1;
+				else target->value.i = 0;
+				break;
+			case KIN_SMALLER:
+				if (comp < 0) target->value.i = 1;
+				else target->value.i = 0;
+				break;
+			case KIN_GREATER:
+				if (comp > 0) target->value.i = 1;
+				else target->value.i = 0;
+				break;
+			case KIN_SMALLER_EQ:
+				if (comp <= 0) target->value.i = 1;
+				else target->value.i = 0;
+				break;
+			case KIN_GREATER_EQ:
+				if (comp >= 0) target->value.i = 1;
+				else target->value.i = 0;
+				break;
+			case KIN_NOT_EQ:
+				if (comp != 0) target->value.i = 1;
+				else target->value.i = 0;
+				break;
+			default:
+				out = 4;
+			}
+			target->t=INT;
+	}
+	else{
+		out = to_double(operand1);
+		if (out!=0) return out;
+		out = to_double(operand2);
+		if (out!=0) return out;
+		switch(rec->inst){
+			case KIN_PLUS:
+				target->value.d = operand1->value.d + operand2->value.d;
+				break;
+			case KIN_MINUS:
+				target->value.d = operand1->value.d - operand2->value.d;
+				break;
+			case KIN_MUL:
+				target->value.d = operand1->value.d * operand2->value.d;
+				break;
+			case KIN_DIV:
+				if (operand2->value.d==0.0) return 9;
+				target->value.d = operand1->value.d / operand2->value.d;
+				break;
+			case KIN_EQ:
+				target->value.d = operand1->value.d == operand2->value.d;
+				break;
+			case KIN_SMALLER:
+				target->value.d = operand1->value.d < operand2->value.d;
+				break;
+			case KIN_GREATER:
+				target->value.d = operand1->value.d > operand2->value.d;
+				break;
+			case KIN_SMALLER_EQ:
+				target->value.d = operand1->value.d <= operand2->value.d;
+				break;
+			case KIN_GREATER_EQ:
+				target->value.d = operand1->value.d >= operand2->value.d;
+				break;
+			case KIN_NOT_EQ:
+				target->value.d = operand1->value.d != operand2->value.d;
+				break;
+			default:
+				out = 4;
+			}
 	}
 	if ((operand1->t == INT) && (operand2->t == INT)){
 		target->value.i = (int)target->value.d;
