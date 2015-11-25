@@ -1,5 +1,4 @@
 
-
 #include "precedence.h"
 unsigned int tmp_counter = 0;
 
@@ -68,13 +67,13 @@ void gen_label(unsigned int lab){
 void printf_stack(tDLList *Stack){
     tDLElemPtr new_help = Stack->First;
     new_help = Stack->First;
-    printf("\n####### STACK ##########\n");
-    // printf("#### %p ####\n",&Stack);
+    fprintf(stderr,"\n####### STACK ##########\n");
+    // fprintf(stderr,"#### %p ####\n",&Stack);
     while(new_help != NULL){
-        printf("%d\n",((dTreeElementPtr) new_help->data)->description);
+        fprintf(stderr,"%d\n",((dTreeElementPtr) new_help->data)->description);
         new_help = new_help->rptr;
     }
-    printf("########################\n");
+    fprintf(stderr,"########################\n");
 }
 tDLList* init_stack(){
     tDLList *Stack = gc_malloc(sizeof(struct tDLList));   //malloc stack
@@ -113,14 +112,14 @@ dTreeElementPtr load_token(dTreeElementPtr new_element, Token *token){
             new_element->description = KIN_IDENTIFIER;
             return new_element;
         default:
-            printf("\nload token !!!!!!!!!!!!\n");
+            fprintf(stderr,"\nload token !!!!!!!!!!!!\n");
             return NULL;
     }
 }
 dTreeElementPtr create_stack_element(enum sTokenKind description, Token *token) {
     dTreeElementPtr new_element = gc_malloc(sizeof(struct dTreeElement));
     if (new_element == NULL) {
-        printf("Malloc ERROR");
+        fprintf(stderr,"Malloc ERROR");
         return NULL;
     }
     if(description == D_TMP){
@@ -168,7 +167,7 @@ int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3){
                 }
                 break;
             default:
-               printf("Error: rules tri argumenty");
+               fprintf(stderr,"Error: rules tri argumenty");
                 return -1;
         }
 
@@ -182,7 +181,7 @@ int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3){
                     return 1;
                 } break;
             default:
-                printf("Ruls");
+                fprintf(stderr,"Ruls");
                 break;
         }
         switch(p2->description){
@@ -199,7 +198,7 @@ int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3){
                 } break;
 
             default:
-                printf("chyba pri uplatnovani pravidiel dvoch\n");
+                fprintf(stderr,"chyba pri uplatnovani pravidiel dvoch\n");
                 return -1;
         }
     }
@@ -211,8 +210,8 @@ int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3){
             case KIN_IDENTIFIER:
                 return 0;
             default:
-                printf("chybny: %d\n", p1->description);
-                printf("chyba pri uplatnovani pravidiel jednej\n");
+                fprintf(stderr,"chybny: %d\n", p1->description);
+                fprintf(stderr,"chyba pri uplatnovani pravidiel jednej\n");
                 return -1;
         }
     }
@@ -230,7 +229,7 @@ int element_reduct(tDLList *Stack){
             break;
         }
         if (i >= 3){
-            return -1;           //ak nepojde matova ruka je v ohni
+            return -1;           
         }
         elements[i] = (dTreeElementPtr) new->data;
         new = new->lptr;
@@ -238,7 +237,7 @@ int element_reduct(tDLList *Stack){
     int exit_code = rules(elements[0],elements[1],elements[2]);
     if(exit_code == 0){
         ((dTreeElementPtr)Stack->Last->data)->description = D_NODE;
-        printf("ELEMEN REDUCT%d\n", ((dTreeElementPtr)Stack->Last->data)->type);
+        fprintf(stderr,"ELEMEN REDUCT%d\n", ((dTreeElementPtr)Stack->Last->data)->type);
         return 0;
     }
     else if(exit_code >= 1 && exit_code <= 2){
@@ -311,20 +310,22 @@ int expression_process(enum sTokenKind end_char, dTreeElementPtr *final_node){  
         }
         if((new_token->type == KIN_IDENTIFIER || (new_token->type >= KW_LENGTH && new_token->type <= KW_SORT)) &&
                 token_predict->type == KIN_L_ROUNDBRACKET){                         //funcion in expession
-           // printf("VNARAM\n");
             gc_free(next_token());
             if(call_function(new_token) != 0){ *final_node = clean_stack(Stack, false); return -1;}
             insert_last(Stack, create_stack_element(D_STOPER, NULL));
             insert_last(Stack, create_stack_element(D_TMP, NULL));
-
-           // printf("VYNARAM\n");
-           // printf_stack(Stack);
             continue;
         }
-        load_new_tag = true;
+         load_new_tag = true;
 
         if((new_token->type == end_char && new_token->type != KIN_R_ROUNDBRACKET) || new_token->type == END_OF_FILE ||
-                new_token->type == KIN_COMMA || new_token->type == KIN_SCOUT){
+                new_token->type == KIN_COMMA || new_token->type == KIN_SCOUT || new_token->type == KIN_ASSIGNEMENT){
+            if(new_token->type == KIN_ASSIGNEMENT){
+                if( (((dTreeElementPtr)Stack->Last->data)->description != KIN_IDENTIFIER) || length_list(Stack) != 3) {
+                    *final_node = clean_stack(Stack, false); 
+                    return -1;
+                }                
+            }
             exit_char = new_token->type;
             new_token->type = D_DOLLAR;
         }
@@ -374,7 +375,7 @@ int expression_process(enum sTokenKind end_char, dTreeElementPtr *final_node){  
                     *final_node = clean_stack(Stack, true);
                     return exit_char;
                 }
-                printf("precedence table errror s tokenom: %d, vrch stacku: %d\n", new_token->type,((dTreeElementPtr) Stack->Last->data)->description);
+                fprintf(stderr,"precedence table errror s tokenom: %d, vrch stacku: %d\n", new_token->type,((dTreeElementPtr) Stack->Last->data)->description);
                 *final_node = clean_stack(Stack, false);
                 return -1;
 
@@ -431,4 +432,3 @@ void preinsert_lastNode(tDLList *L, void *data){
         }
     }
 }
-

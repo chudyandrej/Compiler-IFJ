@@ -47,8 +47,8 @@ int dec_function(unsigned int type_func){
         if ((new_token = next_token())->type == KIN_L_ROUNDBRACKET){
             gc_free(new_token);
             if(parameters_declar(type_func, &data_types, &names) == 0){
-                printf("\ntyps: %s\n",data_types);
-                printf("\nnames: %s\n",names);
+                fprintf(stderr,"\ntyps: %s\n",data_types);
+                fprintf(stderr,"\nnames: %s\n",names);
                 new_token = next_token();
                 BSTFind(&Func,func_name->str);
                 if ( ! BSTActive(&Func)) {
@@ -177,6 +177,7 @@ int for_statement() {
 
     gen_tnp(SCOPE_UP, fake, fake, EMPTY, EMPTY);
     Token *new_token;
+    char *var_name;
     union Address cond;
     cond.label = label;
     union Address uncond;
@@ -211,14 +212,15 @@ int for_statement() {
             }
             gen_label(uncond.label);
             new_token = token_predict;
+            var_name = new_token->str; //save name of ID, cause new_token can be free in expression in some cases
             int exit_code = expression_process(KIN_R_ROUNDBRACKET,&end_node);
-            if(exit_code != KIN_R_ROUNDBRACKET){
+            if(exit_code == KIN_ASSIGNEMENT){
                 exit_code = expression_process(KIN_R_ROUNDBRACKET,&end_node);
                 if(exit_code != KIN_R_ROUNDBRACKET){
                     return 1;
                 }
                 union Address tmp;
-                tmp.variable = new_token->str;
+                tmp.variable = var_name;
                 gen_instructions(KIN_ASSIGNEMENT, tmp, end_node->data, fake, VARIABLE, end_node->type, EMPTY);
                 gc_free(end_node);
             }
@@ -310,7 +312,7 @@ int cout(){
         while(true){
             int ret_code = expression_process(KIN_SEMICOLON, &end_node);
             if(end_node != NULL) {
-                printf("COUT%d\n", end_node->type);
+                fprintf(stderr,"COUT%d\n", end_node->type);
                 gen_instructions(KIN_SCOUT, end_node->data, fake, fake, end_node->type, EMPTY, EMPTY);
                 gc_free(end_node);
             }
@@ -332,7 +334,7 @@ int assing_exp(Token *token_var){       //token_var -> name of destination varia
         if(ret_code == 0) {
             union Address tmp;
             tmp.variable = token_var->str;
-            printf("variable: %s\n", tmp.variable);
+            fprintf(stderr,"variable: %s\n", tmp.variable);
             gen_instructions(KIN_ASSIGNEMENT, tmp, end_node->data, fake, VARIABLE, end_node->type, EMPTY);
             gc_free(end_node);
         }
@@ -353,7 +355,7 @@ Type translate(enum sTokenKind type){
         case KW_AUTO:
             return AUTO;
         default:
-            printf("hope never happen\n");              //just debug
+            fprintf(stderr,"hope never happen\n");              //just debug
             return AUTO;             //this situation never happen
     }
 }
@@ -382,16 +384,16 @@ void ap_type(char **types,unsigned int type){
 
     switch (type){
         case KW_INT:
-            strcat(*types,"i");
+            strcat(*types,"i ");
             break;
         case KW_DOUBLE:
-            strcat(*types,"d");
+            strcat(*types,"d ");
             break;
         case KW_AUTO:
-            strcat(*types,"a");
+            strcat(*types,"a ");
             break;
         case KW_STRING:
-            strcat(*types,"s");
+            strcat(*types,"s ");
             break;
         default:
             break;
@@ -449,6 +451,7 @@ int parameters_used(){
         counter_of_arguments++;
         int exit_code_value = expression_process(KIN_COMMA, &end_node);
         if(end_node != NULL){
+            printf("push %d\n", end_node->description);
             gen_instructions(TAC_PUSH, end_node->data, fake, fake, end_node->type, EMPTY, EMPTY);
             gc_free(end_node);
         }
