@@ -26,7 +26,7 @@ int unaryOp(struct Operation *rec, tBSTPtr my_ST, int con);
 void store_push(struct TMPRecord * tmp);
 int isBuildIn(struct Operation *rec);
 int buildInOp(struct Operation *rec, tBSTPtr my_ST, int op);
-int funcOp(struct Operation *rec, tBSTPtr my_ST);
+int funcOp(struct Operation *rec, tBSTPtr my_ST, tDLList * my_tac);
 void decrease_push();
 char * get_name(char * names, int  i);
 
@@ -116,7 +116,7 @@ int function(char * name, tBSTPtr my_ST, struct TMPRecord * ret){
 			if (op)
 				out = buildInOp(rec, my_ST, op);
 			else
-				out = funcOp(rec, my_ST);
+				out = funcOp(rec, my_ST, my_tac);
 		}
 		else {
 			return 10; // neznama instrukce
@@ -602,7 +602,7 @@ int buildInOp(struct Operation *rec, tBSTPtr my_ST, int op){
 	return out;
 }
 
-int funcOp(struct Operation *rec, tBSTPtr my_ST){
+int funcOp(struct Operation *rec, tBSTPtr my_ST, tDLList * my_tac){
 	int out = 0;
 	char * fce_name = rec->op1.fce;
 	BSTFind(&Func, fce_name);
@@ -632,13 +632,14 @@ int funcOp(struct Operation *rec, tBSTPtr my_ST){
 	struct TMPRecord** BU_working_push = working_push;
 	unsigned int BU_working_size = working_size;
 	unsigned int BU_working_push_size = working_push_size;
+	tDLElemPtr my_active = my_tac->Active; //hotfix
 	out = function(fce_name, &ST, ret);
+	my_tac->Active = my_active; //hotfix
 	if (out) return out;
 	working_tmp = BU_working_tmp;
 	working_push = BU_working_push;
 	working_size = BU_working_size;
 	working_push_size = BU_working_push_size;
-
 	if (rec->t_t==VARIABLE){
 		BSTFind(my_ST, rec->t.variable);
 		if (!BSTActive(my_ST)) return 3;
@@ -647,7 +648,6 @@ int funcOp(struct Operation *rec, tBSTPtr my_ST){
 	else if (rec->t_t==TMP){
 		store_tmp(ret, rec->t.tmp);
 	}
-
 	return out;
 }
 
