@@ -492,7 +492,7 @@ Token *next_token(){
     }
     else{
         if(new_token->type == KIN_SEMICOLON){
-            tmp_counter = 0;
+            //tmp_counter = 0;
         }
         return new_token;
     }

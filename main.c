@@ -41,7 +41,14 @@ int main(int argc, char *argv[]) {
         printf("\n############---FINAL RESULTS---############\n");
         printf("NO. instructions: %d \n", length_list(tac_stack));
         printf("exit_code: %d  !!!!\n", exit_code);
+        printf("///main:///\n");
         print_instuctions();
+        BSTFind(&Func, "foo");
+        if (BSTActive(&Func)){
+            printf("///foo:///\n");
+            tac_stack = GSTCopyTAC(&Func);
+            print_instuctions();
+        }
         printf("//////////////\n");
         exit_code = interpret();
         printf("//////////////\n");
