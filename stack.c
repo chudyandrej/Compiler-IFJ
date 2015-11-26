@@ -22,7 +22,7 @@ void dispose_list(tDLList *L){
     while(L->First != NULL){
         
         temp=L->First->rptr;
-        free(L->First);
+        gc_free(L->First);
         L->First=temp;  
     }
 
@@ -37,7 +37,7 @@ void dispose_list(tDLList *L){
  */
 void insert_last(tDLList *L, void *data){
 
-    tDLElemPtr new = malloc(sizeof(struct tDLElem)); 
+    tDLElemPtr new = gc_malloc(sizeof(struct tDLElem)); 
 
     if (new == NULL){
         data = NULL;
@@ -76,14 +76,14 @@ void delete_last(tDLList *L){
         tDLElemPtr temp; 
         
         if(L->First == L->Last){    /*Just one element in list*/
-            free(L->First);
+            gc_free(L->First);
             L->First=NULL;
             L->Last=NULL;
         }
         else{                       /*Two or more elements in list*/
         
             temp=L->Last->lptr;
-            free(L->Last);
+            gc_free(L->Last);
             L->Last=temp;
             L->Last->rptr=NULL;        
         }
@@ -100,7 +100,7 @@ void post_insert(tDLList *L, void *data){
 
     if(L->Active != NULL){     /*Exist active element*/
       
-        tDLElemPtr new = malloc(sizeof(struct tDLElem)); 
+        tDLElemPtr new = gc_malloc(sizeof(struct tDLElem)); 
         if(new == NULL){
             data = NULL;
         }
@@ -211,7 +211,7 @@ void delete_element(tDLList *L, tDLElemPtr element){
                 temp->lptr->rptr = temp->rptr;
                 L->Last = temp->lptr;
             }
-            free(temp);
+            gc_free(temp);
             break;
 
         }

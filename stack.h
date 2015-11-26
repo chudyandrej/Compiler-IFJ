@@ -17,6 +17,7 @@ typedef struct tDLList{
     tDLElemPtr Active;  /*points to active element in the list*/
 } tDLList;
 
+#include "garbage.h"
 void init_list(tDLList *L);
 void dispose_list(tDLList *L);
 void insert_last(tDLList *L, void *data);

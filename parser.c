@@ -436,7 +436,7 @@ int parameters_declar(unsigned int type_func, char **types, char **names){
                     *names = new_token->str;
                 }
                 else{
-                    *names = realloc(*names, strlen(*names) + strlen(new_token->str) * sizeof(char) + 2);
+                    *names = gc_realloc(*names, strlen(*names) + strlen(new_token->str) * sizeof(char) + 2);
                     strcat(*names, " \0");
                     strcat(*names, new_token->str);
                 }

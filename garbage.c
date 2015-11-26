@@ -101,7 +101,7 @@ void *gc_realloc(void *ptr, size_t size){
     //realloc feature size = 0, is for now not implemented
 
     ptr = realloc(ptr, size);
-    if(ptr == NULL){
+    if((ptr == NULL)&&(size!=0)){
         //deletes origin pointer from log,
         // but it won't be freed, cause, it is maybe already freed by realloc
         gc_delete_element(gc_find(temp));
@@ -142,8 +142,11 @@ void *gc_find(void *ptr){
 
 void gc_free_all(){
 
-    while( copy_last(garbage) != NULL ){
-        free(copy_last(garbage)); //free usefull data
+    while( garbage->First != NULL){
+        if (copy_last(garbage)!=0)
+        {        
+            free(copy_last(garbage)); //free usefull data
+        }
         gc_delete_last();     //free structure from G
     }
 }

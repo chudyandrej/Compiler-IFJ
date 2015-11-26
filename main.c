@@ -54,6 +54,7 @@ int main(int argc, char *argv[]) {
         printf("//////////////\n");
         printf("konec: %d\n", exit_code);
     }
+    gc_free_all();
     free(garbage);
     return exit_code;
 }

@@ -14,7 +14,7 @@
 int str_init(string *s)
 // funkce vytvori novy retezec
 {
-    if ((s->str = (char*) malloc(STR_LEN_INC)) == NULL)
+    if ((s->str = (char*) gc_malloc(STR_LEN_INC)) == NULL)
         return STR_ERROR;
     s->str[0] = '\0';
 s->length = 0;
@@ -25,7 +25,7 @@ s->length = 0;
 void str_free(string *s)
 // funkce uvolni retezec z pameti
 {
-    free(s->str);
+    gc_free(s->str);
 }
 
 void str_clear(string *s)
@@ -41,7 +41,7 @@ int str_add_char(string *s1, char c)
     if (s1->length + 1 >= s1->alloc_size)
     {
         // pamet nestaci, je potreba provest realokaci
-        if ((s1->str = (char*) realloc(s1->str, s1->length + STR_LEN_INC)) == NULL)
+        if ((s1->str = (char*) gc_realloc(s1->str, s1->length + STR_LEN_INC)) == NULL)
             return STR_ERROR;
         s1->alloc_size = s1->length + STR_LEN_INC;
     }
@@ -58,7 +58,7 @@ int str_copy_string(string *s1, string *s2)
     if (newLength >= s1->alloc_size)
     {
         // pamet nestaci, je potreba provest realokaci
-        if ((s1->str = (char*) realloc(s1->str, newLength + 1)) == NULL)
+        if ((s1->str = (char*) gc_realloc(s1->str, newLength + 1)) == NULL)
             return STR_ERROR;
         s1->alloc_size = newLength + 1;
     }

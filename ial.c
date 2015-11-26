@@ -54,7 +54,7 @@ void BSTInsert(tBSTEPtr node, tBSTPtr T){
 }
 
 void BSTAdd (tBSTPtr T, char * key){
-    tBSTEPtr node = malloc(sizeof(struct tBSTElem));
+    tBSTEPtr node = gc_malloc(sizeof(struct tBSTElem));
     node->key = key;
     node->lptr=NULL;
     node->rptr=NULL;
@@ -96,12 +96,12 @@ void funcFree(tBSTEPtr ptr){
     funcFree(ptr->lptr);
     funcFree(ptr->rptr);
     if(ptr->data!=NULL){
-        free(((struct tFunc *)ptr->data)->params);
-        free(((struct tFunc *)ptr->data)->TAC);
-        free(ptr->data);
+        gc_free(((struct tFunc *)ptr->data)->params);
+        gc_free(((struct tFunc *)ptr->data)->TAC);
+        gc_free(ptr->data);
     }
-    free(ptr->key);
-    free(ptr);
+    gc_free(ptr->key);
+    gc_free(ptr);
 }
 
 void GSTDispose(tBSTPtr T){
@@ -121,7 +121,7 @@ int GSTAllDef(tBSTEPtr tmp){
 int GSTDeclare(tBSTPtr T, char * params, char * names){
     if(T->Act==NULL) return 2;
     if(T->Act->data==NULL){
-        tFuncPtr node = malloc(sizeof(struct tFunc));
+        tFuncPtr node = gc_malloc(sizeof(struct tFunc));
         node->params = params;
         node->names = names;
         node->TAC = NULL;
@@ -157,7 +157,7 @@ void * GSTCopyTAC(tBSTPtr T){
 void scopeFree(tVarPtr ptr){
     if (ptr==NULL) return;
     scopeFree(ptr->ptr);
-    free(ptr);
+    gc_free(ptr);
 }
 
 void varFree(tBSTEPtr ptr){
@@ -165,8 +165,8 @@ void varFree(tBSTEPtr ptr){
     varFree(ptr->lptr);
     varFree(ptr->rptr);
     scopeFree(ptr->data);
-    free(ptr->key);
-    free(ptr);
+    gc_free(ptr->key);
+    gc_free(ptr);
 }
 
 void LSTDispose (tBSTPtr T){
@@ -178,7 +178,7 @@ void LSTDispose (tBSTPtr T){
 int LSTAdd (tBSTPtr T, enum Type type, int scope){
     if (T->Act->data!=NULL)
         if(((struct tVar *)T->Act->data)->scope == scope) return 1;
-    tVarPtr node = malloc(sizeof(struct tVar));
+    tVarPtr node = gc_malloc(sizeof(struct tVar));
     node->scope = scope;
     node->assigned = 0;
     node->value.t = type;
@@ -220,7 +220,7 @@ void LSTLeaveScope (tBSTEPtr ptr, int scope){
         if(((struct tVar *)ptr->data)->scope == scope){
             tVarPtr tmp = ptr->data;
             ptr->data = ((struct tVar *)ptr->data)->ptr;
-            free(tmp);
+            gc_free(tmp);
         }
     LSTLeaveScope(ptr->lptr, scope);
     LSTLeaveScope(ptr->rptr, scope);
@@ -368,14 +368,14 @@ char * substr(char * str, int i, int n){
     char * out = NULL;
     if (i<0);
     else if (i==l){
-        out = malloc(sizeof(1));
+        out = gc_malloc(sizeof(1));
         out[0] = '\0';
     } 
     else if (i<l){
         int end;
         if (l>n+i) end = n+i;
         else end = l;
-        out = malloc(sizeof(end-i+1));
+        out = gc_malloc(sizeof(end-i+1));
         memcpy(out, &str[i], end-i);
     }
     return out;

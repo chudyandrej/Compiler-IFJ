@@ -10,6 +10,7 @@
 #define IAL_H_INCLUDED
 #include "tac.h"
 #include "stack.h"
+#include "garbage.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

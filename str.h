@@ -28,5 +28,5 @@ int str_get_length(string *s);
 
 //Added by Kopec Maros
 int str_find(string *s1, char **s2, int size);
-
+#include "garbage.h"
 #endif //IJF_STR_H

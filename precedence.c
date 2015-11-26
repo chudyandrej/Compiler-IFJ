@@ -419,7 +419,7 @@ void preinsert_lastNode(tDLList *L, void *data){
 
     if( last_node != NULL){
 
-        tDLElemPtr new = malloc(sizeof(struct tDLElem));
+        tDLElemPtr new = gc_malloc(sizeof(struct tDLElem));
         if(new == NULL){
             data = NULL;
         }

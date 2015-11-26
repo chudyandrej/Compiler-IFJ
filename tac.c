@@ -47,8 +47,8 @@ int function(char * name, tBSTPtr my_ST, struct TMPRecord * ret){
 	unsigned int push_size = 0;
 	struct TMPRecord** TableRecords; // pole pro TMP promene
 	struct TMPRecord** PushRecords; // pole pro TMP promene
-	TableRecords = malloc(sizeof(struct TMPRecord *) * tmp_size);
-	PushRecords = malloc(sizeof(struct TMPRecord *) * push_size);
+	TableRecords = gc_malloc(sizeof(struct TMPRecord *) * tmp_size);
+	PushRecords = gc_malloc(sizeof(struct TMPRecord *) * push_size);
 	working_tmp = TableRecords; // nastavit globalni na aktualni
 	working_size = tmp_size;
 	working_push = PushRecords;
@@ -131,9 +131,9 @@ int function(char * name, tBSTPtr my_ST, struct TMPRecord * ret){
 
 int countingOp(struct Operation *rec, tBSTPtr my_ST){
 	int out;
-	struct TMPRecord * operand1 = malloc(sizeof(struct TMPRecord));
-	struct TMPRecord * operand2 = malloc(sizeof(struct TMPRecord));
-	struct TMPRecord * target = malloc(sizeof(struct TMPRecord));
+	struct TMPRecord * operand1 = gc_malloc(sizeof(struct TMPRecord));
+	struct TMPRecord * operand2 = gc_malloc(sizeof(struct TMPRecord));
+	struct TMPRecord * target = gc_malloc(sizeof(struct TMPRecord));
 	target->t=DOUBLE;
 	out = dereference(rec, my_ST, 1, operand1);
 	if (out!=0) return out;
@@ -230,7 +230,7 @@ int countingOp(struct Operation *rec, tBSTPtr my_ST){
 
 
 int assignmentOp(struct Operation *rec, tBSTPtr my_ST){
-	struct TMPRecord * dereferenced = malloc(sizeof(struct TMPRecord));
+	struct TMPRecord * dereferenced = gc_malloc(sizeof(struct TMPRecord));
 	int out = dereference(rec, my_ST, 1, dereferenced);
 	if (out!=0) return out;
 	if (rec->t_t==VARIABLE){
@@ -244,7 +244,7 @@ int assignmentOp(struct Operation *rec, tBSTPtr my_ST){
 
 int pushOp(struct Operation *rec, tBSTPtr my_ST){
 	int out = 0;
-	struct TMPRecord * dereferenced = malloc(sizeof(struct TMPRecord));
+	struct TMPRecord * dereferenced = gc_malloc(sizeof(struct TMPRecord));
 	out = dereference(rec, my_ST, 0, dereferenced);
 	if (!out){
 		store_push(dereferenced);
@@ -287,13 +287,13 @@ int dereference(struct Operation *rec, tBSTPtr my_ST, int address_number, struct
 			dereferenced->t = working_tmp[i]->t;
 			break;
 		case VARIABLE:
-			tmp = malloc(sizeof(struct TMPRecord));
+			tmp = gc_malloc(sizeof(struct TMPRecord));
 			BSTFind(my_ST, dereferenced->value.variable);
 			if (!BSTActive(my_ST)) return 3;
 			out = LSTGet(my_ST, tmp);
 			dereferenced->value = tmp->value;
 			dereferenced->t = tmp->t;
-			free(tmp);
+			gc_free(tmp);
 			break;
 		default:
 			return 10;
@@ -304,13 +304,13 @@ int dereference(struct Operation *rec, tBSTPtr my_ST, int address_number, struct
 void * extendTmp(void *ptr){
 	//working_tmp = extendTmp(working_tmp, &tmp_size);
 	working_size = working_size * 2;
-	ptr = realloc(ptr, sizeof(struct TMPRecord *) * working_size);
+	ptr = gc_realloc(ptr, sizeof(struct TMPRecord *) * working_size);
 	return ptr;
 }
 
 void * extendPush(void *ptr, unsigned int size){
 	// zmeni velikost zasobniku na push
-	return realloc(ptr, sizeof(struct TMPRecord *) * size);
+	return gc_realloc(ptr, sizeof(struct TMPRecord *) * size);
 }
 
 int to_double(struct TMPRecord * tmp){
@@ -337,7 +337,7 @@ void store_push(struct TMPRecord * tmp){
 
 int coutOp(struct Operation *rec, tBSTPtr my_ST){
 	int out = 0;
-	struct TMPRecord * dereferenced = malloc(sizeof(struct TMPRecord));
+	struct TMPRecord * dereferenced = gc_malloc(sizeof(struct TMPRecord));
 	out = dereference(rec, my_ST, 0, dereferenced);
 	if (!out){
 		if (dereferenced->t==STRING){
@@ -357,17 +357,17 @@ int coutOp(struct Operation *rec, tBSTPtr my_ST){
 int cinOp(struct Operation *rec, tBSTPtr my_ST){
 	int out = 0;
 	if (rec->t_t!=VARIABLE) return 2;
-	struct TMPRecord * dereferenced = malloc(sizeof(struct TMPRecord));
+	struct TMPRecord * dereferenced = gc_malloc(sizeof(struct TMPRecord));
 	out = dereference(rec, my_ST, 0, dereferenced);
 	if (out!=8){
-		char * str = malloc(1);
+		char * str = gc_malloc(1);
 		char * ptr = NULL;
 		char c;
 		int count = 1;
 		while(isspace(c=fgetc(stdin)));
 
 		do {
-			str = realloc(str, ++count);
+			str = gc_realloc(str, ++count);
 			str[count-2] = c;
 			str[count-1] = '\0';
 		}
@@ -394,7 +394,7 @@ int cinOp(struct Operation *rec, tBSTPtr my_ST){
 
 int condition(struct Operation *rec, tBSTPtr my_ST, int * jump){
 	int out = 0;
-	struct TMPRecord * dereferenced = malloc(sizeof(struct TMPRecord));
+	struct TMPRecord * dereferenced = gc_malloc(sizeof(struct TMPRecord));
 	out = dereference(rec, my_ST, 1, dereferenced);
 	if (!out){
 		if (dereferenced->t==STRING) return 6;
@@ -420,7 +420,7 @@ void jumpOp(struct Operation *rec, tDLList * my_tac){
 
 int returnOp(struct Operation *rec, tBSTPtr my_ST, struct TMPRecord * ret, char c){
 	int out = 0;
-	struct TMPRecord * dereferenced = malloc(sizeof(struct TMPRecord));
+	struct TMPRecord * dereferenced = gc_malloc(sizeof(struct TMPRecord));
 	out = dereference(rec, my_ST, 0, dereferenced);
 	if (!out){
 		if(dereferenced->t==convert(c)){
@@ -449,7 +449,7 @@ Type convert(char c){
 
 int unaryminusOp(struct Operation *rec, tBSTPtr my_ST){
 	int out = 0;
-	struct TMPRecord * dereferenced = malloc(sizeof(struct TMPRecord));
+	struct TMPRecord * dereferenced = gc_malloc(sizeof(struct TMPRecord));
 	out = dereference(rec, my_ST, 1, dereferenced);
 	if (!out){
 		if (dereferenced->t==DOUBLE) dereferenced->value.d = -dereferenced->value.d;
@@ -469,7 +469,7 @@ int unaryminusOp(struct Operation *rec, tBSTPtr my_ST){
 
 int unaryOp(struct Operation *rec, tBSTPtr my_ST, int con){
 	int out = 0;
-	struct TMPRecord * dereferenced = malloc(sizeof(struct TMPRecord));
+	struct TMPRecord * dereferenced = gc_malloc(sizeof(struct TMPRecord));
 	if (rec->t_op1==EMPTY){
 		out = dereference(rec, my_ST, 0, dereferenced);
 		if (dereferenced->t==DOUBLE) dereferenced->value.d = dereferenced->value.d + con;
@@ -506,7 +506,7 @@ int unaryOp(struct Operation *rec, tBSTPtr my_ST, int con){
 
 int buildInOp(struct Operation *rec, tBSTPtr my_ST, int op){
 	int out = 0;
-	struct TMPRecord * target = malloc(sizeof(struct TMPRecord));
+	struct TMPRecord * target = gc_malloc(sizeof(struct TMPRecord));
 	if (op==1){
 		//length
 		struct TMPRecord * operand1;
@@ -554,7 +554,7 @@ int buildInOp(struct Operation *rec, tBSTPtr my_ST, int op){
 		if ((operand1->t==STRING)&&(operand2->t==STRING)){
 			int a = strlen(operand1->value.s);
 			int b = strlen(operand2->value.s);
-			target->value.s = malloc(a+b+1);
+			target->value.s = gc_malloc(a+b+1);
 			target->t = STRING;
 			strcpy(target->value.s, operand1->value.s);
 			strcpy(&target->value.s[a], operand2->value.s);
@@ -583,7 +583,7 @@ int buildInOp(struct Operation *rec, tBSTPtr my_ST, int op){
 		if (operand1->t==STRING){
 			target->t=STRING;
 			int a = strlen(operand1->value.s);
-			target->value.s = malloc(a + 1);
+			target->value.s = gc_malloc(a + 1);
 			strcpy(target->value.s, operand1->value.s);
 			sort(target->value.s);
 		}
@@ -609,7 +609,7 @@ int funcOp(struct Operation *rec, tBSTPtr my_ST, tDLList * my_tac){
 	if (!BSTActive(&Func)) return 10;
 	char * names = ((struct tFunc *)Func.Act->data)->names;
 	char * params = ((struct tFunc *)Func.Act->data)->params;
-	struct TMPRecord * ret = malloc(sizeof(struct TMPRecord));
+	struct TMPRecord * ret = gc_malloc(sizeof(struct TMPRecord));
 	struct tBST ST;
 	BSTInit(&ST);
 	for (int i = strlen(params)-1; i>=1; i--){
@@ -694,7 +694,7 @@ char * get_name(char * names, int  i){
 	}
 	if (counter<i) end = length;
 	length = end - begin + 1;
-	char * name = malloc(sizeof(char)*length);
+	char * name = gc_malloc(sizeof(char)*length);
 	memcpy(name, &names[begin], length-1);
 	name[length-1]='\0';
 	return name;

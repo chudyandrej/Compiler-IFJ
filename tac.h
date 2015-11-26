@@ -7,6 +7,7 @@
 #include <ctype.h>
 #include "scanner.h"
 #include "stack.h"
+#include "garbage.h"
 
 /*
 ***************************************************************
