@@ -396,16 +396,16 @@ void ap_type(char **types,unsigned int type){
 
     switch (type){
         case KW_INT:
-            strcat(*types,"i ");
+            strcat(*types,"i");
             break;
         case KW_DOUBLE:
-            strcat(*types,"d ");
+            strcat(*types,"d");
             break;
         case KW_AUTO:
-            strcat(*types,"a ");
+            strcat(*types,"a");
             break;
         case KW_STRING:
-            strcat(*types,"s ");
+            strcat(*types,"s");
             break;
         default:
             break;
