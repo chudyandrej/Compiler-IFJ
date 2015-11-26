@@ -25,12 +25,6 @@ nad nimi (pridani, vyhledavani ...)
 #include "ial.h"
 
 
-int INTError = 0;
-void interError(){
-    INTError = 1;
-    fprintf(stderr, "**Internal Error**\n not enough space for malloc\n");
-}
-
 void BSTInit (tBSTPtr T){
     T->Root = NULL;
     T->Act = NULL;
@@ -61,10 +55,6 @@ void BSTInsert(tBSTEPtr node, tBSTPtr T){
 
 void BSTAdd (tBSTPtr T, char * key){
     tBSTEPtr node = malloc(sizeof(struct tBSTElem));
-    if (node==NULL) {
-        interError();
-        return;
-    }
     node->key = key;
     node->lptr=NULL;
     node->rptr=NULL;
@@ -189,10 +179,6 @@ int LSTAdd (tBSTPtr T, enum Type type, int scope){
     if (T->Act->data!=NULL)
         if(((struct tVar *)T->Act->data)->scope == scope) return 1;
     tVarPtr node = malloc(sizeof(struct tVar));
-    if (node==NULL) {
-        interError();
-        return 2;
-    }
     node->scope = scope;
     node->assigned = 0;
     node->value.t = type;

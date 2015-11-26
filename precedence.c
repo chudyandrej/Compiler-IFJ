@@ -173,7 +173,7 @@ int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3){
 
     }
     else if(p2 != NULL){    // rules 3-6
-        switch(p1->description){
+        switch(p1->description){        //E++/E--
             case KIN_PLUSPLUS:
             case KIN_MINUSMINUS:
                 if(p2->description == D_NODE){
@@ -184,12 +184,12 @@ int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3){
                 fprintf(stderr,"Ruls");
                 break;
         }
-        switch(p2->description){
+        switch(p2->description){    //++E/--E
             case KIN_PLUSPLUS:
             case KIN_MINUSMINUS:
                 if(p1->description == D_NODE){
                     gen_instructions(p2->description, p1->data, fake, fake, p1->type, EMPTY, EMPTY);
-                    return 1;
+                    return 5;
                 } break;
             case KIN_MINUS:
                 if(p1->description == D_NODE){
@@ -237,7 +237,12 @@ int element_reduct(tDLList *Stack){
     int exit_code = rules(elements[0],elements[1],elements[2]);
     if(exit_code == 0){
         ((dTreeElementPtr)Stack->Last->data)->description = D_NODE;
-        fprintf(stderr,"ELEMEN REDUCT%d\n", ((dTreeElementPtr)Stack->Last->data)->type);
+        //fprintf(stderr,"ELEMEN REDUCT%d\n", ((dTreeElementPtr)Stack->Last->data)->type);
+        return 0;
+    }
+    else if(exit_code == 5){      //exit_code 5, delete element --/++
+        gc_free(elements[1]);
+        delete_element(Stack, Stack->Last->lptr);
         return 0;
     }
     else if(exit_code >= 1 && exit_code <= 2){
@@ -266,7 +271,7 @@ int call_function(Token *id_token){
                 tmp.fce = id_token->str;
                 gen_tnp(TAC_CALL,tmp,fake,FUNCION,EMPTY);
                 return 0;
-            }else{return -1;}
+            }else{return TYPE_COMP_SEM_ERR;}//4
         case KW_FIND:
         case KW_CONCAT:
             if(parameters_used() == 2){
@@ -274,21 +279,21 @@ int call_function(Token *id_token){
                 tmp.fce = id_token->str;
                 gen_tnp(TAC_CALL,tmp,fake,FUNCION,EMPTY);
                 return 0;
-            }else{return -1;}
+            }else{return TYPE_COMP_SEM_ERR;}
         case KW_SUBSTR:
             if(parameters_used() == 3){
                 union Address tmp;
                 tmp.fce = id_token->str;
                 gen_tnp(TAC_CALL,tmp,fake,FUNCION,EMPTY);
                 return 0;
-            }else{return -1;}
+            }else{return TYPE_COMP_SEM_ERR;}
         case KIN_IDENTIFIER:
             if(parameters_used() != -1){
                 union Address tmp;
                 tmp.fce = id_token->str;
                 gen_tnp(TAC_CALL,tmp,fake,FUNCION,EMPTY);
                 return 0;
-            }else{return -1;}
+            }else{return TYPE_COMP_SEM_ERR;}
 
         default:
             return -1;

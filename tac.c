@@ -62,6 +62,7 @@ int function(char * name, tBSTPtr my_ST, struct TMPRecord * ret){
 	while(is_active(my_tac)){ //cyklit nad vsem 3AC instrukcemi
 		struct Operation *rec = copy_active(my_tac);
 		TokenKind instruction = rec->inst;
+		//printf("inst:%d:\n", instruction);
 		if(instruction==KIN_UNARYMINUS){
 			out = unaryminusOp(rec, my_ST);
 		}
@@ -83,8 +84,7 @@ int function(char * name, tBSTPtr my_ST, struct TMPRecord * ret){
 			out = assignmentOp(rec, my_ST);
 		}
 		else if (instruction==TAC_PUSH){
-			if (rec->t.s!=NULL)
-				out = pushOp(rec, my_ST);
+			out = pushOp(rec, my_ST);
 		}
 		else if (instruction==TAC_INIT){
 			out = initOp(rec, my_ST, scope);
@@ -122,7 +122,7 @@ int function(char * name, tBSTPtr my_ST, struct TMPRecord * ret){
 			return 10; // neznama instrukce
 		}
 		shift_active(my_tac);
-		if (out) {printf("%d, out fuu: %d\n", (int)instruction,  out); return out;}
+		if (out) {printf("out:%d:, inst:%d:\n", out, instruction); return out;}
 	}
 
 	return 8; // end of non-void function
@@ -323,7 +323,7 @@ int to_double(struct TMPRecord * tmp){
 }
 
 void store_tmp(struct TMPRecord * tmp, int i){
-	while (i>=((int)working_size + 1)){
+	while (i>=((int)working_size)){
 		working_tmp = extendTmp(working_tmp);
 	}
 	working_tmp[i] = tmp;
