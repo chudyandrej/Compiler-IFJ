@@ -220,11 +220,14 @@ int countingOp(struct Operation *rec, tBSTPtr my_ST){
 		BSTFind(my_ST, rec->t.variable);
 		if (!BSTActive(my_ST)) return 3;
 		out = LSTSet(my_ST, target);
+		gc_free(target);
 	} 
 	else if (rec->t_t==TMP){
 		store_tmp(target, rec->t.tmp);
 	}
 	else return 10;
+	gc_free(operand1);
+	gc_free(operand2);
 	return out;
 }
 
@@ -237,6 +240,7 @@ int assignmentOp(struct Operation *rec, tBSTPtr my_ST){
 		BSTFind(my_ST, rec->t.variable);
 		if (!BSTActive(my_ST)) return 3;
 		out = LSTSet(my_ST, dereferenced);
+		gc_free(dereferenced);
 	}
 	else return 10; //neni duvod volat tuto FCI na TMP promene
 	return out;
@@ -351,6 +355,7 @@ int coutOp(struct Operation *rec, tBSTPtr my_ST){
 		} 
 		else out = 10;
 	}
+	gc_free(dereferenced);
 	return out;
 }
 
@@ -389,6 +394,7 @@ int cinOp(struct Operation *rec, tBSTPtr my_ST){
 		out = LSTSet(my_ST, dereferenced);
 
 	}
+	gc_free(dereferenced);
 	return out;
 }
 
@@ -405,6 +411,7 @@ int condition(struct Operation *rec, tBSTPtr my_ST, int * jump){
 			if(dereferenced->value.i==0) *jump=1;
 		}
 	}
+	gc_free(dereferenced);
 	return out;
 }
 
@@ -437,6 +444,7 @@ int returnOp(struct Operation *rec, tBSTPtr my_ST, struct TMPRecord * ret, char 
 		}
 		else return 4;
 	}
+	gc_free(dereferenced);
 	return out;
 }
 
@@ -459,6 +467,7 @@ int unaryminusOp(struct Operation *rec, tBSTPtr my_ST){
 			BSTFind(my_ST, rec->t.variable);
 			if (!BSTActive(my_ST)) return 3;
 			out = LSTSet(my_ST, dereferenced);
+			gc_free(dereferenced);
 		} else if (rec->t_t==TMP){
 			store_tmp(dereferenced, rec->t.tmp);
 		} 
@@ -479,6 +488,7 @@ int unaryOp(struct Operation *rec, tBSTPtr my_ST, int con){
 			BSTFind(my_ST, rec->t.variable);
 			if (!BSTActive(my_ST)) return 3;
 			out = LSTSet(my_ST, dereferenced);
+			gc_free(dereferenced);
 		} 
 		else return 4; // nebo 6
 	}

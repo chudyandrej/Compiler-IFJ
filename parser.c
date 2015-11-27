@@ -163,6 +163,9 @@ int body_function(){
 
             case KW_AUTO:   //declaration ID to auto must be followed by initialization 
                 if((new_token=next_token())->type == KIN_IDENTIFIER){
+                    union Address tmp;
+                    tmp.variable = new_token->str;
+                    gen_instructions(TAC_INIT,tmp, fake, fake, VARIABLE,AUTO,EMPTY);
                     if((exit_code=assing_exp(new_token)) == 0){continue;}else{return exit_code;}
                     gc_free(new_token);
                 }
@@ -228,8 +231,8 @@ int for_statement() {
             }else{return SYN_ERR;}
 
             gen_label(uncond.label);
-            new_token = token_predict;
-            var_name = new_token->str; //save name of ID, cause new_token can be free in expression in some cases
+            //new_token = token_predict;
+            var_name = token_predict->str; //save name of ID, cause new_token can be free in expression in some cases
             exit_code = expression_process(KIN_R_ROUNDBRACKET,&end_node);      //command part of for statement
             if(exit_code == KIN_ASSIGNEMENT){
                 exit_code = expression_process(KIN_R_ROUNDBRACKET,&end_node);
@@ -357,7 +360,7 @@ int assing_exp(Token *token_var){       //token_var -> name of destination varia
         if( !exit_code ) {
             union Address tmp;
             tmp.variable = token_var->str;
-            fprintf(stderr,"variable: %s\n", tmp.variable);     //debug
+            fprintf(stderr,"variable: %s!!!\n", tmp.variable);     //debug
             gen_instructions(KIN_ASSIGNEMENT, tmp, end_node->data, fake, VARIABLE, end_node->type, EMPTY);
             gc_free(end_node);
         }
