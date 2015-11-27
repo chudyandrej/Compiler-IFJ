@@ -368,15 +368,16 @@ char * substr(char * str, int i, int n){
     char * out = NULL;
     if (i<0);
     else if (i==l){
-        out = gc_malloc(sizeof(1));
+        out = gc_malloc(1);
         out[0] = '\0';
     } 
     else if (i<l){
         int end;
-        if (l>n+i) end = n+i;
+        if (l>(n+i)) end = n+i;
         else end = l;
-        out = gc_malloc(sizeof(end-i+1));
+        out = gc_malloc(end-i+1);
         memcpy(out, &str[i], end-i);
+        out[end-i]='\0';
     }
     return out;
 }

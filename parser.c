@@ -160,6 +160,9 @@ int body_funcion(){
 
             case KW_AUTO:   //declaration ID to auto must be followed by initialization 
                 if((new_token=next_token())->type == KIN_IDENTIFIER){
+                    union Address tmp;
+                    tmp.variable=new_token->str;
+                    gen_instructions(TAC_INIT,tmp, fake, fake, VARIABLE, AUTO, EMPTY);
                     if(assing_exp(new_token) == 0){continue;}else{return 1;}
                     gc_free(new_token);
                 }
