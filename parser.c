@@ -242,7 +242,7 @@ int for_statement() {
                 gc_free(end_node);
             }else if(exit_code == TYPE_COMP_SEM_ERR){return TYPE_COMP_SEM_ERR;}
 
-            if ((new_token = next_token())->type == KIN_L_BRACE && end_node != NULL && end_node->description != D_DOLLAR){
+            if ((new_token = next_token())->type == KIN_L_BRACE){
                 gc_free(new_token);
                 gen_instructions(TAC_GOTO_UNCOND, incre, fake, fake, LABEL, EMPTY, EMPTY);
                 gen_label(skip.label);
