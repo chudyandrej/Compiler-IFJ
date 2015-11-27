@@ -18,7 +18,7 @@ extern union Address fake;
 int start_syntax_analyz();
 int dec_function(unsigned int type_func);
 int parameters_declar(unsigned int type_func, char **types, char **names);
-int body_funcion();
+int body_function();
 int assing_exp(Token *token_var);
 int dec_variable(TokenKind type);
 int cin();

@@ -302,7 +302,7 @@ int call_function(Token *id_token){
 
 }
 
-int expression_process(enum sTokenKind end_char, dTreeElementPtr *final_node){       //vracat posledny node
+int expression_process(enum sTokenKind end_char, dTreeElementPtr *final_node){
     tDLList *Stack = init_stack();
     bool load_new_tag = true;
     Token *new_token = NULL;
@@ -314,14 +314,14 @@ int expression_process(enum sTokenKind end_char, dTreeElementPtr *final_node){  
             new_token = next_token();
         }
         if((new_token->type == KIN_IDENTIFIER || (new_token->type >= KW_LENGTH && new_token->type <= KW_SORT)) &&
-                token_predict->type == KIN_L_ROUNDBRACKET){                         //funcion in expession
+                token_predict->type == KIN_L_ROUNDBRACKET){                    //function in expession
             gc_free(next_token());
-            if(call_function(new_token) != 0){ *final_node = clean_stack(Stack, false); return -1;}
+            if(call_function(new_token) != 0){ *final_node = clean_stack(Stack, false); return TYPE_COMP_SEM_ERR;}  //number of error = 4
             insert_last(Stack, create_stack_element(D_STOPER, NULL));
             insert_last(Stack, create_stack_element(D_TMP, NULL));
             continue;
         }
-         load_new_tag = true;
+        load_new_tag = true;
 
         if((new_token->type == end_char && new_token->type != KIN_R_ROUNDBRACKET) || new_token->type == END_OF_FILE ||
                 new_token->type == KIN_COMMA || new_token->type == KIN_SCOUT || new_token->type == KIN_ASSIGNEMENT){
