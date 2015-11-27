@@ -67,13 +67,13 @@ void gen_label(unsigned int lab){
 void printf_stack(tDLList *Stack){
     tDLElemPtr new_help = Stack->First;
     new_help = Stack->First;
-    fprintf(stderr,"\n####### STACK ##########\n");
+   // fprintf(stderr,"\n####### STACK ##########\n");
     // fprintf(stderr,"#### %p ####\n",&Stack);
     while(new_help != NULL){
-        fprintf(stderr,"%d\n",((dTreeElementPtr) new_help->data)->description);
+   //     fprintf(stderr,"%d\n",((dTreeElementPtr) new_help->data)->description);
         new_help = new_help->rptr;
     }
-    fprintf(stderr,"########################\n");
+ //   fprintf(stderr,"########################\n");
 }
 tDLList* init_stack(){
     tDLList *Stack = gc_malloc(sizeof(struct tDLList));   //malloc stack
@@ -112,7 +112,7 @@ dTreeElementPtr load_token(dTreeElementPtr new_element, Token *token){
             new_element->description = KIN_IDENTIFIER;
             return new_element;
         default:
-            fprintf(stderr,"\nload token !!!!!!!!!!!!\n");
+         //   fprintf(stderr,"\nload token !!!!!!!!!!!!\n");
             return NULL;
     }
 }
@@ -167,7 +167,7 @@ int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3){
                 }
                 break;
             default:
-               fprintf(stderr,"Error: rules tri argumenty");
+              // fprintf(stderr,"Error: rules tri argumenty");
                 return -1;
         }
 
@@ -181,7 +181,7 @@ int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3){
                     return 1;
                 } break;
             default:
-                fprintf(stderr,"Ruls\n");
+                //fprintf(stderr,"Ruls\n");
                 break;
         }
         switch(p2->description){    //++E/--E
@@ -198,7 +198,7 @@ int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3){
                 } break;
 
             default:
-                fprintf(stderr,"chyba pri uplatnovani pravidiel dvoch\n");
+                //fprintf(stderr,"chyba pri uplatnovani pravidiel dvoch\n");
                 return -1;
         }
     }
@@ -210,8 +210,8 @@ int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3){
             case KIN_IDENTIFIER:
                 return 0;
             default:
-                fprintf(stderr,"chybny: %d\n", p1->description);
-                fprintf(stderr,"chyba pri uplatnovani pravidiel jednej\n");
+               // fprintf(stderr,"chybny: %d\n", p1->description);
+               // fprintf(stderr,"chyba pri uplatnovani pravidiel jednej\n");
                 return -1;
         }
     }
@@ -386,7 +386,7 @@ int expression_process(enum sTokenKind end_char, dTreeElementPtr *final_node){
                     *final_node = clean_stack(Stack, true);
                     return exit_char;
                 }
-                fprintf(stderr,"precedence table errror s tokenom: %d, vrch stacku: %d\n", new_token->type,((dTreeElementPtr) Stack->Last->data)->description);
+               // fprintf(stderr,"precedence table errror s tokenom: %d, vrch stacku: %d\n", new_token->type,((dTreeElementPtr) Stack->Last->data)->description);
                 *final_node = clean_stack(Stack, false);
                 return -1;
 

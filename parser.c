@@ -49,8 +49,8 @@ int dec_function(unsigned int type_func){
         if ((new_token = next_token())->type == KIN_L_ROUNDBRACKET){
             gc_free(new_token);
             if((exit_code=parameters_declar(type_func, &data_types, &names)) == 0){
-                fprintf(stderr,"\ntyps: %s\n",data_types);      //debug
-                fprintf(stderr,"\nnames: %s\n",names);          //debug
+               // fprintf(stderr,"\ntyps: %s\n",data_types);      //debug
+               // fprintf(stderr,"\nnames: %s\n",names);          //debug
                 new_token = next_token();
                 BSTFind(&Func,func_name->str);
                 if ( ! BSTActive(&Func)) {
@@ -94,7 +94,7 @@ int dec_function(unsigned int type_func){
 }
 
 int body_function(){
-    fprintf(stderr,"scope UP body !!!  ##\n");          //debug
+   // fprintf(stderr,"scope UP body !!!  ##\n");          //debug
     gen_instructions(SCOPE_UP, fake, fake, fake, EMPTY, EMPTY, EMPTY);
     Token *token_var;
     Token *new_token;
@@ -181,7 +181,7 @@ int body_function(){
             case KIN_L_BRACE:
                 if((exit_code=body_function()) == 0){continue;}else{return exit_code;}
             case KIN_R_BRACE:
-                fprintf(stderr,"scope down body!!!  ##\n");     //debug
+                //fprintf(stderr,"scope down body!!!  ##\n");     //debug
                 gc_free(new_token);
                 gen_instructions(SCOPE_DOWN, fake, fake, fake, EMPTY, EMPTY, EMPTY);
                 return 0;
@@ -338,7 +338,7 @@ int cout(){
         while(true){
             ret_code = expression_process(KIN_SEMICOLON, &end_node);
             if(end_node != NULL && end_node->description != D_DOLLAR) {
-                fprintf(stderr,"COUT%d\n", end_node->type);             //debug
+               // fprintf(stderr,"COUT%d\n", end_node->type);             //debug
                 gen_instructions(KIN_SCOUT, end_node->data, fake, fake, end_node->type, EMPTY, EMPTY);
                 gc_free(end_node);
             }else{break;}   //if end_node == D_DOLLAR => no expression -> ERROR
@@ -362,7 +362,7 @@ int assing_exp(Token *token_var){       //token_var -> name of destination varia
         if( !exit_code ) {
             union Address tmp;
             tmp.variable = token_var->str;
-            fprintf(stderr,"variable: %s!!!\n", tmp.variable);     //debug
+           // fprintf(stderr,"variable: %s!!!\n", tmp.variable);     //debug
             gen_instructions(KIN_ASSIGNEMENT, tmp, end_node->data, fake, VARIABLE, end_node->type, EMPTY);
             gc_free(end_node);
         }
@@ -384,7 +384,7 @@ Type translate(enum sTokenKind type){
         case KW_AUTO:           
             return AUTO;
         default:
-            fprintf(stderr,"hope never happen\n");              //just debug
+            //fprintf(stderr,"hope never happen\n");              //just debug
             return AUTO;             //this situation never happen
     }
 }
