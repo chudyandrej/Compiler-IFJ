@@ -122,7 +122,10 @@ int function(char * name, tBSTPtr my_ST, struct TMPRecord * ret){
 			return 10; // neznama instrukce
 		}
 		shift_active(my_tac);
-		if (out) {printf("out:%d:, inst:%d:\n", out, instruction); return out;}
+		if (out) {
+			//printf("out:%d:, inst:%d:\n", out, instruction);
+			return out;
+		}
 	}
 
 	return 8; // end of non-void function

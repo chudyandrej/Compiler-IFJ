@@ -181,7 +181,7 @@ int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3){
                     return 1;
                 } break;
             default:
-                fprintf(stderr,"Ruls");
+                fprintf(stderr,"Ruls\n");
                 break;
         }
         switch(p2->description){    //++E/--E
@@ -262,7 +262,8 @@ int element_reduct(tDLList *Stack){
 }
 
 int call_function(Token *id_token){
-
+    int number_of_params=0;
+    char *params=NULL;
     switch(id_token->type){
         case KW_SORT:
         case KW_LENGTH:
@@ -287,19 +288,24 @@ int call_function(Token *id_token){
                 gen_tnp(TAC_CALL,tmp,fake,FUNCION,EMPTY);
                 return 0;
             }else{return TYPE_COMP_SEM_ERR;}
-        case KIN_IDENTIFIER:
-            if(parameters_used() != -1){
+        case KIN_IDENTIFIER:            //user's function
+            if((number_of_params= parameters_used()) != -1){
+                BSTFind(&Func, id_token->str);  //check if function is declared if so, set active
+                if ( ! BSTActive(&Func) ){      
+                    errorMessage_semantic("UNDEFINED function");
+                    return PROGRAM_SEM_ERR; //3
+                }
+                params = ((struct tFunc *)Func.Act->data)->params;
+                if(strlen(params)-1 != (size_t)number_of_params){return TYPE_COMP_SEM_ERR;}
                 union Address tmp;
                 tmp.fce = id_token->str;
                 gen_tnp(TAC_CALL,tmp,fake,FUNCION,EMPTY);
                 return 0;
-            }else{return TYPE_COMP_SEM_ERR;}
+            }else{return SYN_ERR;}
 
         default:
             return -1;
-
     }
-
 }
 
 int expression_process(enum sTokenKind end_char, dTreeElementPtr *final_node){

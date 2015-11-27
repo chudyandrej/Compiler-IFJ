@@ -79,6 +79,7 @@ int dec_function(unsigned int type_func){
                         }
                     }
                     gc_free(func_name);
+                    if(exit_code == TYPE_COMP_SEM_ERR){errorMessage_semantic("WRONG number of function arguments!");}
                     return exit_code;
                 }
                 else {
@@ -105,10 +106,10 @@ int body_function(){
         switch(new_token->type){
             case KW_CIN:
                 gc_free(new_token);
-                if (cin() == 0){continue;} else{return SYN_ERR;} //2
+                if ((exit_code=cin()) == 0){continue;} else{return exit_code;}
             case KW_COUT:
                 gc_free(new_token);
-                if (cout() == 0){continue;} else{return SYN_ERR;}
+                if ((exit_code=cout()) == 0){continue;} else{return exit_code;}
             case KW_IF:
                 gc_free(new_token);
                 if ((exit_code=if_statement()) == 0){continue;} else{return exit_code;}
@@ -325,16 +326,17 @@ int cin(){
         }      
     }
     errorMessage_syntax(" WRONG cin operator!");
-    return 1;
+    return SYN_ERR;
 }
 
 int cout(){
     Token *new_token;
+    int ret_code=SYN_ERR; //in case, first if statement is false
     dTreeElementPtr end_node = NULL;
     if ((new_token=next_token())->type == KIN_SCOUT){ 
         gc_free(new_token);
         while(true){
-            int ret_code = expression_process(KIN_SEMICOLON, &end_node);
+            ret_code = expression_process(KIN_SEMICOLON, &end_node);
             if(end_node != NULL && end_node->description != D_DOLLAR) {
                 fprintf(stderr,"COUT%d\n", end_node->type);             //debug
                 gen_instructions(KIN_SCOUT, end_node->data, fake, fake, end_node->type, EMPTY, EMPTY);
@@ -346,8 +348,8 @@ int cout(){
             else{ break; }
         }
     }
-    errorMessage_syntax("WRONG cout operator!");
-    return 1;
+    if(ret_code == SYN_ERR){errorMessage_syntax("WRONG cout operator!");} 
+    return ret_code;
 }
 
 int assing_exp(Token *token_var){       //token_var -> name of destination variable
@@ -366,7 +368,7 @@ int assing_exp(Token *token_var){       //token_var -> name of destination varia
         }
         return exit_code;
     }
-    printf("%d assignement\n", new_token->type);
+   // printf("%d assignement\n", new_token->type);
     errorMessage_syntax("WRONG assignement!");
     return SYN_ERR; //2
 }
@@ -478,9 +480,12 @@ int parameters_used(){
     while(true) {
         counter_of_arguments++;
         int exit_code_value = expression_process(KIN_COMMA, &end_node);
-        if(end_node->description != D_DOLLAR && end_node != NULL){
-            gen_instructions(TAC_PUSH, end_node->data, fake, fake, end_node->type, EMPTY, EMPTY);
-            gc_free(end_node);
+        if(end_node != NULL){
+            if(end_node->description == D_DOLLAR){return 0;} // zero number of arguments
+            else{
+                gen_instructions(TAC_PUSH, end_node->data, fake, fake, end_node->type, EMPTY, EMPTY);
+                gc_free(end_node);
+            }
         }
         if(exit_code_value == KIN_COMMA) {
             continue;
