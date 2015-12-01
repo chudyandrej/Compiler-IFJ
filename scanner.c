@@ -332,25 +332,23 @@ Token * get_token(FILE * fp) {
                         cleanup(token, str_tmp);
                     }
                 }
-                else if (isalpha(c)) {
-                    if ( c == 'e' || c == 'E') {
-                        if (++count_e > 1 || (!isdigit(tc = (char)getc(fp)) && tc != '+' && tc != '-')) {
-                            ungetc(tc, fp);
-                            token->type = KIN_UNKNOWN;
-                            cleanup(NULL, str_tmp);
-                            return token;
-                        }
+                else if ( c == 'e' || c == 'E') {
+                    if (++count_e > 1 || (!isdigit(tc = (char)getc(fp)) && tc != '+' && tc != '-')) {
                         ungetc(tc, fp);
-                        enable_op = TRUE;
-                        if (str_add_char(str_tmp, c)) {
-                            cleanup(token, str_tmp);
-                        }
-                    }
-                    else {
                         token->type = KIN_UNKNOWN;
                         cleanup(NULL, str_tmp);
                         return token;
                     }
+                    ungetc(tc, fp);
+                    enable_op = TRUE;
+                    if (str_add_char(str_tmp, c)) {
+                       cleanup(token, str_tmp);
+                    }
+                }
+                else if (!isoperator(c)) {
+                    token->type = KIN_UNKNOWN;
+                    cleanup(NULL, str_tmp);
+                    return token;
                 }
                 else {
                     ungetc(c, fp);
