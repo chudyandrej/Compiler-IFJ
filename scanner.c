@@ -52,7 +52,6 @@ Token * get_token(FILE * fp) {
 
     while(1) {
         c =(char)getc(fp);
-
         switch(state) {
             /* ######################## S_START ################################# */
             case S_START:
@@ -294,6 +293,11 @@ Token * get_token(FILE * fp) {
                         ungetc(hex[1],fp);
                     }
                     break;
+                default:
+                    token->type = KIN_UNKNOWN;
+                    cleanup(NULL, str_tmp);
+                    return token;
+
                 }
                 if (str_add_char(str_tmp, ch)) cleanup(token, str_tmp);
                 state = S_TEXT;
@@ -330,7 +334,7 @@ Token * get_token(FILE * fp) {
                 }
                 else if (isalpha(c)) {
                     if ( c == 'e' || c == 'E') {
-                        if (++count_e > 1 || !isdigit(tc = (char)getc(fp))) {
+                        if (++count_e > 1 || (!isdigit(tc = (char)getc(fp)) && tc != '+' && tc != '-')) {
                             ungetc(tc, fp);
                             token->type = KIN_UNKNOWN;
                             cleanup(NULL, str_tmp);
@@ -365,6 +369,10 @@ Token * get_token(FILE * fp) {
                 /* ##################### S_COMMENT_LINE ############################# */
             case S_COMMENT_LINE:
                 if (c == '\n') state = S_START;
+                else if (c == EOF) {
+                    token->type = KIN_UNKNOWN;
+                    return token;
+                }
                 break;
 
                 /* ##################### S_COMMENT_BLOCK ############################ */
@@ -375,6 +383,10 @@ Token * get_token(FILE * fp) {
                     }
                     else
                         ungetc(c, fp);
+                }
+                else if (c == EOF) {
+                    token->type = KIN_UNKNOWN;
+                    return token;
                 }
                 break;
 
@@ -515,7 +527,6 @@ Token * cleanup(Token * t, string * s) {
     if (t != NULL) gc_free(t);
     return NULL;
 }
-
 
 char * keywords[] = {
         "auto",
