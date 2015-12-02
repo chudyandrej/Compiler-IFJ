@@ -124,7 +124,10 @@ int body_function(){
                     gen_instructions(TAC_RETURN,end_node->data,fake,fake,end_node->type,EMPTY,EMPTY);
                     gc_free(end_node);
                     continue;
-                } else{return (exit_code == TYPE_COMP_SEM_ERR) ? TYPE_COMP_SEM_ERR : SYN_ERR;}
+                } else{
+                    errorMessage_syntax("BAD SYNTAX in RETURN function");
+                    return (exit_code == TYPE_COMP_SEM_ERR) ? TYPE_COMP_SEM_ERR : SYN_ERR;
+                }
 
             case KIN_IDENTIFIER:
                 token_var = new_token;      //save token with ID
@@ -344,11 +347,10 @@ int cout(){
             }else{break;}   //if end_node == D_DOLLAR => no expression -> ERROR
             if(ret_code == KIN_SEMICOLON){return 0; }
             else if(ret_code == KIN_SCOUT){continue; }
-            else if(ret_code == TYPE_COMP_SEM_ERR){return TYPE_COMP_SEM_ERR;}//4
             else{ break; }
         }
     }
-    if(ret_code == SYN_ERR){errorMessage_syntax("WRONG cout operator!");} 
+    errorMessage_syntax("WRONG cout operator!"); 
     return ret_code;
 }
 

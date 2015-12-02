@@ -63,21 +63,9 @@ void gen_label(unsigned int lab){
     insert_last(tac_stack, instruction);
 }
 
-
-void printf_stack(tDLList *Stack){
-    tDLElemPtr new_help = Stack->First;
-    new_help = Stack->First;
-   // fprintf(stderr,"\n####### STACK ##########\n");
-    // fprintf(stderr,"#### %p ####\n",&Stack);
-    while(new_help != NULL){
-   //     fprintf(stderr,"%d\n",((dTreeElementPtr) new_help->data)->description);
-        new_help = new_help->rptr;
-    }
- //   fprintf(stderr,"########################\n");
-}
 tDLList* init_stack(){
     tDLList *Stack = gc_malloc(sizeof(struct tDLList));   //malloc stack
-    init_list(Stack);                           //init stack
+    init_list(Stack);                                    //init stack
     dTreeElementPtr new_element;
     new_element = create_stack_element(D_DOLLAR, NULL);
     insert_last(Stack,new_element);
@@ -112,7 +100,6 @@ dTreeElementPtr load_token(dTreeElementPtr new_element, Token *token){
             new_element->description = KIN_IDENTIFIER;
             return new_element;
         default:
-         //   fprintf(stderr,"\nload token !!!!!!!!!!!!\n");
             return NULL;
     }
 }
@@ -159,7 +146,7 @@ int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3){
                 if (p1->description == D_NODE && p3->description == D_NODE) {
                    
                     gen_tnp(p2->description, p3->data, p1->data, p3->type, p1->type);
-                    return 2;
+                    return 2;   //number of useless tokens in stack
                 } break;
             case D_NODE:
                 if (p1->description == KIN_R_ROUNDBRACKET && p3->description == KIN_L_ROUNDBRACKET) {
@@ -167,8 +154,7 @@ int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3){
                 }
                 break;
             default:
-              // fprintf(stderr,"Error: rules tri argumenty");
-                return -1;
+                return -1; //error
         }
 
     }
@@ -181,7 +167,6 @@ int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3){
                     return 1;
                 } break;
             default:
-                //fprintf(stderr,"Ruls\n");
                 break;
         }
         switch(p2->description){    //++E/--E
@@ -189,7 +174,7 @@ int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3){
             case KIN_MINUSMINUS:
                 if(p1->description == D_NODE){
                     gen_instructions(p2->description, p1->data, fake, fake, p1->type, EMPTY, EMPTY);
-                    return 5;
+                    return 5;       //special situation
                 } break;
             case KIN_MINUS:
                 if(p1->description == D_NODE){
@@ -198,7 +183,6 @@ int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3){
                 } break;
 
             default:
-                //fprintf(stderr,"chyba pri uplatnovani pravidiel dvoch\n");
                 return -1;
         }
     }
@@ -208,14 +192,11 @@ int rules( dTreeElementPtr p1, dTreeElementPtr p2, dTreeElementPtr p3){
             case KIN_NUM_DOUBLE:
             case KIN_TEXT:
             case KIN_IDENTIFIER:
-                return 0;
+                return 0;   //do not delete element in stack, just create node
             default:
-               // fprintf(stderr,"chybny: %d\n", p1->description);
-               // fprintf(stderr,"chyba pri uplatnovani pravidiel jednej\n");
                 return -1;
         }
     }
-
     return -1;
 }
 int element_reduct(tDLList *Stack){
@@ -237,7 +218,6 @@ int element_reduct(tDLList *Stack){
     int exit_code = rules(elements[0],elements[1],elements[2]);
     if(exit_code == 0){
         ((dTreeElementPtr)Stack->Last->data)->description = D_NODE;
-        //fprintf(stderr,"ELEMEN REDUCT%d\n", ((dTreeElementPtr)Stack->Last->data)->type);
         return 0;
     }
     else if(exit_code == 5){      //exit_code 5, delete element --/++
@@ -256,8 +236,7 @@ int element_reduct(tDLList *Stack){
         return 0;
     }
     else {
-
-        return -1;
+        return -1; 
     }
 }
 
@@ -304,7 +283,7 @@ int call_function(Token *id_token){
             }else{return SYN_ERR;}
 
         default:
-            return -1;
+            return SYN_ERR; //2
     }
 }
 
@@ -313,8 +292,8 @@ int expression_process(enum sTokenKind end_char, dTreeElementPtr *final_node){
     bool load_new_tag = true;
     Token *new_token = NULL;
     int exit_char = KIN_R_ROUNDBRACKET;     //default value
+    int exit_code;
     while(true) {
-       // printf_stack(Stack);
         int top_token = ((dTreeElementPtr)(find_last(Stack,false))->data)->description;
         if(load_new_tag == true) {
             new_token = next_token();
@@ -322,7 +301,7 @@ int expression_process(enum sTokenKind end_char, dTreeElementPtr *final_node){
         if((new_token->type == KIN_IDENTIFIER || (new_token->type >= KW_LENGTH && new_token->type <= KW_SORT)) &&
                 token_predict->type == KIN_L_ROUNDBRACKET){                    //function in expession
             gc_free(next_token());
-            if(call_function(new_token) != 0){ *final_node = clean_stack(Stack, false); return TYPE_COMP_SEM_ERR;}  //number of error = 4
+            if((exit_code=call_function(new_token)) != 0){ *final_node = clean_stack(Stack, false); return exit_code;}  //3 or 4
             insert_last(Stack, create_stack_element(D_STOPER, NULL));
             insert_last(Stack, create_stack_element(D_TMP, NULL));
             continue;
@@ -334,7 +313,7 @@ int expression_process(enum sTokenKind end_char, dTreeElementPtr *final_node){
             if(new_token->type == KIN_ASSIGNEMENT){
                 if( (((dTreeElementPtr)Stack->Last->data)->description != KIN_IDENTIFIER) || length_list(Stack) != 3) {
                     *final_node = clean_stack(Stack, false); 
-                    return -1;
+                    return SYN_ERR; //2
                 }                
             }
             exit_char = new_token->type;
@@ -344,7 +323,7 @@ int expression_process(enum sTokenKind end_char, dTreeElementPtr *final_node){
         int exit_code;
         if(new_token->type > D_DOLLAR){
             *final_node = clean_stack(Stack, false);
-            return -1;
+            return SYN_ERR; //2
         }
 
         switch (PrecedentTable[top_token][new_token->type]) {
@@ -363,40 +342,30 @@ int expression_process(enum sTokenKind end_char, dTreeElementPtr *final_node){
                 if(exit_code == 0){
                     load_new_tag = false;
                     continue;
-                }
-                if(exit_code == 100 && length_list(Stack) == 2 &&
-                        ((dTreeElementPtr)(find_last(Stack,false))->data)->description == D_DOLLAR) {
-                    *final_node = clean_stack(Stack, true);
-                    return end_char;
-                }
-                else{
-                    *final_node = clean_stack(Stack, false);
-                    return -1;
-                }
+                }else {return SYN_ERR;} //2
             case '=':
                 insert_last(Stack, create_stack_element(new_token->type, new_token));
                 continue;
             case '!':
-              //  printf("\nvykricnik\n");
                 *final_node = clean_stack(Stack, true);
                 return exit_char;
             default:
+                /*error in precedence table, because needed rule doesn't exist -> means
+                2 situations -> 1. it is an error
+                             -> 2. everything was already reduced*/
                 if(length_list(Stack) == 2 &&
                     ((dTreeElementPtr)(find_last(Stack,false))->data)->description == D_DOLLAR) {
                     *final_node = clean_stack(Stack, true);
                     return exit_char;
                 }
-               // fprintf(stderr,"precedence table errror s tokenom: %d, vrch stacku: %d\n", new_token->type,((dTreeElementPtr) Stack->Last->data)->description);
                 *final_node = clean_stack(Stack, false);
-                return -1;
-
+                return SYN_ERR; //2
         }
     }
 }
 
 dTreeElementPtr clean_stack(tDLList *Stack,  bool correct_end){
     dTreeElementPtr ptr = (correct_end) ? Stack->Last->data : NULL;
-    //ptr = (ptr->description == D_DOLLAR) ? NULL : ptr;  //case no parameters in function
     dispose_list(Stack);
     return ptr;
 }
