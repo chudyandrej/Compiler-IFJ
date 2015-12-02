@@ -49,8 +49,6 @@ int dec_function(unsigned int type_func){
         if ((new_token = next_token())->type == KIN_L_ROUNDBRACKET){
             gc_free(new_token);
             if((exit_code=parameters_declar(type_func, &data_types, &names)) == 0){
-               // fprintf(stderr,"\ntyps: %s\n",data_types);      //debug
-               // fprintf(stderr,"\nnames: %s\n",names);          //debug
                 new_token = next_token();
                 BSTFind(&Func,func_name->str);
                 if ( ! BSTActive(&Func)) {
@@ -94,7 +92,6 @@ int dec_function(unsigned int type_func){
 }
 
 int body_function(){
-   // fprintf(stderr,"scope UP body !!!  ##\n");          //debug
     gen_instructions(SCOPE_UP, fake, fake, fake, EMPTY, EMPTY, EMPTY);
     Token *token_var;
     Token *new_token;
@@ -133,10 +130,10 @@ int body_function(){
                 token_var = new_token;      //save token with ID
                 if(token_predict->type == KIN_MINUSMINUS || token_predict->type == KIN_PLUSPLUS){
                     operator_history = (new_token=next_token())->type;
-                    gc_free(new_token); 
-                    if(new_token->type == KIN_SEMICOLON){
+                    gc_free(new_token);
+                    if((new_token=next_token())->type == KIN_SEMICOLON){
                         union Address tmp;
-                        tmp.variable = new_token->str;
+                        tmp.variable = token_var->str;
                         gen_instructions(operator_history,tmp,fake,fake,VARIABLE,EMPTY,EMPTY);
                         gc_free(new_token);
                         continue;
@@ -152,7 +149,6 @@ int body_function(){
                 operator_history = new_token->type;
                 gc_free(new_token);
                 if((token_var=next_token())->type == KIN_IDENTIFIER){
-                    // token_var - info about identifier
                     if((new_token=next_token())->type == KIN_SEMICOLON){
                         union Address tmp;
                         tmp.variable = token_var->str;
@@ -184,7 +180,6 @@ int body_function(){
             case KIN_L_BRACE:
                 if((exit_code=body_function()) == 0){continue;}else{return exit_code;}
             case KIN_R_BRACE:
-                //fprintf(stderr,"scope down body!!!  ##\n");     //debug
                 gc_free(new_token);
                 gen_instructions(SCOPE_DOWN, fake, fake, fake, EMPTY, EMPTY, EMPTY);
                 return 0;
@@ -235,7 +230,6 @@ int for_statement() {
             }else{return SYN_ERR;}
 
             gen_label(uncond.label);
-            //new_token = token_predict;
             var_name = token_predict->str; //save name of ID, cause new_token can be free in expression in some cases
             exit_code = expression_process(KIN_R_ROUNDBRACKET,&end_node);      //command part of for statement
             if(exit_code == KIN_ASSIGNEMENT){
@@ -341,7 +335,6 @@ int cout(){
         while(true){
             ret_code = expression_process(KIN_SEMICOLON, &end_node);
             if(end_node != NULL && end_node->description != D_DOLLAR) {
-               // fprintf(stderr,"COUT%d\n", end_node->type);             //debug
                 gen_instructions(KIN_SCOUT, end_node->data, fake, fake, end_node->type, EMPTY, EMPTY);
                 gc_free(end_node);
             }else{break;}   //if end_node == D_DOLLAR => no expression -> ERROR
@@ -364,13 +357,11 @@ int assing_exp(Token *token_var){       //token_var -> name of destination varia
         if( !exit_code ) {
             union Address tmp;
             tmp.variable = token_var->str;
-           // fprintf(stderr,"variable: %s!!!\n", tmp.variable);     //debug
             gen_instructions(KIN_ASSIGNEMENT, tmp, end_node->data, fake, VARIABLE, end_node->type, EMPTY);
             gc_free(end_node);
         }
         return exit_code;
     }
-   // printf("%d assignement\n", new_token->type);
     errorMessage_syntax("WRONG assignement!");
     return SYN_ERR; //2
 }
@@ -386,7 +377,6 @@ Type translate(enum sTokenKind type){
         case KW_AUTO:           
             return AUTO;
         default:
-            //fprintf(stderr,"hope never happen\n");              //just debug
             return AUTO;             //this situation never happen
     }
 }
