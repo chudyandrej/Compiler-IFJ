@@ -16,7 +16,6 @@
 #define KEYWORDS_SIZE 15
 #define SUCCESS 0
 #define FAIL 1
-#define ESC_FAIL -1
 
 int count_e;
 int enable_op;
@@ -299,7 +298,7 @@ Token * get_token(FILE * fp) {
                     cleanup(NULL, str_tmp);
                     return token;
                 };
-                if (ch < 0 || ch > 255) {
+                if (ch < 1 || ch > 255) {
                     token->type = KIN_UNKNOWN;
                     cleanup(NULL, str_tmp);
                     return token;
@@ -537,15 +536,15 @@ int escape_check(char base, int max_size) {
         tmp_array[counter] = (char) getc(fp);
         if (base == BINARY && (tmp_array[counter] != '0' && tmp_array[counter] != '1')) {
             ungetc(tmp_array[counter],fp);
-            return ESC_FAIL;
+            return FAIL;
         }
         else if (base == HEXA && (!isxdigit(tmp_array[counter]))) {
             ungetc(tmp_array[counter],fp);
-            return ESC_FAIL;
+            return FAIL;
         }
         else if (base == OCTAL && (tmp_array[counter] < '0' || tmp_array[counter] > '7')) {
             ungetc(tmp_array[counter],fp);
-            return ESC_FAIL;
+            return FAIL;
         }
     }
     tmp_array[max_size] = '\0';
