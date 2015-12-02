@@ -124,7 +124,7 @@ int body_function(){
                 } else{
                     errorMessage_syntax("BAD SYNTAX in RETURN function");
                     return (exit_code == TYPE_COMP_SEM_ERR) ? TYPE_COMP_SEM_ERR : SYN_ERR;
-                }
+                } 
 
             case KIN_IDENTIFIER:
                 token_var = new_token;      //save token with ID
