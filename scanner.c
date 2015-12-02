@@ -440,10 +440,9 @@ Token * get_token(FILE * fp) {
  */
 int isoperator(char c)
 {
-    int i;
     char operators[] = {';', '*', '/', '+', '-', '>', '<', '=', '!', '(', ')',
-                        '{', '}', ',', EOF};
-    for (i = 0; (unsigned)i < strlen(operators); i++) {
+                        '{', '}', ',', EOF, '\0'};
+    for (int i = 0; (unsigned)i < strlen(operators); i++) {
         if (c == operators[i])
             return TRUE;
     }
