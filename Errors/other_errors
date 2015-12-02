@@ -1,0 +1,7 @@
+string substr(string s, int i , int n){  int a=5; return1; }
+string concat(string s, string s2){  int a=5; return1; }
+int find(string s, string s2){  int a=5; return1; }
+string s=find("asdf","sd");
+int length(int i){ int a=5; return1; } 
+double foo(int a); double(double a);
+double foo(int a); string foo(int a);
