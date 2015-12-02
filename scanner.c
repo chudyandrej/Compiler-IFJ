@@ -532,7 +532,7 @@ Token * cleanup(Token * t, string * s) {
 }
 
 int escape_check(char base, int max_size) {
-    char tmp_array[max_size+1];
+    char tmp_array[max_size];
     for (int counter = 0; counter < max_size;counter++) {
         tmp_array[counter] = (char) getc(fp);
         if (base == BINARY && (tmp_array[counter] != '0' && tmp_array[counter] != '1')) {
