@@ -59,6 +59,8 @@ struct TMPRecord{
 };
 
 int interpret();
-
+void decrease_push();
+void store_tmp(struct TMPRecord * tmp, int i);
 #include "ial.h"
+#include "buildin.h"
 #endif //TAC_H_INCLUDED

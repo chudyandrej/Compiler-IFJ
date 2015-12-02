@@ -4,7 +4,7 @@ extern struct tBST Func; //globalni tabulka funkci
 struct TMPRecord** working_tmp; //tmp promene aktualni funce
 struct TMPRecord** working_push;
 unsigned int working_size = 0;
-unsigned int working_push_size = 0;
+unsigned int push_size = 0;
 
 void * extendTmp(void *ptr);
 int countingOp(struct Operation *rec, tBSTPtr my_ST);
@@ -16,7 +16,6 @@ int dereference(struct Operation *rec, tBSTPtr my_ST, int address_number, struct
 int pushOp(struct Operation *rec, tBSTPtr my_ST);
 int to_double(struct TMPRecord * tmp);
 int function(char * name, tBSTPtr my_ST, struct TMPRecord * ret);
-void store_tmp(struct TMPRecord * tmp, int i);
 int condition(struct Operation *rec, tBSTPtr my_ST, int * jump);
 void jumpOp(struct Operation *rec, tDLList * my_tac);
 int returnOp(struct Operation *rec, tBSTPtr my_ST, struct TMPRecord * ret, char c);
@@ -24,16 +23,14 @@ Type convert(char c);
 int unaryminusOp(struct Operation *rec, tBSTPtr my_ST);
 int unaryOp(struct Operation *rec, tBSTPtr my_ST, int con);
 void store_push(struct TMPRecord * tmp);
-int isBuildIn(struct Operation *rec);
-int buildInOp(struct Operation *rec, tBSTPtr my_ST, int op);
 int funcOp(struct Operation *rec, tBSTPtr my_ST, tDLList * my_tac);
-void decrease_push();
 char * get_name(char * names, int  i);
 
 int interpret(){
 	if (GSTAllDef(Func.Root) != 1) return 3;
 	BSTFind(&Func, "main");
 	if (BSTActive(&Func)!=1) return 3;
+	working_push = gc_malloc(sizeof(struct TMPRecord *) * push_size);
 	struct TMPRecord ret;
 	struct tBST ST;
 	BSTInit(&ST);
@@ -44,22 +41,19 @@ int function(char * name, tBSTPtr my_ST, struct TMPRecord * ret){
 	int out = 0; // osetreni semantickych chyb
 	int scope = 0; //aktualni zanoreni 
 	unsigned int tmp_size = 4; //velikost pole pro TMP promene
-	unsigned int push_size = 0;
 	struct TMPRecord** TableRecords; // pole pro TMP promene
-	struct TMPRecord** PushRecords; // pole pro TMP promene
 	TableRecords = gc_malloc(sizeof(struct TMPRecord *) * tmp_size);
-	PushRecords = gc_malloc(sizeof(struct TMPRecord *) * push_size);
 	working_tmp = TableRecords; // nastavit globalni na aktualni
 	working_size = tmp_size;
-	working_push = PushRecords;
-	working_push_size = push_size;
 	BSTFind(&Func, name);
 	char * params = ((struct tFunc *)Func.Act->data)->params;
 	tDLList * my_tac = GSTCopyTAC(&Func); //stahnout zasobnik 3AC
 	tDLList my_push; // zasobnik na pushovani pro volani funkci
 	init_list(&my_push);
 	activate_first(my_tac);
-	while(is_active(my_tac)){ //cyklit nad vsem 3AC instrukcemi
+	while(is_active(my_tac)){ 
+			// cyklit nad vsem 3AC instrukcemi
+			// pokud dojde na konec tak chyba neukonceni RETURNem
 		struct Operation *rec = copy_active(my_tac);
 		TokenKind instruction = rec->inst;
 		//printf("inst:%d:\n", instruction);
@@ -145,6 +139,7 @@ int countingOp(struct Operation *rec, tBSTPtr my_ST){
 	if ((operand1->t == STRING) && (operand2->t == STRING)){
 		int comp = strcmp(operand1->value.s, operand2->value.s);
 		switch(rec->inst){
+			// operace definovane nad STRING
 			case KIN_EQ:
 				if (comp == 0) target->value.i = 1;
 				else target->value.i = 0;
@@ -175,6 +170,7 @@ int countingOp(struct Operation *rec, tBSTPtr my_ST){
 			target->t=INT;
 	}
 	else{
+		// numericke operace se vzdy pocitaji jako double a nasledne se pretypuji
 		out = to_double(operand1);
 		if (out!=0) return out;
 		out = to_double(operand2);
@@ -337,9 +333,9 @@ void store_tmp(struct TMPRecord * tmp, int i){
 }
 
 void store_push(struct TMPRecord * tmp){
-	working_push_size++;
-	working_push = extendPush(working_push, working_push_size);
-	working_push[working_push_size-1] = tmp;
+	push_size++;
+	working_push = extendPush(working_push, push_size);
+	working_push[push_size-1] = tmp;
 }
 
 int coutOp(struct Operation *rec, tBSTPtr my_ST){
@@ -517,104 +513,6 @@ int unaryOp(struct Operation *rec, tBSTPtr my_ST, int con){
 	return out;
 }
 
-int buildInOp(struct Operation *rec, tBSTPtr my_ST, int op){
-	int out = 0;
-	struct TMPRecord * target = gc_malloc(sizeof(struct TMPRecord));
-	if (op==1){
-		//length
-		struct TMPRecord * operand1;
-		operand1 = working_push[working_push_size-1];
-		decrease_push();
-		if (operand1->t==STRING){
-			target->t=INT;
-			target->value.i=strlen(operand1->value.s);
-		} 
-		else out = 4;
-	}
-	else if (op==2){
-		//substr
-		struct TMPRecord * operand3;
-		operand3 = working_push[working_push_size-1];
-		decrease_push();
-		struct TMPRecord * operand2;
-		operand2 = working_push[working_push_size-1];
-		decrease_push();
-		struct TMPRecord * operand1;
-		operand1 = working_push[working_push_size-1];
-		decrease_push();
-		if (operand2->t==DOUBLE){
-			operand2->value.i = (int)operand2->value.d;
-			operand2->t=INT;
-		}
-		if (operand3->t==DOUBLE){
-			operand3->value.i = (int)operand3->value.d;
-			operand3->t=INT;
-		}
-		if ((operand1->t==STRING)&&(operand2->t==INT)&&(operand3->t==INT)){
-			target->t=STRING;
-			target->value.s = substr(operand1->value.s, operand2->value.i, operand3->value.i);
-		}
-		else out = 4;
-	}
-	else if (op==3){
-		//concat
-		struct TMPRecord * operand2;
-		operand2 = working_push[working_push_size-1];
-		decrease_push();
-		struct TMPRecord * operand1;
-		operand1 = working_push[working_push_size-1];
-		decrease_push();
-		if ((operand1->t==STRING)&&(operand2->t==STRING)){
-			int a = strlen(operand1->value.s);
-			int b = strlen(operand2->value.s);
-			target->value.s = gc_malloc(a+b+1);
-			target->t = STRING;
-			strcpy(target->value.s, operand1->value.s);
-			strcpy(&target->value.s[a], operand2->value.s);
-		}
-		else out = 4;
-	}
-	else if (op==4){
-		//find
-		struct TMPRecord * operand2;
-		operand2 = working_push[working_push_size-1];
-		decrease_push();
-		struct TMPRecord * operand1;
-		operand1 = working_push[working_push_size-1];
-		decrease_push();
-		if ((operand1->t==STRING)&&(operand2->t==STRING)){
-			target->t=INT;
-			target->value.i = find(operand1->value.s, operand2->value.s);
-		}
-		else out = 4;
-	}
-	else if (op==5){
-		// sort
-		struct TMPRecord * operand1;
-		operand1 = working_push[working_push_size-1];
-		decrease_push();
-		if (operand1->t==STRING){
-			target->t=STRING;
-			int a = strlen(operand1->value.s);
-			target->value.s = gc_malloc(a + 1);
-			strcpy(target->value.s, operand1->value.s);
-			sort(target->value.s);
-		}
-		else return 4;
-	}
-	else out = 10;
-	if (out) return out;
-	if (rec->t_t==VARIABLE){
-		BSTFind(my_ST, rec->t.variable);
-		if (!BSTActive(my_ST)) return 3;
-		out = LSTSet(my_ST, target);
-	} 
-	else if (rec->t_t==TMP){
-		store_tmp(target, rec->t.tmp);
-	}
-	return out;
-}
-
 int funcOp(struct Operation *rec, tBSTPtr my_ST, tDLList * my_tac){
 	int out = 0;
 	char * fce_name = rec->op1.fce;
@@ -622,14 +520,14 @@ int funcOp(struct Operation *rec, tBSTPtr my_ST, tDLList * my_tac){
 	if (!BSTActive(&Func)) return 10;
 	char * names = ((struct tFunc *)Func.Act->data)->names;
 	char * params = ((struct tFunc *)Func.Act->data)->params;
-	struct TMPRecord * ret = gc_malloc(sizeof(struct TMPRecord));
-	struct tBST ST;
+	struct TMPRecord * ret = gc_malloc(sizeof(struct TMPRecord)); //navratova hodnota fce
+	struct tBST ST; // vyvori Symbol Table pro volanou funkci
 	BSTInit(&ST);
-	for (int i = strlen(params)-1; i>=1; i--){
+	for (int i = strlen(params)-1; i>=1; i--){ //naplni strom paramery
 		Type parameter = convert(params[i]);
 		char * name = get_name(names, i);
 		struct TMPRecord * operand;
-		operand = working_push[working_push_size-1];
+		operand = working_push[push_size-1];
 		decrease_push();
 		if ((operand->t!=parameter)&&((operand->t==STRING)||(parameter==STRING))){
 			return 4;
@@ -642,17 +540,14 @@ int funcOp(struct Operation *rec, tBSTPtr my_ST, tDLList * my_tac){
 	}
 
 	struct TMPRecord** BU_working_tmp = working_tmp; //tmp promene aktualni funce
-	struct TMPRecord** BU_working_push = working_push;
 	unsigned int BU_working_size = working_size;
-	unsigned int BU_working_push_size = working_push_size;
-	tDLElemPtr my_active = my_tac->Active; //hotfix
+	tDLElemPtr my_active = my_tac->Active; //zapamovavat pozici v 3AC
 	out = function(fce_name, &ST, ret);
-	my_tac->Active = my_active; //hotfix
+	my_tac->Active = my_active; //nahrat pozici v 3AC
+	LSTDispose(&ST);
 	if (out) return out;
 	working_tmp = BU_working_tmp;
-	working_push = BU_working_push;
 	working_size = BU_working_size;
-	working_push_size = BU_working_push_size;
 	if (rec->t_t==VARIABLE){
 		BSTFind(my_ST, rec->t.variable);
 		if (!BSTActive(my_ST)) return 3;
@@ -664,33 +559,10 @@ int funcOp(struct Operation *rec, tBSTPtr my_ST, tDLList * my_tac){
 	return out;
 }
 
-int isBuildIn(struct Operation *rec){
-/*
-0 || not build in
-1 || int length(string s) 
-2 || string substr(string s, int i, int n) 
-3 || string concat(string s1, string s2) 
-4 || int find(string s, string search)
-5 || string sort(string s) 
-*/
-	char * str = rec->op1.fce;
-	if (strcmp(str, "length")==0)
-		return 1;
-	else if (strcmp(str, "substr")==0)
-		return 2;
-	else if (strcmp(str, "concat")==0)
-		return 3;
-	else if (strcmp(str, "find")==0)
-		return 4;
-	else if (strcmp(str, "sort")==0)
-		return 5;	
-	return 0;
-
-}
 
 void decrease_push(){
-	working_push_size--;
-	working_push = extendPush(working_push, working_push_size);
+	push_size--;
+	working_push = extendPush(working_push, push_size);
 }
 
 char * get_name(char * names, int  i){

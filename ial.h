@@ -8,7 +8,6 @@
 
 #ifndef IAL_H_INCLUDED
 #define IAL_H_INCLUDED
-#include "tac.h"
 #include "stack.h"
 #include "garbage.h"
 #include <stdio.h>
@@ -70,6 +69,7 @@ typedef struct tFunc{
     /*! zmenit void az bude 3AC*/
 } *tFuncPtr;
 
+#include "tac.h"
 void * GSTCopyTAC(tBSTPtr);
 void GSTDispose(tBSTPtr);
 int GSTAllDef(tBSTEPtr rootPtr); // return 1 kdyz vsechny deklarovane funkce byly definovany
@@ -107,6 +107,5 @@ int find(char *s, char *search);
 void swap(char *s, int i, int j);
 void sift_down(char *s, int start, int length);
 void sort(char *s);
-char * substr(char * str, int i, int n);
 
 #endif //IAL_H_INCLUDED
