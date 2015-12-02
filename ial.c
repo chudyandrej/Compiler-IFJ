@@ -165,7 +165,6 @@ void varFree(tBSTEPtr ptr){
     varFree(ptr->lptr);
     varFree(ptr->rptr);
     scopeFree(ptr->data);
-    gc_free(ptr->key);
     gc_free(ptr);
 }
 
