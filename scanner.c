@@ -350,12 +350,7 @@ Token * get_token(FILE * fp) {
                        cleanup(token, str_tmp);
                     }
                 }
-                else if (!isoperator(c)) {
-                    token->type = KIN_UNKNOWN;
-                    cleanup(NULL, str_tmp);
-                    return token;
-                }
-                else {
+                else if (isoperator(c) || isspace(c)) {
                     ungetc(c, fp);
                     if (copy_str_to_token(token, str_tmp)) {
                         cleanup(token, str_tmp);
@@ -365,6 +360,12 @@ Token * get_token(FILE * fp) {
                     }
                     else token->type = KIN_NUM_DOUBLE;
                     str_free(str_tmp);
+                    return token;
+                }
+                else {
+                    printf("AHOJ------------------\n");
+                    token->type = KIN_UNKNOWN;
+                    cleanup(NULL, str_tmp);
                     return token;
                 }
                 break;
