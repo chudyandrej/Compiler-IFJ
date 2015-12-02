@@ -532,7 +532,7 @@ Token * cleanup(Token * t, string * s) {
 }
 
 int escape_check(char base, int max_size) {
-    char tmp_array[max_size];
+    char tmp_array[max_size+1];
     for (int counter = 0; counter < max_size;counter++) {
         tmp_array[counter] = (char) getc(fp);
         if (base == BINARY && (tmp_array[counter] != '0' && tmp_array[counter] != '1')) {
@@ -548,6 +548,7 @@ int escape_check(char base, int max_size) {
             return ESC_FAIL;
         }
     }
+    tmp_array[max_size] = '\0';
     return strtol(tmp_array,NULL,base);
 }
 
