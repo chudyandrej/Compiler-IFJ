@@ -14,6 +14,14 @@ extern FILE * fp; /* Pointer to the source file */
 enum {TRUE = 1, FALSE = 0};
 
 
+//Enum pro escape sekvence
+enum {
+    BINARY = 2,
+    OCTAL = 8,
+    HEXA = 16,
+};
+
+
 /*
  * Typedef: TokenKind
  * Author: Bayer Jan, Kopec Maros
@@ -130,5 +138,6 @@ int copy_char_to_token(Token *t, char c);
 int copy_str_to_token(Token *t, string *s);
 Token * get_token(FILE * fp);
 Token * cleanup(Token * t, string * s);
+int escape_check(char base, int max_size);
 
 #endif //IJF_SCANNER_H

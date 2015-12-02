@@ -11,9 +11,12 @@
 #include "scanner.h"
 
 #define ESC_HEX_MAX 2
+#define ESC_BINARY_MAX 8
+#define ESC_OCTAL_MAX 3
 #define KEYWORDS_SIZE 15
 #define SUCCESS 0
 #define FAIL 1
+#define ESC_FAIL -1
 
 int count_e;
 int enable_op;
@@ -32,8 +35,7 @@ Token * get_token(FILE * fp) {
     State state = S_START;
     string * str_tmp;
     Token * token;
-    char hex[ESC_HEX_MAX];
-    char ch; //help variable for escape sequence processing
+    int ch; //help variable for escape sequence processing
     if ((token = gc_malloc(sizeof(Token))) == NULL) {
         return NULL;
     }
@@ -284,22 +286,25 @@ Token * get_token(FILE * fp) {
                     break;
                 case 'x':
                 case 'X':
-                    hex[0] = (char) getc(fp);
-                    hex[1] = (char) getc(fp);
-
-                    if (isxdigit(hex[0]) && isxdigit(hex[1])) ch = (char)strtol(hex,NULL,16);
-                    else {
-                        ungetc(hex[0],fp);
-                        ungetc(hex[1],fp);
-                    }
+                    ch = escape_check(HEXA,ESC_HEX_MAX);
+                    break;
+                case 'b':
+                    ch = escape_check(BINARY,ESC_BINARY_MAX);
+                    break;
+                case '0':
+                    ch = escape_check(OCTAL,ESC_OCTAL_MAX);
                     break;
                 default:
                     token->type = KIN_UNKNOWN;
                     cleanup(NULL, str_tmp);
                     return token;
-
+                };
+                if (ch < 0 || ch > 255) {
+                    token->type = KIN_UNKNOWN;
+                    cleanup(NULL, str_tmp);
+                    return token;
                 }
-                if (str_add_char(str_tmp, ch)) cleanup(token, str_tmp);
+                if (str_add_char(str_tmp, (char)ch)) cleanup(token, str_tmp);
                 state = S_TEXT;
                 break;
 
@@ -524,6 +529,26 @@ Token * cleanup(Token * t, string * s) {
     if (s != NULL) str_free(s);
     if (t != NULL) gc_free(t);
     return NULL;
+}
+
+int escape_check(char base, int max_size) {
+    char tmp_array[max_size];
+    for (int counter = 0; counter < max_size;counter++) {
+        tmp_array[counter] = (char) getc(fp);
+        if (base == BINARY && (tmp_array[counter] != '0' && tmp_array[counter] != '1')) {
+            ungetc(tmp_array[counter],fp);
+            return ESC_FAIL;
+        }
+        else if (base == HEXA && (!isxdigit(tmp_array[counter]))) {
+            ungetc(tmp_array[counter],fp);
+            return ESC_FAIL;
+        }
+        else if (base == OCTAL && (tmp_array[counter] < '0' || tmp_array[counter] > '7')) {
+            ungetc(tmp_array[counter],fp);
+            return ESC_FAIL;
+        }
+    }
+    return strtol(tmp_array,NULL,base);
 }
 
 char * keywords[] = {
