@@ -20,7 +20,9 @@ int start_syntax_analyz(){
                     continue;
                 }
                 else{
+                    printf("asdkjfaaaaaa\n");
                     gc_free_all();
+                    printf("adsfj \n");
                     return  exit_code;
                 }
             case END_OF_FILE:
@@ -45,6 +47,10 @@ int dec_function(unsigned int type_func){
     char *names = NULL;
     int exit_code;
 
+    if( func_name->type >= KW_LENGTH && func_name->type <= KW_SORT){ 
+        errorMessage_semantic("Redeclaration/redefiniton of build-in function!");
+        return PROGRAM_SEM_ERR;
+    }
     if (func_name->type == KIN_IDENTIFIER){
         if ((new_token = next_token())->type == KIN_L_ROUNDBRACKET){
             gc_free(new_token);
@@ -58,12 +64,12 @@ int dec_function(unsigned int type_func){
                     errorMessage_semantic("WRONG arguments of function!");
                     return PROGRAM_SEM_ERR; //3
                 }
-                if (new_token->type == KIN_SEMICOLON){
+                if (new_token->type == KIN_SEMICOLON){      //prototype
                     gc_free(new_token);
                     gc_free(func_name);
                     return 0;
                 }
-                else if(new_token->type == KIN_L_BRACE) {
+                else if(new_token->type == KIN_L_BRACE) {   //definition 
                     gc_free(new_token);
                     tac_stack = gc_malloc(sizeof(struct tDLList));
                     init_list(tac_stack);
@@ -166,10 +172,12 @@ int body_function(){
                     union Address tmp;
                     tmp.variable = new_token->str;
                     gen_instructions(TAC_INIT,tmp, fake, fake, VARIABLE,AUTO,EMPTY);
+                    if(token_predict->type != KIN_ASSIGNEMENT){
+                        errorMessage_semantic("AUTO ID initialization missing!");return VAR_TYPE_ERR;}
                     if((exit_code=assing_exp(new_token)) == 0){continue;}else{return exit_code;}
                     gc_free(new_token);
                 }
-                else{return VAR_TYPE_ERR;} //5
+                else{ errorMessage_syntax("WRONG identifier declaration!");return SYN_ERR;} //2
 
             case KW_DOUBLE:  case KW_INT:  case KW_STRING:
                 if ((exit_code=dec_variable(new_token->type)) == 0) {
@@ -360,6 +368,7 @@ int assing_exp(Token *token_var){       //token_var -> name of destination varia
             gen_instructions(KIN_ASSIGNEMENT, tmp, end_node->data, fake, VARIABLE, end_node->type, EMPTY);
             gc_free(end_node);
         }
+        if(exit_code != 0){errorMessage_syntax("WRONG assignement!");}
         return exit_code;
     }
     errorMessage_syntax("WRONG assignement!");
