@@ -17,7 +17,7 @@ while read line; do
     echo "Input: $line" >> log_invalid_values_test.txt
     printf "Output by interpret:\n" >> log_invalid_values_test.txt
 
-    ./"$1" ./Errors/input 1>> log_invalid_values_test.txt 2>/dev/null
+    ./"$1" ./Errors/input 1>> log_invalid_values_test.txt 
     echo "Return value of interpret: $?" >> log_invalid_values_test.txt
 
     valgrind ./"$1" ./Errors/input 2> valgrind_log 1>&2
@@ -43,7 +43,7 @@ while read line; do
     echo "Input: $line" >> log_invalid_values_test.txt
     printf "Output by interpret:\n" >> log_invalid_values_test.txt
 
-    ./"$1" ./Errors/input 1>> log_invalid_values_test.txt 2>/dev/null
+    ./"$1" ./Errors/input 1>> log_invalid_values_test.txt 
     echo "Return value of interpret: $?" >> log_invalid_values_test.txt
 
 
