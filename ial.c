@@ -176,7 +176,7 @@ void LSTDispose (tBSTPtr T){
 
 int LSTAdd (tBSTPtr T, enum Type type, int scope){
     if (T->Act->data!=NULL)
-        if(((struct tVar *)T->Act->data)->scope == scope) return 1;
+        if(((struct tVar *)T->Act->data)->scope == scope) return 3;
     tVarPtr node = gc_malloc(sizeof(struct tVar));
     node->scope = scope;
     node->assigned = 0;
@@ -229,11 +229,11 @@ void LSTLeaveScope (tBSTEPtr ptr, int scope){
 int LSTGet (tBSTPtr T, struct TMPRecord * v){
     tVarPtr tmp = T->Act->data;
     if (tmp==NULL){
-        return 8    ;
+        return 3;
     }
     if(tmp->assigned == 0){
         v->t = tmp->value.t;
-        return 2;
+        return 8;
     }
     v->value = tmp->value.value;
     v->t = tmp->value.t;
