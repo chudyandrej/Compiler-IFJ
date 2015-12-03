@@ -1,4 +1,6 @@
-
+//#include <iostream>
+//#include <vector>
+//using namespace std;
 
 /**Funkce @my_abs pro tvorbu absolutnĂ­ hodnoty vracĂ­ absolutnĂ­ hodnotu z parametru double z)**/
 double my_abs(double x) {
