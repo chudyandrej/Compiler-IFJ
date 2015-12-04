@@ -9,7 +9,6 @@ int start_syntax_analyz(){
     while(true) {
         new_token = next_token();
         switch (new_token->type) {
-            case KW_AUTO:
             case KW_DOUBLE:
             case KW_INT:
             case KW_STRING:
@@ -457,7 +456,7 @@ int parameters_declar(unsigned int type_func, char **types, char **names){
         return 0;
     }                                               
     while(true) {
-        if((new_token->type >= KW_AUTO) && (new_token->type <= KW_STRING)){     //data type of parameters
+        if((new_token->type > KW_AUTO) && (new_token->type <= KW_STRING)){     //data type of parameters
             ap_type(types, new_token->type);
             gc_free(new_token);
             if ((new_token=next_token())->type == KIN_IDENTIFIER) {
