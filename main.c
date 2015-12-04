@@ -39,6 +39,7 @@ int main(int argc, char *argv[]) {
     fclose(fp);
     if(exit_code == 0) {
         exit_code = interpret();
+        if(exit_code) handle_err(exit_code);
     }
     gc_free_all();
     free(garbage);

@@ -44,7 +44,7 @@ typedef enum ErrCode {
      *  s rídicím programem, špatné parametry príkazové rádky atd.)*/
 }tErrCode;
 
-int handle_err(tErrCode code);
+void handle_err(tErrCode code);
 void errorMessage_syntax(const char *message );
 void errorMessage_lexical(const char *message );
 void errorMessage_internal(const char *message );

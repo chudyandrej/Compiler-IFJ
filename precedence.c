@@ -299,9 +299,9 @@ int expression_process(enum sTokenKind end_char, dTreeElementPtr *final_node){
             new_token = next_token();
         }
         if((new_token->type == KIN_IDENTIFIER || (new_token->type >= KW_LENGTH && new_token->type <= KW_SORT)) &&
-                token_predict->type == KIN_L_ROUNDBRACKET){                    //function in expession
+                token_predict->type == KIN_L_ROUNDBRACKET){                    //calling function in expession
             gc_free(next_token());
-            if((exit_code=call_function(new_token)) != 0){ *final_node = clean_stack(Stack, false); return exit_code;}  //3 or 4
+            if((exit_code=call_function(new_token)) != 0){ *final_node = clean_stack(Stack, false); return exit_code;}  //2,3 or 4
             insert_last(Stack, create_stack_element(D_STOPER, NULL));
             insert_last(Stack, create_stack_element(D_TMP, NULL));
             continue;
@@ -342,7 +342,7 @@ int expression_process(enum sTokenKind end_char, dTreeElementPtr *final_node){
                 if(exit_code == 0){
                     load_new_tag = false;
                     continue;
-                }else {return SYN_ERR;} //2
+                }else {*final_node = clean_stack(Stack, false); return SYN_ERR;} //2
             case '=':
                 insert_last(Stack, create_stack_element(new_token->type, new_token));
                 continue;

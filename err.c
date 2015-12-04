@@ -2,9 +2,11 @@
 
 #include "err.h"
 
-int handle_err(tErrCode code) {
-    fprintf(stderr, "ERROR MESSAGE");
-    return code;
+void handle_err(tErrCode code) {
+    if(code==1) errorMessage_lexical("1");
+    else if (code==2) errorMessage_syntax("2");
+    else if (code<=10) errorMessage_semantic("semantic error");
+    else errorMessage_internal("");
 }
 
 void errorMessage_syntax(const char *message ){
