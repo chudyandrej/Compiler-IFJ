@@ -363,7 +363,7 @@ int cinOp(struct Operation *rec, tBSTPtr my_ST){
 	if (rec->t_t!=VARIABLE) return 2;
 	struct TMPRecord * dereferenced = gc_malloc(sizeof(struct TMPRecord));
 	out = dereference(rec, my_ST, 0, dereferenced);
-	if (out!=8){
+	if (out!=3){
 		char * str = gc_malloc(1);
 		char * ptr = NULL;
 		char c;
