@@ -20,9 +20,7 @@ int start_syntax_analyz(){
                     continue;
                 }
                 else{
-                    printf("asdkjfaaaaaa\n");
                     gc_free_all();
-                    printf("adsfj \n");
                     return  exit_code;
                 }
             case END_OF_FILE:
@@ -61,7 +59,7 @@ int dec_function(unsigned int type_func){
                     BSTAdd(&Func, func_name->str);
                 }
                 if (GSTDeclare(&Func, data_types, names)){       
-                    errorMessage_semantic("WRONG arguments of function!");
+                    errorMessage_semantic("WRONG declaration of function!");
                     return PROGRAM_SEM_ERR; //3
                 }
                 if (new_token->type == KIN_SEMICOLON){      //prototype
@@ -163,8 +161,8 @@ int body_function(){
                         gc_free(new_token);
                         continue;
                     }
-                    return SYN_ERR;
                 }
+                errorMessage_syntax("Body of function !");
                 return SYN_ERR;
 
             case KW_AUTO:   //declaration ID to auto must be followed by initialization 
@@ -228,21 +226,23 @@ int for_statement() {
             if((exit_code=assing_exp(new_token)) != 0){ return exit_code;}
             gc_free(new_token);
         }
-        else{ errorMessage_syntax("ERROR in definition part of FOR statement!"); return SYN_ERR;}
+        else{ errorMessage_syntax("In definition part of FOR statement!"); return SYN_ERR;}
         gen_label(incre.label);
         if ((exit_code=expression_process(KIN_SEMICOLON, &end_node)) == KIN_SEMICOLON) {       //expression part of for statement
             if(end_node != NULL && end_node->description != D_DOLLAR) {
                 gen_instructions(TAC_GOTO_COND, cond, end_node->data, fake, LABEL, end_node->type, EMPTY);
                 gen_instructions(TAC_GOTO_UNCOND, skip, fake, fake, LABEL, EMPTY, EMPTY);
                 gc_free(end_node);
-            }else{return SYN_ERR;}
+            }else{errorMessage_syntax("Expression part of FOR statement!"); return SYN_ERR;}
 
             gen_label(uncond.label);
             var_name = token_predict->str; //save name of ID, cause new_token can be free in expression in some cases
             exit_code = expression_process(KIN_R_ROUNDBRACKET,&end_node);      //command part of for statement
+
             if(exit_code == KIN_ASSIGNEMENT){
                 exit_code = expression_process(KIN_R_ROUNDBRACKET,&end_node);
                 if(exit_code != KIN_R_ROUNDBRACKET || end_node == NULL || end_node->description == D_DOLLAR){
+                    errorMessage_syntax("Command part of FOR statement!");
                     return (exit_code == TYPE_COMP_SEM_ERR) ? TYPE_COMP_SEM_ERR : SYN_ERR;
                 }
                 union Address tmp;
@@ -362,13 +362,13 @@ int assing_exp(Token *token_var){       //token_var -> name of destination varia
         gc_free(new_token);
         int exit_code = expression_process(KIN_SEMICOLON, &end_node);
         exit_code = (exit_code == KIN_SEMICOLON && end_node != NULL)? 0 : exit_code;
-        if( !exit_code ) {
+        if( exit_code == 0 ) {
             union Address tmp;
             tmp.variable = token_var->str;
             gen_instructions(KIN_ASSIGNEMENT, tmp, end_node->data, fake, VARIABLE, end_node->type, EMPTY);
             gc_free(end_node);
         }
-        if(exit_code != 0){errorMessage_syntax("WRONG assignement!");}
+        else{errorMessage_syntax("WRONG assignement!");}
         return exit_code;
     }
     errorMessage_syntax("WRONG assignement!");
@@ -396,7 +396,7 @@ int dec_variable(enum sTokenKind type){
         union Address tmp;
         tmp.variable = new_token->str;
         gen_instructions(TAC_INIT,tmp, fake, fake, VARIABLE,translate(type),EMPTY);
-        if (token_predict->type == KIN_SEMICOLON) {
+        if (token_predict->type == KIN_SEMICOLON) {     //variable declaration
             gc_free(next_token());
             gc_free(new_token);
             return 0;
@@ -440,12 +440,12 @@ int parameters_declar(unsigned int type_func, char **types, char **names){
     strcpy(*types, "");
     ap_type(types, type_func);
     Token *new_token= next_token();
-    if(new_token->type == KIN_R_ROUNDBRACKET) {
+    if(new_token->type == KIN_R_ROUNDBRACKET) {     //no parameters
         gc_free(new_token);
         return 0;
     }                                               
     while(true) {
-        if((new_token->type >= KW_AUTO) && (new_token->type <= KW_STRING)){
+        if((new_token->type >= KW_AUTO) && (new_token->type <= KW_STRING)){     //data type of parameters
             ap_type(types, new_token->type);
             gc_free(new_token);
             if ((new_token=next_token())->type == KIN_IDENTIFIER) {
