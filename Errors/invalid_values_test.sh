@@ -31,6 +31,7 @@ while read line; do
 
 done < ./Errors/invalid_value_inputs; 
 
+printf "\n-----TESTS outside of main-----\n" >> log_invalid_values_test.txt
 
 while read line; do
 

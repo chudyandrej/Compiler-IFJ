@@ -88,3 +88,11 @@ for( a=1; a< c ; c+1+c=i*4){ }
 for( a=1; a< c ; c+1+c=i*4){ }
 if(a-4){ } else { }
 int a=func(4,4*);
+int a=454564e4.8;
+int a=457.4654.546;
+int a=545..456;
+int a=4++++4;
+int a=4----4;
+int a=4+-*/4;
+int a=4--;
+int a=++a++1;
