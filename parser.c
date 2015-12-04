@@ -121,13 +121,13 @@ int body_function(){
             case KW_RETURN:
                 gc_free(new_token);
                 if((exit_code=expression_process(KIN_SEMICOLON, &end_node)) == KIN_SEMICOLON){
-                    if(end_node == NULL || end_node->description == D_DOLLAR){return SYN_ERR;}    //D_DOLLAR when no expression occured
+                    if(end_node == NULL || end_node->description == D_DOLLAR){return (end_node==NULL)? exit_code: SYN_ERR;}    //D_DOLLAR when no expression occured
                     gen_instructions(TAC_RETURN,end_node->data,fake,fake,end_node->type,EMPTY,EMPTY);
                     gc_free(end_node);
                     continue;
                 } else{
                     errorMessage_syntax("BAD SYNTAX in RETURN function");
-                    return (exit_code == TYPE_COMP_SEM_ERR) ? TYPE_COMP_SEM_ERR : SYN_ERR;
+                    return (end_node==NULL)? exit_code: SYN_ERR;
                 } 
 
             case KIN_IDENTIFIER:
@@ -212,7 +212,7 @@ int for_statement() {
     skip.label = label + 3;
     label = label + 4;
     dTreeElementPtr end_node = NULL;
-    int exit_code;
+    int exit_code = SYN_ERR;
 
     if ((new_token=next_token())->type == KIN_L_ROUNDBRACKET){
         gc_free(new_token);
@@ -233,7 +233,7 @@ int for_statement() {
                 gen_instructions(TAC_GOTO_COND, cond, end_node->data, fake, LABEL, end_node->type, EMPTY);
                 gen_instructions(TAC_GOTO_UNCOND, skip, fake, fake, LABEL, EMPTY, EMPTY);
                 gc_free(end_node);
-            }else{errorMessage_syntax("Expression part of FOR statement!"); return SYN_ERR;}
+            }else{errorMessage_syntax("Expression part of FOR statement!"); return (end_node==NULL)? exit_code:SYN_ERR;}
 
             gen_label(uncond.label);
             var_name = token_predict->str; //save name of ID, cause new_token can be free in expression in some cases
@@ -243,13 +243,13 @@ int for_statement() {
                 exit_code = expression_process(KIN_R_ROUNDBRACKET,&end_node);
                 if(exit_code != KIN_R_ROUNDBRACKET || end_node == NULL || end_node->description == D_DOLLAR){
                     errorMessage_syntax("Command part of FOR statement!");
-                    return (exit_code == TYPE_COMP_SEM_ERR) ? TYPE_COMP_SEM_ERR : SYN_ERR;
+                    return (end_node==NULL)? exit_code:SYN_ERR;
                 }
                 union Address tmp;
                 tmp.variable = var_name;
                 gen_instructions(KIN_ASSIGNEMENT, tmp, end_node->data, fake, VARIABLE, end_node->type, EMPTY);
                 gc_free(end_node);
-            }else if(exit_code == TYPE_COMP_SEM_ERR){return TYPE_COMP_SEM_ERR;}
+            }else if(exit_code != KIN_R_ROUNDBRACKET){return (end_node==NULL)? exit_code:SYN_ERR;}
 
             if ((new_token = next_token())->type == KIN_L_BRACE){
                 gc_free(new_token);
@@ -261,15 +261,15 @@ int for_statement() {
                 gen_instructions(SCOPE_DOWN, fake, fake, fake, EMPTY, EMPTY, EMPTY);
                 return exit_code;
             }
-        }else if(exit_code == TYPE_COMP_SEM_ERR){return TYPE_COMP_SEM_ERR;}
+        }
     }
     errorMessage_syntax("Error in for statement !");
-    return SYN_ERR; //2
+    return (end_node==NULL)? exit_code:SYN_ERR;
 }
 
 int if_statement(){
 
-    int exit_code;
+    int exit_code=SYN_ERR;
     Token *new_token;
     union Address cond;
     cond.label = label;
@@ -279,12 +279,15 @@ int if_statement(){
     dTreeElementPtr end_node = NULL;
 
     if(((new_token=next_token())->type == KIN_L_ROUNDBRACKET) && ((exit_code=expression_process(KIN_R_ROUNDBRACKET, &end_node)) == KIN_R_ROUNDBRACKET)){
-        if(exit_code == TYPE_COMP_SEM_ERR){return TYPE_COMP_SEM_ERR;} //4
-        if(end_node != NULL) {
+        if(end_node != NULL && end_node->description != D_DOLLAR){
             gen_instructions(TAC_GOTO_COND, cond, end_node->data, fake, LABEL, end_node->type, EMPTY);
             gc_free(new_token);
             gc_free(end_node);
+        }else{
+            errorMessage_syntax("Bad syntax in \"if\"");
+            return (end_node==NULL)? exit_code:SYN_ERR;
         }
+        
         if((new_token = next_token())->type == KIN_L_BRACE && ((exit_code=body_function()) == 0)) {
            gen_instructions(TAC_GOTO_UNCOND, uncond, fake, fake, LABEL, EMPTY,EMPTY);
            gen_label(cond.label);
@@ -301,7 +304,7 @@ int if_statement(){
        }
     }
     errorMessage_syntax("Bad syntax in \"if\"");
-    return exit_code;
+    return (end_node==NULL)? exit_code:SYN_ERR;
 }
 
 int cin(){
@@ -352,7 +355,7 @@ int cout(){
         }
     }
     errorMessage_syntax("WRONG cout operator!"); 
-    return ret_code;
+    return (end_node==NULL)? ret_code:SYN_ERR;
 }
 
 int assing_exp(Token *token_var){       //token_var -> name of destination variable
@@ -361,14 +364,23 @@ int assing_exp(Token *token_var){       //token_var -> name of destination varia
     if (new_token->type == KIN_ASSIGNEMENT){
         gc_free(new_token);
         int exit_code = expression_process(KIN_SEMICOLON, &end_node);
-        exit_code = (exit_code == KIN_SEMICOLON && end_node != NULL)? 0 : exit_code;
+        
+        if(end_node != NULL && end_node->description == D_DOLLAR){
+            exit_code = SYN_ERR;
+        }
+        else if(end_node != NULL){
+            exit_code = (exit_code==KIN_SEMICOLON)? 0 : SYN_ERR;
+        }       
         if( exit_code == 0 ) {
             union Address tmp;
             tmp.variable = token_var->str;
             gen_instructions(KIN_ASSIGNEMENT, tmp, end_node->data, fake, VARIABLE, end_node->type, EMPTY);
             gc_free(end_node);
+            exit_code = 0;
         }
-        else{errorMessage_syntax("WRONG assignement!");}
+        else{
+            errorMessage_syntax("WRONG assignement!");
+        }
         return exit_code;
     }
     errorMessage_syntax("WRONG assignement!");
@@ -480,18 +492,21 @@ int parameters_used(){
     dTreeElementPtr end_node = NULL;
     while(true) {
         counter_of_arguments++;
-        int exit_code_value = expression_process(KIN_COMMA, &end_node);
+        int exit_code = expression_process(KIN_COMMA, &end_node);
         if(end_node != NULL){
-            if(end_node->description == D_DOLLAR){return 0;} // zero number of arguments
+            if(end_node->description == D_DOLLAR){            
+                gc_free(end_node);
+                return 0;           // zero number of arguments
+            } 
             else{
                 gen_instructions(TAC_PUSH, end_node->data, fake, fake, end_node->type, EMPTY, EMPTY);
                 gc_free(end_node);
             }
         }
-        if(exit_code_value == KIN_COMMA) {
+        if(exit_code == KIN_COMMA) {
             continue;
         }
-        else if(exit_code_value == KIN_R_ROUNDBRACKET){
+        else if(exit_code == KIN_R_ROUNDBRACKET){
             return counter_of_arguments;
         }
         errorMessage_syntax("WRONG syntax of function arguments!");
