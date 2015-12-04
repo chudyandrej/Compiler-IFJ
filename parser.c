@@ -472,6 +472,7 @@ int parameters_used(){
     while(true) {
         counter_of_arguments++;
         int exit_code_value = expression_process(KIN_COMMA, &end_node);
+        if (exit_code_value==SYN_ERR) return -1;
         if(end_node != NULL){
             if(end_node->description == D_DOLLAR){return 0;} // zero number of arguments
             else{

@@ -30,6 +30,7 @@ int interpret(){
 	if (GSTAllDef(Func.Root) != 1) return 3;
 	BSTFind(&Func, "main");
 	if (BSTActive(&Func)!=1) return 3;
+	if (((struct tFunc *)Func.Act->data)->names!=NULL) return 4;
 	working_push = gc_malloc(sizeof(struct TMPRecord *) * push_size);
 	struct TMPRecord ret;
 	struct tBST ST;
