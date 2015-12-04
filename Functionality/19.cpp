@@ -24,4 +24,5 @@ int main(){
         }
     cout << "Vysledek je: " << vysl << "\n";
     }
+    return 0;
 }

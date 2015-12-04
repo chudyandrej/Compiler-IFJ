@@ -71,7 +71,7 @@ echo "----------OTHER_ERROR_TEST_DONE-----------"
 rm ./valgrind_log
 
 if [ $exit_code -eq 1 ]; then
-    echo "TESTS FAILD, check where!"
+    echo "TESTS FAILED, check where!"
 else
     printf "\n---Test complete, check log_invalid_values_test.txt and"
     echo " if everything is OK, made more tests up!!!"

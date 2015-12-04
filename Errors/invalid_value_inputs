@@ -1,7 +1,7 @@
 int a=4/0;
 int a=4+3+"text"; 
 int a=;
-int length(int i){ int a=5; return1; } 
+int length(int i){ int a=5; return 1; } 
  int a=length(4);
  int a=length("ao", "ah");
  int a= length("sjfdsjfa);
@@ -31,7 +31,7 @@ int i=find();
 find();
 int a = find("a;sj""a;as");
 string s=find("asdf","sd");
- string sort(string s){  int a=5; return1; }
+ string sort(string s){  int a=5; return 1; }
  string h=sort("asdf","sadf");
  string h=sort(4654);
  string h=sort();
@@ -87,3 +87,4 @@ for( a=1; a< c ; c+1=i*4){ }
 for( a=1; a< c ; c+1+c=i*4){ }
 for( a=1; a< c ; c+1+c=i*4){ }
 if(a-4){ } else { }
+int a=func(4,4*);
