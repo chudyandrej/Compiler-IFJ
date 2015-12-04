@@ -312,6 +312,9 @@ Token * get_token(FILE * fp) {
             case S_NUMBER:
                 if (isdigit(c) || (enable_op && (c == '+' || c == '-'))) {
                     if ((c == '+' || c == '-')) {
+                        if (str_add_char(str_tmp, c)) {
+			    cleanup(NULL, str_tmp);
+                        }
                         if (!isdigit(c = (char) getc(fp))) {
                             ungetc(c, fp);
                             token->type = KIN_UNKNOWN;
