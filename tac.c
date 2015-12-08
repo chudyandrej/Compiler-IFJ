@@ -31,6 +31,7 @@ int interpret(){
 	BSTFind(&Func, "main");
 	if (BSTActive(&Func)!=1) return 3;
 	if (((struct tFunc *)Func.Act->data)->names!=NULL) return 4;
+	if (((struct tFunc *)Func.Act->data)->params[0]!='i') return 4;
 	working_push = gc_malloc(sizeof(struct TMPRecord *) * push_size);
 	struct TMPRecord ret;
 	struct tBST ST;
@@ -258,6 +259,8 @@ int pushOp(struct Operation *rec, tBSTPtr my_ST){
 
 int initOp(struct Operation *rec, tBSTPtr my_ST, int scope){
 	int out;
+	BSTFind(&Func, rec->t.variable);
+	if (BSTActive(&Func)) return 3;
 	BSTFind(my_ST, rec->t.variable);
 	if(!BSTActive(my_ST)) BSTAdd(my_ST, rec->t.variable);
 	out = LSTAdd(my_ST, rec->t_op1, scope);
@@ -534,8 +537,10 @@ int funcOp(struct Operation *rec, tBSTPtr my_ST, tDLList * my_tac){
 		if ((operand->t!=parameter)&&((operand->t==STRING)||(parameter==STRING))){
 			return 4;
 		}
+		BSTFind(&Func, name); // zkontroluje ze jmeno neni stejne jako nazev fce
+		if (BSTActive(&Func)) return 3;
 		BSTFind(&ST, name);
-		if (BSTActive(&ST)) return 6;
+		if (BSTActive(&ST)) return 3;
 		BSTAdd(&ST, name);
 		LSTAdd(&ST, parameter, 0);
 		LSTSet(&ST, operand);
