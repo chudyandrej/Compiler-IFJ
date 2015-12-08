@@ -5,11 +5,13 @@
 #include <stdlib.h>
 #include "tac.h"
 #include "ial.h"
+#include "scanner.h"
 
 
 char * substr(char * str, int i, int n);
 int isBuildIn(struct Operation *rec);
 int buildInOp(struct Operation *rec, tBSTPtr my_ST, int op);
+int escapeCheckCin(FILE * fp);
 
 
 #endif //BUILDIN_H_INCLUDED

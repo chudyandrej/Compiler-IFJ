@@ -372,6 +372,7 @@ int cinOp(struct Operation *rec, tBSTPtr my_ST){
 		while(isspace(c=fgetc(stdin)));
 
 		do {
+			if (c == '\\' && (c = (char) escapeCheckCin(stdin)) == -1) return 6;
 			str = gc_realloc(str, ++count);
 			str[count-2] = c;
 			str[count-1] = '\0';

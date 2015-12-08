@@ -2,6 +2,10 @@
 extern struct TMPRecord** working_push;
 extern unsigned int push_size;
 
+#define ESC_HEX_MAX 2
+#define ESC_BINARY_MAX 8
+#define ESC_OCTAL_MAX 3
+
 /**
  * Return a substring defined by:
  * @param  str pointer to char array
@@ -149,4 +153,39 @@ int buildInOp(struct Operation *rec, tBSTPtr my_ST, int op){
         store_tmp(target, rec->t.tmp);
     }
     return out;
+}
+
+int escapeCheckCin (FILE * fp) {
+    if (feof(stdin)) return -1;
+    char c = fgetc(stdin);
+    switch(c) {
+        case 'n':
+            return '\n';
+            break;
+        case 't':
+            return '\t';
+            break;
+        case '"':
+            return '\"';
+            break;
+        case '\\':
+            return '\\';
+            break;
+        case 'x':
+        case 'X':
+            c = escape_check(HEXA,ESC_HEX_MAX,fp);
+            return c;
+            break;
+        case 'b':
+            c = escape_check(BINARY,ESC_BINARY_MAX,fp);
+            return c;
+            break;
+        case '0':
+            c = escape_check(OCTAL,ESC_OCTAL_MAX,fp);
+            return c;
+            break;
+        default:
+            return -1;
+    };
+    return -1;
 }
