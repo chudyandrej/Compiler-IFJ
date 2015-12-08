@@ -365,7 +365,6 @@ Token * get_token(FILE * fp) {
                     return token;
                 }
                 else {
-                    printf("AHOJ------------------\n");
                     token->type = KIN_UNKNOWN;
                     cleanup(NULL, str_tmp);
                     return token;
