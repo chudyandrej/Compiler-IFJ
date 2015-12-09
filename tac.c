@@ -406,7 +406,7 @@ int condition(struct Operation *rec, tBSTPtr my_ST, int * jump){
 	struct TMPRecord * dereferenced = gc_malloc(sizeof(struct TMPRecord));
 	out = dereference(rec, my_ST, 1, dereferenced);
 	if (!out){
-		if (dereferenced->t==STRING) return 6;
+		if (dereferenced->t==STRING) return 4;
 		else if (dereferenced->t==DOUBLE){
 			if(dereferenced->value.d==0.0) *jump=1;
 		}
