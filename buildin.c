@@ -154,38 +154,3 @@ int buildInOp(struct Operation *rec, tBSTPtr my_ST, int op){
     }
     return out;
 }
-
-int escapeCheckCin (FILE * fp) {
-    if (feof(stdin)) return -1;
-    char c = fgetc(stdin);
-    switch(c) {
-        case 'n':
-            return '\n';
-            break;
-        case 't':
-            return '\t';
-            break;
-        case '"':
-            return '\"';
-            break;
-        case '\\':
-            return '\\';
-            break;
-        case 'x':
-        case 'X':
-            c = escape_check(HEXA,ESC_HEX_MAX,fp);
-            return c;
-            break;
-        case 'b':
-            c = escape_check(BINARY,ESC_BINARY_MAX,fp);
-            return c;
-            break;
-        case '0':
-            c = escape_check(OCTAL,ESC_OCTAL_MAX,fp);
-            return c;
-            break;
-        default:
-            return -1;
-    };
-    return -1;
-}
