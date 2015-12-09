@@ -93,6 +93,7 @@ int buildInOp(struct Operation *rec, tBSTPtr my_ST, int op){
         if ((operand1->t==STRING)&&(operand2->t==INT)&&(operand3->t==INT)){
             target->t=STRING;
             target->value.s = substr(operand1->value.s, operand2->value.i, operand3->value.i);
+            if (target->value.s == NULL) out = 10;
         }
         else out = 4;
     }
