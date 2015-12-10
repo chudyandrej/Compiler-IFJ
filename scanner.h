@@ -138,6 +138,6 @@ int copy_char_to_token(Token *t, char c);
 int copy_str_to_token(Token *t, string *s);
 Token * get_token(FILE * fp);
 Token * cleanup(Token * t, string * s);
-int escape_check(char base, int max_size,FILE * fp);
+int escape_check(char base, int max_size);
 
 #endif //IJF_SCANNER_H

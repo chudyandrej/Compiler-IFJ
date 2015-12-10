@@ -285,13 +285,13 @@ Token * get_token(FILE * fp) {
                     break;
                 case 'x':
                 case 'X':
-                    ch = escape_check(HEXA,ESC_HEX_MAX,fp);
+                    ch = escape_check(HEXA,ESC_HEX_MAX);
                     break;
                 case 'b':
-                    ch = escape_check(BINARY,ESC_BINARY_MAX,fp);
+                    ch = escape_check(BINARY,ESC_BINARY_MAX);
                     break;
                 case '0':
-                    ch = escape_check(OCTAL,ESC_OCTAL_MAX,fp);
+                    ch = escape_check(OCTAL,ESC_OCTAL_MAX);
                     break;
                 default:
                     token->type = KIN_UNKNOWN;
@@ -532,7 +532,7 @@ Token * cleanup(Token * t, string * s) {
     return NULL;
 }
 
-int escape_check(char base, int max_size, FILE * fp) {
+int escape_check(char base, int max_size) {
     char tmp_array[max_size];
     for (int counter = 0; counter < max_size;counter++) {
         tmp_array[counter] = (char) getc(fp);
