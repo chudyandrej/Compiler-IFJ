@@ -1,3 +1,12 @@
+/*
+ * File: garbage.c
+ *
+ * Description: Malloc Garbage Collector
+ * Authors: Kondula Václav, Kopec Martin
+ *
+ * Created: 2015/11/15
+ * Last time modified: 2015/11/25
+ */
 
 #include "garbage.h"
 

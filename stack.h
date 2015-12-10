@@ -1,3 +1,13 @@
+/*
+ * File: stack.c
+ *
+ * Description: Malloc Garbage Collector
+ * Authors: Kondula Václav, Kopec Martin
+ *
+ * Created: 2015/10/24
+ * Last time modified: 2015/11/25
+ */
+
 #ifndef INTERPRET_STACK_H
 #define INTERPRET_STACK_H
 
@@ -32,7 +42,6 @@ void activate_first(tDLList *L);
 int is_active(tDLList *L);
 void *copy_active(tDLList *L);
 void shift_active(tDLList *L);
-
 
 
 #endif //INTERPRET_STACK_H

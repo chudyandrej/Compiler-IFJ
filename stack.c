@@ -1,3 +1,13 @@
+/*
+ * File: stack.c
+ *
+ * Description: Malloc Garbage Collector
+ * Authors: Kondula Václav, Kopec Martin
+ *
+ * Created: 2015/10/24
+ * Last time modified: 2015/11/25
+ */
+
 #include "stack.h"
 
 /**
@@ -31,7 +41,7 @@ void dispose_list(tDLList *L){
 }
 
 /**
- * Function create new element and inserts its as last element
+ * Function creates new element and inserts its as last element
  * @param L    pointer to the list
  * @param data pointer to data to be stored
  */
@@ -91,7 +101,7 @@ void delete_last(tDLList *L){
 }
 
 /**
- * Function creates new element and if acitve exists new element
+ * Function creates new element and if acitve exists, new element
  * is inserted behind active element, otherwise does nothing
  * @param L    pointer to the list
  * @param data pointer to data to be stored
@@ -129,18 +139,28 @@ void activate_last(tDLList *L){
     L->Active = L->Last;
 }
 
+/**
+ * Function activates first element in list
+ * If list is empty, Active still points to NULL
+ * @param L   pointer to the list
+ */
 void activate_first(tDLList *L){
 
     L->Active = L->First;
 }
 
+/**
+ * Function checks list activity out
+ * @param L   pointer to the list
+ * @return    1 when active element exists
+ *            0 when active element doesn't exist
+ */
 int is_active(tDLList *L){
     return L->Active==NULL?0:1;
 }
 
-
 /**
- * Function returns void pointer on Last element
+ * Function returns void pointer on last element
  * @param  L pointer to the list
  * @return   void pointer on last element, if list
  *           is empty, return NULL
@@ -155,6 +175,12 @@ void *copy_last(tDLList *L){
     }
 }
 
+/**
+ * Function returns void pointer on active element
+ * @param  L pointer to the list
+ * @return   void pointer on last element, if list
+ *           is empty, return NULL
+ */
 void *copy_active(tDLList *L){
    
     if(L->Active != NULL){
@@ -171,8 +197,6 @@ void *copy_active(tDLList *L){
  * If active doesn't exist, function does nothing
  * @param L   pointer to the list
  */
-
-
 void shift_active(tDLList *L){
     
     if(L->Active != NULL){
@@ -180,6 +204,11 @@ void shift_active(tDLList *L){
     }
 }
 
+/**
+ * Length of list function 
+ * @param L   pointer to the list
+ * @return    the length of list
+ */
 int length_list(tDLList *L){
     int count = 0;
     tDLElemPtr temp = L->First;
@@ -191,7 +220,11 @@ int length_list(tDLList *L){
     return count;
 }
 
-
+/**
+ * Function deletes element given by pointer
+ * @param L         pointer to the list
+ * @param element   pointer to the element
+ */
 void delete_element(tDLList *L, tDLElemPtr element){
 
     tDLElemPtr temp = L->Last;
@@ -213,7 +246,6 @@ void delete_element(tDLList *L, tDLElemPtr element){
             }
             gc_free(temp);
             break;
-
         }
         else{
             temp = temp->lptr;

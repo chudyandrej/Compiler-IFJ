@@ -1,4 +1,12 @@
-
+/*
+ * File: garbage.h
+ *
+ * Description: Malloc Garbage Collector header file
+ * Authors: Kondula Václav, Kopec Martin
+ *
+ * Created: 2015/11/15
+ * Last time modified: 2015/11/22
+ */
 
 #ifndef IJF_GARBAGE_H
 #define IJF_GARBAGE_H
