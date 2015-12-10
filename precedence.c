@@ -1,3 +1,12 @@
+/*
+ * File: precedence.c
+ *
+ * Description: Expressions parser
+ * Authors: Chudý Andrej, Kopec Martin
+ *
+ * Created: 2015/11/02
+ * Last time modified: 2015/11/27
+ */
 
 #include "precedence.h"
 unsigned int tmp_counter = 0;

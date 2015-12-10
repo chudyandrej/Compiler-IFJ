@@ -1,3 +1,12 @@
+/*
+ * File: parser.h
+ *
+ * Description: Syntax analyzer head file
+ * Authors: Chudý Andrej, Kopec Martin
+ *
+ * Created: 2015/10/20
+ * Last time modified: 2015/11/21
+ */
 
 #ifndef IJF_PARSER_H
 #define IJF_PARSER_H

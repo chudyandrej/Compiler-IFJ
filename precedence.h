@@ -1,3 +1,12 @@
+/*
+ * File: precedence.h
+ *
+ * Description: Expressions parser head file
+ * Authors: Chudý Andrej, Kopec Martin
+ *
+ * Created: 2015/11/02
+ * Last time modified: 2015/11/14
+ */
 
 #ifndef IJF_PRECEDENCE_H
 #define IJF_PRECEDENCE_H

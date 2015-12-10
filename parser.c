@@ -1,3 +1,13 @@
+/*
+ * File: parser.c
+ *
+ * Description: Syntax analyzer
+ * Authors: Chudý Andrej, Kopec Martin
+ *
+ * Created: 2015/10/20
+ * Last time modified: 2015/12/04
+ */
+
 #include "parser.h"
 
 unsigned int label = 1;
@@ -530,9 +540,6 @@ Token *next_token(){
         exit(LEX_ERR);
     }
     else{
-        if(new_token->type == KIN_SEMICOLON){
-            //tmp_counter = 0;
-        }
         return new_token;
     }
 }
