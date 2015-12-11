@@ -1,3 +1,10 @@
+/*
+ * File: tac.c
+ *
+ * Description: Interpret
+ * Authors: Vaclav Kondula
+ */
+
 #include "tac.h"
 
 extern struct tBST Func; //globalni tabulka funkci

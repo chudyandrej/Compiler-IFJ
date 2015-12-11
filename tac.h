@@ -11,10 +11,11 @@
 
 /*
 ***************************************************************
-** 3 adresne instrukce.
-* Autor: xkondu00, Vaclav Kondula
-* Popis: obsahuje struktury a funkce nad 3AC
-* zasobnikova struktura prejata z stack.h
+** 3 adress instruction.
+* Autor: Vaclav Kondula
+* Popis: structures and functions of 3 adress code
+* stack was used from stack.c
+* instruction names are in scanner.h
 ***************************************************************
 */
 
@@ -43,7 +44,7 @@ union Address{
 };
 
 typedef struct Operation{
-    TokenKind  inst; //! importovat ze scanneru
+    TokenKind  inst;
     union Address t;
     union Address op1;
     union Address op2;

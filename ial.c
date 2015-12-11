@@ -1,30 +1,30 @@
 /*
-* Soubor s implementacemi algoritmu pro predmet IAL
-* Verze zadani: a/2/i
-* a) Knuth-Morris-Pratt ˚uv algoritmus
+* Implementations of algarithms for IAL class
+* Assigment version: a/2/i
+* a) Knuth-Morris-Pratt algoritm
 * 2) Heap sort
-* I) Tabulka symbolu pomoci binarniho stronu 
+* I) Symbol table using BST
 */
 
 /*
 ***************************************************************
-** Tabulka symbolu pomoci binarniho vyhledavaciho stromu.
-* Autor: xkondu00, Vaclav Kondula
-* Popis: Globalni tabulka symbolu (funkci) a jednotlive lokalni 
-tabulky spolu sdileji zakladni strukturu a funkce 
-nad nimi (pridani, vyhledavani ...)
-* Globalni BST: elementy typu tVar
-* Lokalni BST: kazde element je double-linked list
+** Symbol table using BInary search tree.
+* Author: xkondu00, Vaclav Kondula
+* Descripiton: Both global and local sumbol table shares some
+strcuctures and operations. Other operations are implemented 
+specificly for one ot another.
+* Global BST: elements of type tVar
+* Local BST: every node in Local BST is a stack
 ***************************************************************
 */
 
 
 /***********/
-/* SDILENE */
+/* SHARED */
 /***********/
 #include "ial.h"
 
-
+// initialize a new BST, must be empty
 void BSTInit (tBSTPtr T){
     T->Root = NULL;
     T->Act = NULL;
@@ -33,7 +33,7 @@ void BSTInit (tBSTPtr T){
 void BSTInsert(tBSTEPtr node, tBSTPtr T){
     if(T->Act==NULL) return;
     int comp = strcmp(node->key,T->Act->key);
-    if(comp<0){
+    if(comp<0){ // follow left pointer
         if(T->Act->lptr==NULL) { 
             T->Act->lptr=node;
             T->Act = T->Act->lptr;
@@ -42,7 +42,7 @@ void BSTInsert(tBSTEPtr node, tBSTPtr T){
             BSTInsert(node, T);
         }
     }
-    else {
+    else { // folow right pointer
         if(T->Act->rptr==NULL) { 
             T->Act->rptr=node;
             T->Act = T->Act->rptr;
@@ -53,6 +53,7 @@ void BSTInsert(tBSTEPtr node, tBSTPtr T){
     }
 }
 
+// add new node, uses BSTInsert
 void BSTAdd (tBSTPtr T, char * key){
     tBSTEPtr node = gc_malloc(sizeof(struct tBSTElem));
     node->key = key;
@@ -69,6 +70,7 @@ void BSTAdd (tBSTPtr T, char * key){
     
 } 
 
+//set Act (active) pointer to found node
 void BSTFind (tBSTPtr T, char * key){
     T->Act = NULL;
     tBSTEPtr tmp = T->Root;
@@ -104,11 +106,14 @@ void funcFree(tBSTEPtr ptr){
     gc_free(ptr);
 }
 
+// free all nodes in a tree
 void GSTDispose(tBSTPtr T){
     funcFree(T->Root);
     T->Root=NULL;
     T->Act=NULL;
 }
+
+// cheks whether all functions are defined
 int GSTAllDef(tBSTEPtr tmp){
     if(tmp==NULL) return 1;
     if(tmp->data==NULL) return 2;
@@ -118,15 +123,17 @@ int GSTAllDef(tBSTEPtr tmp){
     a = GSTAllDef(tmp->rptr);
     return a;
 }  
+
+// declare function
 int GSTDeclare(tBSTPtr T, char * params, char * names){
     if(T->Act==NULL) return 2;
-    if(T->Act->data==NULL){
+    if(T->Act->data==NULL){ // function didn't exist before
         tFuncPtr node = gc_malloc(sizeof(struct tFunc));
         node->params = params;
         node->names = names;
         node->TAC = NULL;
         T->Act->data = node;
-    } else {
+    } else { // checks whether last prototype of function is same as this one
         if(strcmp(params,((struct tFunc *)T->Act->data)->params)!=0)
             return 1;
         if ((names==NULL)||(((struct tFunc *)T->Act->data)->names==NULL)){
@@ -137,7 +144,8 @@ int GSTDeclare(tBSTPtr T, char * params, char * names){
             return 1;
     }
     return 0;
-}  
+}
+// stores stack of 3AC to global ST 
 int GSTDefine(tBSTPtr T, void * TAC){
     if(T->Act==NULL || T->Act->data==NULL) return 2;
     if(((struct tFunc *)T->Act->data)->TAC != NULL) return 1;
@@ -145,6 +153,7 @@ int GSTDefine(tBSTPtr T, void * TAC){
     return 0;
 }
 
+// returns pointer to a 3AC stack of active function 
 void * GSTCopyTAC(tBSTPtr T){
     return ((struct tFunc *)T->Act->data)->TAC;
 }  
@@ -168,12 +177,14 @@ void varFree(tBSTEPtr ptr){
     gc_free(ptr);
 }
 
+// dispose all nodes and all stacks of a tree
 void LSTDispose (tBSTPtr T){
     varFree(T->Root);
     T->Root=NULL;
     T->Act=NULL;
 }
 
+// Initialize variable in a given scope
 int LSTAdd (tBSTPtr T, enum Type type, int scope){
     if (T->Act->data!=NULL)
         if(((struct tVar *)T->Act->data)->scope == scope) return 3;
@@ -186,25 +197,27 @@ int LSTAdd (tBSTPtr T, enum Type type, int scope){
     node->ptr = tmp;
     return 0;
 }  
+
+// set variable in the highest posible scope and retypes if necessary
 int LSTSet (tBSTPtr T, struct TMPRecord * v){
     tVarPtr tmp = T->Act->data;
     if (tmp==NULL)
         return 3;
-    if (tmp->value.t == STRING){
+    if (tmp->value.t == STRING){ // if variable is string accept only string
         if (v->t == STRING) tmp->value.value = v->value;
         else return 4;
     }
-    else if(tmp->value.t == DOUBLE){
-        if (v->t == DOUBLE) tmp->value.value = v->value;
-        else if (v->t == INT) tmp->value.value.d = (double) v->value.i;
+    else if(tmp->value.t == DOUBLE){ //if duoble
+        if (v->t == DOUBLE) tmp->value.value = v->value; // store double
+        else if (v->t == INT) tmp->value.value.d = (double) v->value.i; // retype from integer
         else return 4;
     }
-    else if(tmp->value.t == INT){
-        if (v->t == INT) tmp->value.value = v->value;
-        else if (v->t == DOUBLE) tmp->value.value.i = (int) v->value.d;
+    else if(tmp->value.t == INT){ // if int
+        if (v->t == INT) tmp->value.value = v->value; // store int
+        else if (v->t == DOUBLE) tmp->value.value.i = (int) v->value.d; //retype form double
         else return 4;
     }
-    else if(tmp->value.t == AUTO){
+    else if(tmp->value.t == AUTO){ // if auto, store anything and set type of variable
         tmp->value.value = v->value;
         tmp->value.t = v->t;
     }
@@ -213,6 +226,7 @@ int LSTSet (tBSTPtr T, struct TMPRecord * v){
     return 0;
 }  
 
+// remove all variables in given scope
 void LSTLeaveScope (tBSTEPtr ptr, int scope){
     if(ptr==NULL) return;
     if(ptr->data!=NULL)
@@ -226,12 +240,13 @@ void LSTLeaveScope (tBSTEPtr ptr, int scope){
     return ;
 } 
 
+// saves value to a pointer and return 0 if success or exit error_code
 int LSTGet (tBSTPtr T, struct TMPRecord * v){
     tVarPtr tmp = T->Act->data;
-    if (tmp==NULL){
+    if (tmp==NULL){ // variable wasn't defined 
         return 3;
     }
-    if(tmp->assigned == 0){
+    if(tmp->assigned == 0){ // variable wasn't declared
         v->t = tmp->value.t;
         return 8;
     }

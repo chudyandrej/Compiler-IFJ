@@ -1,9 +1,9 @@
 /*
-* Soubor s implementacemi algoritmu pro predmet IAL
-* Verze zadani: a/2/i
-* a) Knuth-Morris-Prattuv algoritmus
+* Implementations of algarithms for IAL class
+* Assigment version: a/2/i
+* a) Knuth-Morris-Pratt algoritm
 * 2) Heap sort
-* I) Tabulka symbolu pomoci binarniho stronu 
+* I) Symbol table using BST
 */
 
 #ifndef IAL_H_INCLUDED
@@ -16,44 +16,38 @@
 
 /*
 ***************************************************************
-** Tabulka symbolu pomoci binarniho vyhledavaciho stromu.
-* Autor: xkondu00, Vaclav Kondula
-* Popis: Globalni tabulka symbolu (funkci) a jednotlive lokalni 
-tabulky spolu sdileji zakladni strukturu a funkce 
-nad nimi (pridani, vyhledavani ...)
-* Globalni BST: elementy typu tVar
-* Lokalni BST: kazde element je double-linked list
+** Symbol table using BInary search tree.
+* Author: xkondu00, Vaclav Kondula
+* Descripiton: Both global and local sumbol table shares some
+strcuctures and operations. Other operations are implemented 
+specificly for one ot another.
+* Global BST: elements of type tVar
+* Local BST: every node in Local BST is a stack
 ***************************************************************
 */
 
 
 /***********/
-/* SDILENE */
+/* SHARED */
 /***********/
 typedef struct tBSTElem {
-    char * key;     // klic pro porovnavani
-    void * data;    // pointer na data:
-                        //globalni TS: struktura tFunc
-                        //lokalni TS: DL list, nebo NULL, kdyz neexistuje
-    struct tBSTElem *lptr;   // levy element
-    struct tBSTElem *rptr;   // pravy element
+    char * key;     // key for comparing
+    void * data;    // data pointer:
+                        //global ST: struktura tFunc
+                        //local ST: DL list, or NULL
+    struct tBSTElem *lptr;   // left element
+    struct tBSTElem *rptr;   // right element
 } *tBSTEPtr;
 
 typedef struct tBST{
-    tBSTEPtr Root;  // koren
-    tBSTEPtr Act;   // aktivni
+    tBSTEPtr Root;  // root element
+    tBSTEPtr Act;   // active element
 } *tBSTPtr;
 
 void BSTInit (tBSTPtr);
-void BSTAdd (tBSTPtr, char *); //zaroven oznaci pridane za Aktualni
-void BSTFind (tBSTPtr, char *);
-int BSTActive (tBSTPtr); //return 0 kdzy neaktivni
-
-/*
-** Pridani noveho symbolu: **
-BSTFind(&T, key);
-if( ! BSTActive) BSTAdd(&T. key);
-*/
+void BSTAdd (tBSTPtr, char *); //it also mark added as active
+void BSTFind (tBSTPtr, char *); // set Act to found node or NULL if not found
+int BSTActive (tBSTPtr); //return 0 if not active
 
 /***************/
 /* Globalni TS */
@@ -63,47 +57,45 @@ typedef struct tFunc{
         // d = double
         // i = int
         // s = string
-        // prvni je navratova hodnota, zbyvajici parametry v danem poradi
-    void * TAC; //pointer na list 3AC 
-    char * names; //rozdelene mezerami
-    /*! zmenit void az bude 3AC*/
+        // a = auto
+        // first is a return vlaue,m others are parameter types
+    void * TAC; //pointer to a stack of 3AC 
+    char * names; //names of parameters separated by spaces
 } *tFuncPtr;
 
 #include "tac.h"
 void * GSTCopyTAC(tBSTPtr);
 void GSTDispose(tBSTPtr);
-int GSTAllDef(tBSTEPtr rootPtr); // return 1 kdyz vsechny deklarovane funkce byly definovany
-int GSTDeclare(tBSTPtr, char * params, char * names); //return 0 kdyz parametry odpovidaji (nebo byly prazdne)
-int GSTDefine(tBSTPtr, void * TACs); //vzdy volat declare pred define!!!
-                                        //return 0 kdyz jde o prvni definici
+int GSTAllDef(tBSTEPtr rootPtr); // return 1 if all declared functions were also defined
+int GSTDeclare(tBSTPtr, char * params, char * names); //return 0 if params match or are none
+int GSTDefine(tBSTPtr, void * TACs); //always call declare before define!!!
+                                        //return 0 if it's first definition
 
 
 /**************/
 /* Lokalni TS */
 /**************/
-/*! osetrit datatype auto*/
 
 typedef struct tVar{
-    int scope; //zanoreni, pri volani funkce zacina na 0
+    int scope; //defines in whitch scope was value initialize
     char assigned;
     struct TMPRecord value; 
-    struct tVar * ptr;    //pointer na pravy
-                        //pri deklaraci se pridavaji prvky ZLEVA
+    struct tVar * ptr;    //pointer to right
 } *tVarPtr;
 
 void LSTDispose (tBSTPtr);
-int LSTAdd (tBSTPtr, Type type, int scope); //return 0 kdyz nebylo v zanorenim doposud definovano
-int LSTSet (tBSTPtr, struct TMPRecord * v); //return 0 kdyz nedoslo k nekompatibilite typu
-                            //vzdy nastavuje aktivni prvek v poslednim zanoreni!!
+int LSTAdd (tBSTPtr, Type type, int scope); //return 0 if there was no variabl of same name in given scope
+int LSTSet (tBSTPtr, struct TMPRecord * v); //return 0 if types match or could be retyped
 void LSTLeaveScope (tBSTEPtr root, int scope); 
-        //odstrani vsechny lokalni promene z daneho zanoreni
+        //remove all values in given scope
 int LSTGet (tBSTPtr, struct TMPRecord * v);
 
 /**************/
 /*  BUILD IN  */
 /**************/
 
-int find(char *s, char *search);
+int find(char *s, char *search); // return valus is the index of 1st character in 1st match
+                                // or -1 if not found
 void swap(char *s, int i, int j);
 void sift_down(char *s, int start, int length);
 void sort(char *s);

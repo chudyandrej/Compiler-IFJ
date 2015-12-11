@@ -1,3 +1,10 @@
+/*
+ * File: buildin.h
+ *
+ * Description: All build in functions that are not required in ial.c
+ * Authors: Vaclav Kondula
+ */
+
 #ifndef BUILDIN_H_INCLUDED
 #define BUILDIN_H_INCLUDED
 #include <stdio.h>

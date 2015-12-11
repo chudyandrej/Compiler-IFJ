@@ -1,3 +1,10 @@
+/*
+ * File: buildin.c
+ *
+ * Description: All build in functions that are not required in ial.c
+ * Authors: Vaclav Kondula
+ */
+
 #include "buildin.h"
 extern struct TMPRecord** working_push;
 extern unsigned int push_size;
